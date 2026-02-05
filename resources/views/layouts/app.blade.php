@@ -37,14 +37,20 @@
     <nav class="h-[74px] flex items-center justify-between">
 
       <!-- LOGO -->
-      <a href="{{ url('/') }}" class="flex items-center gap-3">
-        <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-emerald-800">
-          <span class="text-white text-lg">🌿</span>
-        </span>
-        <span class="text-lg font-semibold text-emerald-950">
-          Ecoaventura
-        </span>
-      </a>
+    <a href="{{ url('/') }}" class="flex items-center gap-3">
+  <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-emerald-800 overflow-hidden">
+    <img
+      src="{{ asset('img/logo.jpeg') }}"
+      alt="Logo Ecoaventura"
+      class="h-full w-full object-contain"
+    >
+  </span>
+
+  <span class="text-lg font-semibold text-emerald-950">
+    Ecoaventura
+  </span>
+</a>
+
 
       <!-- MENU -->
       <ul class="hidden md:flex items-center gap-2 text-sm font-medium text-emerald-950/80">
