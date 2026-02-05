@@ -8,6 +8,8 @@ use App\Http\Controllers\Admin\AdminSitioController;
 use App\Http\Controllers\HoteleroController;
 use App\Http\Controllers\RestauranteroController;
 use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\Admin\AdminSolicitudesController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -50,6 +52,9 @@ Route::middleware('auth')->group(function () {
 
         //  UNA SOLA LÍNEA: CRUD COMPLETO
         Route::resource('sitios', AdminSitioController::class);
+        Route::get('/solicitudes', [AdminSolicitudesController::class, 'index'])->name('solicitudes.index');
+        Route::get('solicitudes/{id}', [AdminSolicitudesController::class, 'show'])->name('solicitudes.show');
+
     });
 
     /*

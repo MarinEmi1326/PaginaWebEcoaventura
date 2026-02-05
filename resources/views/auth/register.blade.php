@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @php
-    // 👇 Esto oculta el navbar SOLO en esta vista (registro)
+    // Oculta el navbar SOLO en esta vista (registro)
     $hideNavbar = true;
 @endphp
 
@@ -45,7 +45,7 @@
 
             {{-- Tabs --}}
             <div class="mt-6 p-1 rounded-xl bg-slate-200/70 flex">
-                <a href="{{ route('login') }}" 
+                <a href="{{ route('login') }}"
                    class="w-1/2 text-center text-sm py-2 rounded-lg text-slate-600 hover:text-slate-900 transition">
                     Iniciar Sesión
                 </a>
@@ -76,102 +76,100 @@
                 {{-- Selector rol --}}
                 <div class="grid grid-cols-3 gap-3">
                     <button type="button" data-rol="turista" class="rol-btn rounded-xl border px-3 py-3 text-sm flex flex-col items-center gap-2 bg-emerald-50 border-emerald-700 text-emerald-900">
-                        <span></span> Turista
+                        Turista
                     </button>
 
                     <button type="button" data-rol="hotelero" class="rol-btn rounded-xl border px-3 py-3 text-sm flex flex-col items-center gap-2 bg-white border-slate-200 text-slate-700 hover:bg-slate-50 transition">
-                        <span></span> Hotelero
+                        Hotelero
                     </button>
 
                     <button type="button" data-rol="restaurantero" class="rol-btn rounded-xl border px-3 py-3 text-sm flex flex-col items-center gap-2 bg-white border-slate-200 text-slate-700 hover:bg-slate-50 transition">
-                        <span></span> Restaurantero
+                        Restaurantero
                     </button>
                 </div>
 
                 {{-- Nombre --}}
                 <div>
-                    <label class="text-xs text-slate-600">Nombre</label>
-                    <input name="nombre" value="{{ old('nombre') }}" type="text"
+                    <label class="text-xs text-slate-600">Nombre *</label>
+                    <input name="nombre" value="{{ old('nombre') }}" type="text" required
                         class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-200"
                         placeholder="Tu nombre">
                 </div>
 
                 {{-- Apaterno --}}
                 <div>
-                    <label class="text-xs text-slate-600">Apellido paterno</label>
-                    <input name="apaterno" value="{{ old('apaterno') }}" type="text"
+                    <label class="text-xs text-slate-600">Apellido paterno *</label>
+                    <input name="apaterno" value="{{ old('apaterno') }}" type="text" required
                         class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-200"
                         placeholder="Apellido paterno">
                 </div>
 
-                {{-- Amaterno --}}
+                {{-- Amaterno (tú dijiste que ya lo hiciste required) --}}
                 <div>
-                    <label class="text-xs text-slate-600">Apellido materno (opcional)</label>
-                    <input name="amaterno" value="{{ old('amaterno') }}" type="text"
+                    <label class="text-xs text-slate-600">Apellido materno *</label>
+                    <input name="amaterno" value="{{ old('amaterno') }}" type="text" required
                         class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-200"
                         placeholder="Apellido materno">
                 </div>
 
                 {{-- Correo --}}
                 <div>
-                    <label class="text-xs text-slate-600">Correo electrónico</label>
-                    <input name="correo" value="{{ old('correo') }}" type="email"
+                    <label class="text-xs text-slate-600">Correo electrónico *</label>
+                    <input name="correo" value="{{ old('correo') }}" type="email" required
                         class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-200"
                         placeholder="tu@email.com">
                 </div>
 
-                {{-- Teléfono --}}
+                {{-- Teléfono (solo hotelero/restaurantero) --}}
                 <div id="telefono-container" style="display:none;">
-                    <label class="text-xs text-slate-600">Teléfono (opcional)</label>
-                    <input name="telefono" value="{{ old('telefono') }}" type="text"
+                    <label class="text-xs text-slate-600">Teléfono *</label>
+                    <input id="telefono-input" name="telefono" value="{{ old('telefono') }}" type="text"
                         class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-200"
-                        placeholder="+52 123 456 7890">
+                        placeholder="Ej: 9611234567">
                 </div>
 
-                {{-- Nombre del hotel --}}
+                {{-- Hotel (solo hotelero) --}}
                 <div id="hotel-container" style="display:none;">
-                    <label class="text-xs text-slate-600">Nombre del hotel</label>
-                    <input name="nombre_hotel" value="{{ old('nombre_hotel') }}" type="text"
+                    <label class="text-xs text-slate-600">Nombre del hotel *</label>
+                    <input id="nombre-hotel-input" name="nombre_hotel" value="{{ old('nombre_hotel') }}" type="text"
                         class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-200"
                         placeholder="Nombre del hotel">
                 </div>
 
-                {{-- Dirección del hotel --}}
                 <div id="direccion-container" style="display:none;">
-                    <label class="text-xs text-slate-600">Dirección del hotel</label>
-                    <input name="direccion_hotel" value="{{ old('direccion_hotel') }}" type="text"
+                    <label class="text-xs text-slate-600">Dirección del hotel *</label>
+                    <input id="direccion-hotel-input" name="direccion_hotel" value="{{ old('direccion_hotel') }}" type="text"
                         class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-200"
                         placeholder="Dirección del hotel">
                 </div>
 
-                {{-- Nombre del restaurante --}}
+                {{-- Restaurante (solo restaurantero) --}}
                 <div id="restaurante-container" style="display:none;">
-                    <label class="text-xs text-slate-600">Nombre del restaurante</label>
-                    <input name="nombre_restaurante" value="{{ old('nombre_restaurante') }}" type="text"
+                    <label class="text-xs text-slate-600">Nombre del restaurante *</label>
+                    <input id="nombre-rest-input" name="nombre_restaurante" value="{{ old('nombre_restaurante') }}" type="text"
                         class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-200"
                         placeholder="Nombre del restaurante">
                 </div>
 
-                {{-- Dirección del restaurante --}}
                 <div id="direccion-restaurante-container" style="display:none;">
-                    <label class="text-xs text-slate-600">Dirección del restaurante</label>
-                    <input name="direccion_restaurante" value="{{ old('direccion_restaurante') }}" type="text"
+                    <label class="text-xs text-slate-600">Dirección del restaurante *</label>
+                    <input id="direccion-rest-input" name="direccion_restaurante" value="{{ old('direccion_restaurante') }}" type="text"
                         class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-200"
                         placeholder="Dirección del restaurante">
                 </div>
 
                 {{-- Contraseña --}}
                 <div>
-                    <label class="text-xs text-slate-600">Contraseña</label>
-                    <input name="password" type="password"
+                    <label class="text-xs text-slate-600">Contraseña *</label>
+                    <input name="password" type="password" required
                         class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-200"
                         placeholder="••••••••">
                 </div>
 
                 {{-- Confirmar Contraseña --}}
                 <div>
-                    <label class="text-xs text-slate-600">Confirmar contraseña</label>
-                    <input name="password_confirmation" type="password"
+                    <label class="text-xs text-slate-600">Confirmar contraseña *</label>
+                    <input name="password_confirmation" type="password" required
                         class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-200"
                         placeholder="••••••••">
                 </div>
@@ -179,7 +177,7 @@
                 <label class="flex items-center gap-2 text-xs text-slate-600">
                     <input type="checkbox" name="terms"
                            class="rounded border-slate-300 text-emerald-700 focus:ring-emerald-200"
-                           {{ old('terms') ? 'checked' : '' }}>
+                           {{ old('terms') ? 'checked' : '' }} required>
                     Acepto los términos y condiciones y la política de privacidad
                 </label>
 
@@ -196,6 +194,19 @@
     const inputRol = document.getElementById('rol');
     const buttons = document.querySelectorAll('.rol-btn');
 
+    const telBox = document.getElementById('telefono-container');
+    const telInput = document.getElementById('telefono-input');
+
+    const hotelBox = document.getElementById('hotel-container');
+    const hotelDirBox = document.getElementById('direccion-container');
+    const hotelNameInput = document.getElementById('nombre-hotel-input');
+    const hotelDirInput  = document.getElementById('direccion-hotel-input');
+
+    const restBox = document.getElementById('restaurante-container');
+    const restDirBox = document.getElementById('direccion-restaurante-container');
+    const restNameInput = document.getElementById('nombre-rest-input');
+    const restDirInput  = document.getElementById('direccion-rest-input');
+
     function paintActive(role){
         buttons.forEach(btn => {
             const isActive = btn.dataset.rol === role;
@@ -208,28 +219,47 @@
             btn.classList.toggle('text-slate-700', !isActive);
         });
 
-        // Mostrar campos según el rol
+        // Reset required
+        telInput.required = false;
+        hotelNameInput.required = false;
+        hotelDirInput.required  = false;
+        restNameInput.required  = false;
+        restDirInput.required   = false;
+
+        // Mostrar/ocultar según rol
         if (role === 'hotelero' || role === 'restaurantero') {
-            document.getElementById('telefono-container').style.display = 'block'; // Mostrar teléfono
+            telBox.style.display = 'block';
+            telInput.required = true;
         } else {
-            document.getElementById('telefono-container').style.display = 'none'; // Ocultar teléfono
+            telBox.style.display = 'none';
+            telInput.value = ''; // opcional: limpiar
         }
 
         if (role === 'hotelero') {
-            document.getElementById('hotel-container').style.display = 'block'; // Mostrar nombre de hotel
-            document.getElementById('direccion-container').style.display = 'block'; // Mostrar dirección del hotel
-            document.getElementById('restaurante-container').style.display = 'none'; // Ocultar restaurante
-            document.getElementById('direccion-restaurante-container').style.display = 'none'; // Ocultar dirección del restaurante
+            hotelBox.style.display = 'block';
+            hotelDirBox.style.display = 'block';
+            hotelNameInput.required = true;
+            hotelDirInput.required  = true;
+
+            restBox.style.display = 'none';
+            restDirBox.style.display = 'none';
+            restNameInput.value = '';
+            restDirInput.value = '';
         } else if (role === 'restaurantero') {
-            document.getElementById('restaurante-container').style.display = 'block'; // Mostrar nombre del restaurante
-            document.getElementById('direccion-restaurante-container').style.display = 'block'; // Mostrar dirección del restaurante
-            document.getElementById('hotel-container').style.display = 'none'; // Ocultar nombre del hotel
-            document.getElementById('direccion-container').style.display = 'none'; // Ocultar dirección del hotel
+            restBox.style.display = 'block';
+            restDirBox.style.display = 'block';
+            restNameInput.required = true;
+            restDirInput.required  = true;
+
+            hotelBox.style.display = 'none';
+            hotelDirBox.style.display = 'none';
+            hotelNameInput.value = '';
+            hotelDirInput.value = '';
         } else {
-            document.getElementById('hotel-container').style.display = 'none'; // Ocultar nombre de hotel
-            document.getElementById('direccion-container').style.display = 'none'; // Ocultar dirección del hotel
-            document.getElementById('restaurante-container').style.display = 'none'; // Ocultar nombre del restaurante
-            document.getElementById('direccion-restaurante-container').style.display = 'none'; // Ocultar dirección del restaurante
+            hotelBox.style.display = 'none';
+            hotelDirBox.style.display = 'none';
+            restBox.style.display = 'none';
+            restDirBox.style.display = 'none';
         }
     }
 
@@ -240,6 +270,6 @@
         });
     });
 
-    paintActive(inputRol.value || 'turista'); // Establecer valor inicial
+    paintActive(inputRol.value || 'turista');
 </script>
 @endsection

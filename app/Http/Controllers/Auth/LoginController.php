@@ -49,10 +49,18 @@ class LoginController extends Controller
             if ($user->rol === 'admin') {
                 return redirect()->route('admin.dashboard');
             }
-
+             // ✅ Bloquear si no está aprobado
+            if (in_array($user->rol, ['hotelero','restaurantero']) && $user->estado !== 'aprobado') {
+                Auth::logout();
+                return back()->withErrors([
+                    'correo' => 'Tu cuenta aún no está aprobada por el administrador.',
+                ])->onlyInput('correo');
+            }
             // Otros roles (por ahora al home)
             return redirect()->route('home');
         }
+       
+
 
         // Error de credenciales
         return back()->withErrors([
