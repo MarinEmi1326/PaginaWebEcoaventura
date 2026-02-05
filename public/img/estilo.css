@@ -1,0 +1,502 @@
+#footer {
+  background-color: #7a7777;
+  height: 20vh;
+}
+
+#copyright {
+  text-align: center;
+  color: #cacccc;
+  font-style: italic;
+}
+
+.footer-link {
+  display: block;
+  color: #20B2AA;
+  text-decoration: none;
+}
+#contenido {
+  min-height: 70vh;
+}
+#table-catalogo {
+  width: 80%;
+  margin: auto;
+}
+
+/* RESET */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Asegurar altura 100% para footer abajo */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* BODY sin fondo global */
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  color: #1f3a0b;
+  position: relative;
+}
+
+/* MAIN para empujar footer abajo */
+main {
+  flex: 1 0 auto;
+  position: relative;
+  overflow: hidden;
+  padding-top: 80px;
+  padding-bottom: 80px;
+  margin: 0 auto;
+  width: 100%;
+  min-height: 500px;
+}
+
+/* TITULO VERDE */
+.titulo-verde {
+  color: #127a4a;
+}
+
+/* NAVBAR */
+.navbar {
+  background: linear-gradient(90deg, #3CB371, #20B2AA);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 30px;
+  height: 80px;
+  flex-wrap: wrap;
+  box-shadow: inset 0 -3px 5px rgba(0,0,0,0.15);
+}
+
+.logo-nombre {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  height: 60px;
+  width: auto;
+  margin-right: 15px;
+}
+
+/* Aquí quitamos .fw-bold para que no sea negrita */
+.navbar h1,
+.navbar-brand span,
+.navbar-brand .fs-4 {
+  font-size: 24px;
+  color: white;
+  animation: slideFadeIn 2.5s ease forwards;
+  font-weight: normal;  /* <- agregué esto para asegurarnos que no sea negrita */
+}
+
+/* BOTONES GENERALES */
+.btn-login,
+.btn-custom,
+.btn-agregar,
+.btn-enviar,
+button[type="submit"].btn.btn-success,
+.badge {
+  background: linear-gradient(135deg, #20B2AA, #3CB371);
+  color: white !important;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 6px 12px rgba(60,179,113,0.5);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-login:hover,
+.btn-custom:hover,
+.btn-agregar:hover,
+.btn-enviar:hover,
+button[type="submit"].btn.btn-success:hover,
+.badge:hover {
+  background: linear-gradient(135deg, #3CB371, #20B2AA);
+  transform: scale(1.05);
+  box-shadow: 0 8px 18px rgba(32,178,170,0.8);
+  color: #fff;
+}
+
+.btn-modificar {
+  background: linear-gradient(135deg, #4caf50, #2e7d32);
+  color: white;
+  font-weight: 600;
+  border: none;
+  box-shadow: 0 4px 8px rgba(46,125,50,0.6);
+  transition: background 0.3s ease;
+}
+
+.btn-modificar:hover {
+  background: linear-gradient(135deg, #2e7d32, #4caf50);
+}
+
+.btn-eliminar {
+  background: linear-gradient(135deg, #e53935, #b71c1c);
+  color: white;
+  font-weight: 600;
+  border: none;
+  box-shadow: 0 4px 8px rgba(183,28,28,0.6);
+  transition: background 0.3s ease;
+}
+
+.btn-eliminar:hover {
+  background: linear-gradient(135deg, #b71c1c, #e53935);
+}
+
+.btn-reporte {
+  background: linear-gradient(135deg, #1976d2, #0d47a1);
+  color: white;
+  font-weight: 600;
+  border: none;
+  box-shadow: 0 4px 8px rgba(13,71,161,0.6);
+  transition: background 0.3s ease;
+}
+
+.btn-reporte:hover {
+  background: linear-gradient(135deg, #0d47a1, #1976d2);
+}
+
+/* NAVBAR TOGGLER */
+.navbar-toggler {
+  border: none;
+}
+
+.navbar-toggler-icon {
+  filter: invert(1);
+}
+
+/* CONTENIDO PRINCIPAL */
+.main-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 80px 20px;
+  text-align: center;
+  background-color: transparent;
+  min-height: calc(100vh - 80px);
+}
+
+.slogan,
+.fs-4.fst-italic.text-success {
+  font-size: 24px;
+  font-style: italic;
+  color: #2e8b57;
+  padding: 0 15px;
+}
+
+/* CARTAS */
+.card {
+  transition: all 0.3s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+footer {
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+  margin: 0;
+}
+
+/* ANIMACIONES */
+@keyframes slideFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .logo-nombre {
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .logo {
+    height: 50px;
+    margin-right: 0;
+    margin-bottom: 5px;
+  }
+
+  .navbar h1,
+  .navbar-brand span,
+  .navbar-brand .fs-4 {
+    font-size: 20px;
+    text-align: center;
+    font-weight: normal; /* también para móvil */
+  }
+
+  .btn-login,
+  .btn-custom {
+    padding: 8px 16px;
+    font-size: 14px;
+    margin-top: 5px;
+  }
+
+  .main-content {
+    padding: 40px 10px;
+  }
+
+  .slogan,
+  .fs-4.fst-italic.text-success {
+    font-size: 20px;
+  }
+}
+
+/* ========= LOGIN STYLES ========= */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  position: relative;
+}
+
+.login-page::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -2;
+  background: url('img/fondo-turistico.jpg') center center / cover no-repeat fixed;
+  animation: fondoZoom 40s ease-in-out infinite;
+  filter: brightness(0.95) contrast(1.05);
+}
+
+.login-page::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.10);
+  z-index: -1;
+}
+
+@keyframes fondoZoom {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.03); }
+}
+
+.login-container {
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+  padding: 40px 30px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.login-card h2 {
+  color: #127a4a;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.login-card label {
+  font-weight: 600;
+  color: #1f3a0b;
+  display: block;
+  margin-bottom: 0.5rem;
+  text-align: left;
+}
+
+.login-card .form-control {
+  border-radius: 8px;
+  border: 1.5px solid #3CB371;
+  padding: 12px 15px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.login-card .form-control:focus {
+  border-color: #20B2AA;
+  box-shadow: 0 0 5px rgba(32,178,170,0.5);
+  outline: none;
+}
+
+.login-card p {
+  color: #1f3a0b;
+  font-weight: 500;
+}
+
+.login-card a.text-success {
+  text-decoration: none;
+  font-weight: 600;
+  color: #127a4a;
+}
+
+.login-card a.text-success:hover {
+  text-decoration: underline;
+  color: #0e4f26;
+}
+
+main.position-relative {
+  position: relative;
+  overflow: hidden;
+  min-height: 500px;
+  padding-top: 60px;
+  padding-bottom: 60px;
+}
+
+#backgroundCarousel {
+  position: absolute;
+  top: 0;
+  left: 10;
+  width: 80%;
+  height: 400%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+#backgroundCarousel .carousel-inner,
+#backgroundCarousel .carousel-item {
+  height: 100%;
+}
+
+#backgroundCarousel img {
+  object-fit: cover;
+  height: 100%;
+  width: 100%;
+  filter: brightness(0.7);
+  user-select: none;
+  pointer-events: none;
+}
+
+main > section.position-relative {
+  position: relative;
+  z-index: 1;
+  padding: 60px 10px;
+  text-align: center;
+  color: #127a4a;
+}
+
+/* Igualar estilo de todos los enlaces del navbar */
+.menu a,
+.dropdown-link > a {
+  color: white;
+  padding: 14px 16px;
+  text-decoration: none;
+  display: inline-block;
+  font-weight: normal; /* <- Esto es clave para que no se vea más grueso */
+  transition: background-color 0.3s ease;
+}
+
+/* Hover igual */
+.menu a:hover,
+.dropdown-link > a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Contenedor del dropdown */
+.dropdown-link {
+  position: relative;
+  display: inline-block;
+}
+
+/* Submenú desplegable */
+.dropdown-content-link {
+  display: none;
+  position: absolute;
+  background-color: #ffffff;
+  min-width: 160px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  z-index: 1000;
+  border-radius: 8px;
+  overflow: hidden;
+  right: 0;
+}
+
+/* Estilo de subopciones */
+.dropdown-content-link a {
+  color: #1f3a0b;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  font-weight: normal;
+}
+
+/* Hover en submenú */
+.dropdown-content-link a:hover {
+  background-color: #f1f1f1;
+}
+
+/* Mostrar submenú al pasar el mouse */
+.dropdown-link:hover .dropdown-content-link {
+  display: block;
+}
+
+/* Arreglar color de enlaces del navbar */
+.navbar .nav-link {
+  color: white !important;
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+.navbar .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+}
+
+/* Menú desplegable */
+.dropdown-menu {
+  border-radius: 8px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+  font-weight: 500;
+}
+
+.dropdown-menu .dropdown-item:hover {
+  background-color: #eafaf0;
+  color: #127a4a;
+}
+
+/* Mejora al botón del formulario */
+form button.btn-success {
+  font-weight: bold;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(60,179,113,0.4);
+  transition: 0.3s ease;
+}
+
+form button.btn-success:hover {
+  transform: scale(1.03);
+  background-color: #2e8b57;
+}
+
+.navbar-brand span,
+.navbar-brand .fs-4,
+.navbar-brand .fw-bold {
+  font-weight: 400 !important;
+}
+
