@@ -22,6 +22,9 @@ class Usuario extends Authenticatable
         'rol',
         'activo',
         'estado',
+        'fecha_solicitud',
+        'fecha_respuesta',
+        'motivo_rechazo',
     ];
 
     protected $hidden = [

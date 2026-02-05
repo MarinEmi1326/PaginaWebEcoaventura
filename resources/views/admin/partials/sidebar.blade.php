@@ -16,7 +16,8 @@
             <span>🏠</span> Panel De Control
         </a>
 
-        <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5">
+        <a href="{{ route('admin.solicitudes.index') }}"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5">
             <span>📥</span> Bandeja de Solicitudes
         </a>
 
