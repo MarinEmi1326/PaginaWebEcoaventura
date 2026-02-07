@@ -52,8 +52,17 @@ Route::middleware('auth')->group(function () {
 
         //  UNA SOLA LÍNEA: CRUD COMPLETO
         Route::resource('sitios', AdminSitioController::class);
-        Route::get('/solicitudes', [AdminSolicitudesController::class, 'index'])->name('solicitudes.index');
-        Route::get('solicitudes/{id}', [AdminSolicitudesController::class, 'show'])->name('solicitudes.show');
+        Route::get('/solicitudes', [AdminSolicitudesController::class, 'index'])
+        ->name('solicitudes.index');
+
+        Route::get('/solicitudes/{id}', [AdminSolicitudesController::class, 'show'])
+            ->name('solicitudes.show');
+
+        Route::post('/solicitudes/{id}/aprobar', [AdminSolicitudesController::class, 'aprobar'])
+            ->name('solicitudes.aprobar');
+
+        Route::post('/solicitudes/{id}/rechazar', [AdminSolicitudesController::class, 'rechazar'])
+            ->name('solicitudes.rechazar');
 
     });
 
