@@ -6,7 +6,7 @@
 <div class="space-y-6">
 
     <div>
-        <a href="{{ route('admin.solicitudes.index') }}"
+        <a href="{{ route('admin.solicitudes.index') }} "
            class="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 hover:text-emerald-900">
             ← Regresar a solicitudes
         </a>
@@ -28,7 +28,7 @@
         </div>
     @endif
 
-    {{-- Errores de validación (por ejemplo motivo_rechazo) --}}
+    {{-- Errores de validación --}}
     @if ($errors->any())
         <div class="rounded-2xl border border-red-200 bg-red-50 p-4 text-red-700">
             <div class="font-semibold mb-2">Revisa los campos:</div>
@@ -116,7 +116,8 @@
                     {{ $solicitud->rol === 'hotelero' ? 'Datos del hotel' : 'Datos del restaurante' }}
                 </div>
 
-                @if($hotel)
+                {{-- Datos del hotel --}}
+                @if($solicitud->rol === 'hotelero' && isset($hotel))
                     <div class="space-y-2 text-sm">
                         <div class="flex justify-between gap-4">
                             <span class="text-slate-500">Nombre</span>
@@ -132,11 +133,28 @@
                             <span class="text-slate-500">Teléfono</span>
                             <span class="text-slate-900 font-semibold">{{ $hotel->telefono ?? '—' }}</span>
                         </div>
+                    </div>
+                {{-- Datos del restaurante --}}
+                @elseif($solicitud->rol === 'restaurantero' && isset($restaurante))
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between gap-4">
+                            <span class="text-slate-500">Nombre</span>
+                            <span class="text-slate-900 font-semibold">{{ $restaurante->nombre ?? '—' }}</span>
+                        </div>
 
+                        <div class="flex justify-between gap-4">
+                            <span class="text-slate-500">Dirección</span>
+                            <span class="text-slate-900 font-semibold">{{ $restaurante->direccion ?? '—' }}</span>
+                        </div>
+
+                        <div class="flex justify-between gap-4">
+                            <span class="text-slate-500">Teléfono</span>
+                            <span class="text-slate-900 font-semibold">{{ $restaurante->telefono ?? '—' }}</span>
+                        </div>
                     </div>
                 @else
                     <div class="text-sm text-slate-500">
-                        No se encontró información del hotel asociado.
+                        No se encontró información del negocio asociado.
                     </div>
                 @endif
             </div>
@@ -152,14 +170,14 @@
                         @csrf
                         <button type="submit"
                                 class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-700 text-white font-semibold hover:bg-emerald-800 transition">
-                             Aprobar
+                            ✅ Aprobar
                         </button>
                     </form>
 
                     {{-- Rechazar --}}
                     <button onclick="document.getElementById('rechazar-form').style.display = 'block'; document.getElementById('rechazar-form').scrollIntoView({behavior: 'smooth'});"
                             class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-700 transition">
-                         Rechazar
+                        ❌ Rechazar
                     </button>
                 </div>
 
