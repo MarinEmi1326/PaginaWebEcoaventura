@@ -104,7 +104,7 @@
                         placeholder="Apellido paterno">
                 </div>
 
-                {{-- Amaterno (tú dijiste que ya lo hiciste required) --}}
+                {{-- Amaterno --}}
                 <div>
                     <label class="text-xs text-slate-600">Apellido materno *</label>
                     <input name="amaterno" value="{{ old('amaterno') }}" type="text" required
@@ -194,20 +194,22 @@
     const inputRol = document.getElementById('rol');
     const buttons = document.querySelectorAll('.rol-btn');
 
+    // Contenedores
     const telBox = document.getElementById('telefono-container');
-    const telInput = document.getElementById('telefono-input');
-
     const hotelBox = document.getElementById('hotel-container');
     const hotelDirBox = document.getElementById('direccion-container');
-    const hotelNameInput = document.getElementById('nombre-hotel-input');
-    const hotelDirInput  = document.getElementById('direccion-hotel-input');
-
     const restBox = document.getElementById('restaurante-container');
     const restDirBox = document.getElementById('direccion-restaurante-container');
-    const restNameInput = document.getElementById('nombre-rest-input');
-    const restDirInput  = document.getElementById('direccion-rest-input');
 
-    function paintActive(role){
+    // Inputs
+    const telInput = document.getElementById('telefono-input');
+    const hotelNameInput = document.getElementById('nombre-hotel-input');
+    const hotelDirInput = document.getElementById('direccion-hotel-input');
+    const restNameInput = document.getElementById('nombre-rest-input');
+    const restDirInput = document.getElementById('direccion-rest-input');
+
+    function paintActive(role) {
+        // 1. Estética de los botones
         buttons.forEach(btn => {
             const isActive = btn.dataset.rol === role;
             btn.classList.toggle('bg-emerald-50', isActive);
@@ -219,57 +221,63 @@
             btn.classList.toggle('text-slate-700', !isActive);
         });
 
-        // Reset required
-        telInput.required = false;
-        hotelNameInput.required = false;
-        hotelDirInput.required  = false;
-        restNameInput.required  = false;
-        restDirInput.required   = false;
+        // 2. Resetear todos los campos a un estado "desactivado" por defecto
+        const allInputs = [telInput, hotelNameInput, hotelDirInput, restNameInput, restDirInput];
+        allInputs.forEach(input => {
+            input.required = false;
+            input.disabled = true; // IMPORTANTE: Esto evita que se envíen datos basura
+            input.value = '';      // Limpiamos lo que haya escrito
+        });
 
-        // Mostrar/ocultar según rol
-        if (role === 'hotelero' || role === 'restaurantero') {
-            telBox.style.display = 'block';
-            telInput.required = true;
-        } else {
-            telBox.style.display = 'none';
-            telInput.value = ''; // opcional: limpiar
-        }
+        // 3. Ocultar todos los contenedores por defecto
+        const allBoxes = [telBox, hotelBox, hotelDirBox, restBox, restDirBox];
+        allBoxes.forEach(box => box.style.display = 'none');
 
+        // 4. Activar solo lo necesario según el rol
         if (role === 'hotelero') {
+            // Mostrar
+            telBox.style.display = 'block';
             hotelBox.style.display = 'block';
             hotelDirBox.style.display = 'block';
+            // Habilitar
+            telInput.disabled = false;
+            telInput.required = true;
+            hotelNameInput.disabled = false;
             hotelNameInput.required = true;
-            hotelDirInput.required  = true;
+            hotelDirInput.disabled = false;
+            hotelDirInput.required = true;
 
-            restBox.style.display = 'none';
-            restDirBox.style.display = 'none';
-            restNameInput.value = '';
-            restDirInput.value = '';
         } else if (role === 'restaurantero') {
+            // Mostrar
+            telBox.style.display = 'block';
             restBox.style.display = 'block';
             restDirBox.style.display = 'block';
+            // Habilitar
+            telInput.disabled = false;
+            telInput.required = true;
+            restNameInput.disabled = false;
             restNameInput.required = true;
-            restDirInput.required  = true;
+            restDirInput.disabled = false;
+            restDirInput.required = true;
 
-            hotelBox.style.display = 'none';
-            hotelDirBox.style.display = 'none';
-            hotelNameInput.value = '';
-            hotelDirInput.value = '';
-        } else {
-            hotelBox.style.display = 'none';
-            hotelDirBox.style.display = 'none';
-            restBox.style.display = 'none';
-            restDirBox.style.display = 'none';
+        } else if (role === 'turista') {
+            // Para el turista, todo se queda oculto y disabled (gracias al paso 2 y 3)
+            console.log("Rol Turista seleccionado: campos adicionales desactivados.");
         }
     }
 
+    // Eventos de los botones
     buttons.forEach(btn => {
         btn.addEventListener('click', () => {
             inputRol.value = btn.dataset.rol;
-            paintActive(inputRol.value);
+            paintActive(btn.dataset.rol);
         });
     });
 
-    paintActive(inputRol.value || 'turista');
+    // Inicialización al cargar la página (por si hay un error de validación y regresa el valor anterior)
+    window.addEventListener('DOMContentLoaded', () => {
+        paintActive(inputRol.value || 'turista');
+    });
 </script>
+
 @endsection

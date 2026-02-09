@@ -10,7 +10,10 @@ use App\Models\Restaurantero;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
+use App\Mail\VerificacionTuristaMail;
+use App\Mail\SolicitudPendienteMail;
 
 class RegisterController extends Controller
 {
@@ -38,7 +41,7 @@ class RegisterController extends Controller
             'terms'    => ['accepted'],
 
             // Teléfono SOLO para hotelero/restaurantero
-            'telefono' => ['required_if:rol,hotelero,restaurantero', 'digits:10'],
+            'telefono' => ['required_if:rol,hotelero,restaurantero', 'nullable', 'digits:10'],
 
             // Hotel (solo hotelero)
             'nombre_hotel'    => ['required_if:rol,hotelero'],
@@ -68,12 +71,19 @@ class RegisterController extends Controller
             ]);
 
             if ($request->rol === 'turista') {
-                Turista::create([
+               $turista = Turista::create([
                     'nombre' => $request->nombre,
                     'apaterno' => $request->apaterno,
                     'amaterno' => $request->amaterno,
                     'id_usuario' => $user->id_usuario,
                 ]);
+
+                 
+                 // Enviar correo de verificación al turista
+                Mail::to($user->correo)->send(new VerificacionTuristaMail($turista));
+                // Loguear al usuario
+                Auth::login($user);
+                return redirect()->route('home')->with('success', 'Cuenta de turista registrada correctamente.');
             }
 
             if ($request->rol === 'hotelero') {
@@ -83,6 +93,7 @@ class RegisterController extends Controller
                     'amaterno' => $request->amaterno,
                     'telefono' => $request->telefono,
                     'id_usuario' => $user->id_usuario,
+                    
                 ]);
 
                  //Crear hotel asociado (campos obligatorios => defaults)
@@ -94,6 +105,10 @@ class RegisterController extends Controller
                     'foto'       => 'img/Hoteles/default.png',
                     'id_hotelero'=> $hotelero->id_hotelero,
                 ]);
+               // Enviamos el correo pasando el objeto $user
+                Mail::to($user->correo)->send(new SolicitudPendienteMail($user));
+
+                return redirect()->route('login')->with('info', 'Tu solicitud ha sido enviada. Espera la aprobación del administrador.');
             }
 
             if ($request->rol === 'restaurantero') {
@@ -103,6 +118,7 @@ class RegisterController extends Controller
                     'amaterno' => $request->amaterno,
                     'telefono' => $request->telefono,
                     'id_usuario' => $user->id_usuario,
+                    
                 ]);
 
                  // ✅ Crear restaurante asociado (campos obligatorios => defaults)
@@ -115,6 +131,11 @@ class RegisterController extends Controller
                     'foto'            => 'img/Restaurantes/default.png',
                     'id_restaurantero'=> $restaurantero->id_restaurantero,
                 ]);
+
+                // Enviamos el correo pasando el objeto $user
+                Mail::to($user->correo)->send(new SolicitudPendienteMail($user));
+
+                return redirect()->route('login')->with('info', 'Tu solicitud ha sido enviada. Espera la aprobación del administrador.');
             }
         });
 

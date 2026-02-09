@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\RechazoSolicitudMail;  
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SolicitudAprobadaMail;
 
 class AdminSolicitudesController extends Controller
 {
@@ -88,13 +91,21 @@ class AdminSolicitudesController extends Controller
 
     public function aprobar($id)
     {
-        $u = DB::table('usuario')->where('id_usuario', $id)->first();
+        // 2. Buscamos los datos básicos del usuario y su nombre real
+        $u = DB::table('usuario as u')
+            ->leftJoin('hotelero as h', 'h.id_usuario', '=', 'u.id_usuario')
+            ->leftJoin('restaurantero as r', 'r.id_usuario', '=', 'u.id_usuario')
+            ->where('u.id_usuario', $id)
+            ->select('u.*', DB::raw("COALESCE(h.nombre, r.nombre) as nombre_persona"))
+            ->first();
+
         abort_if(!$u, 404);
 
         if ($u->estado !== 'pendiente') {
             return back()->with('error', 'Esta solicitud ya fue atendida.');
         }
 
+        // 3. Actualizamos en la base de datos
         DB::table('usuario')->where('id_usuario', $id)->update([
             'estado' => 'aprobado',
             'activo' => 1,
@@ -102,7 +113,14 @@ class AdminSolicitudesController extends Controller
             'motivo_rechazo' => null,
         ]);
 
-        return redirect()->route('admin.solicitudes.index')->with('ok', 'Solicitud aprobada correctamente.');
+        // 4. Enviamos el correo de aprobación
+        try {
+            Mail::to($u->correo)->send(new SolicitudAprobadaMail($u));
+        } catch (\Exception $e) {
+            dd($e->getMessage());// Opcional: Loggear el error si el mail falla pero la aprobación sigue
+        }
+
+        return redirect()->route('admin.solicitudes.index')->with('ok', 'Solicitud aprobada correctamente y correo de bienvenida enviado.');
     }
 
     public function rechazar(Request $request, $id)
@@ -111,7 +129,14 @@ class AdminSolicitudesController extends Controller
             'motivo_rechazo' => ['required', 'min:5'],
         ]);
 
-        $u = DB::table('usuario')->where('id_usuario', $id)->first();
+        // Buscamos los datos incluyendo el nombre
+        $u = DB::table('usuario as u')
+            ->leftJoin('hotelero as h', 'h.id_usuario', '=', 'u.id_usuario')
+            ->leftJoin('restaurantero as r', 'r.id_usuario', '=', 'u.id_usuario')
+            ->where('u.id_usuario', $id)
+            ->select('u.*', DB::raw("COALESCE(h.nombre, r.nombre) as nombre_persona"))
+            ->first();
+
         abort_if(!$u, 404);
 
         if ($u->estado !== 'pendiente') {
@@ -125,7 +150,14 @@ class AdminSolicitudesController extends Controller
             'motivo_rechazo' => $request->motivo_rechazo,
         ]);
 
-        return redirect()->route('admin.solicitudes.index')->with('ok', 'Solicitud rechazada correctamente.');
+        // 5. Enviamos correo de rechazo usando el nombre recuperado
+        try {
+            Mail::to($u->correo)->send(new RechazoSolicitudMail($request->motivo_rechazo, $u->nombre_persona));
+        } catch (\Exception $e) {
+           dd("Error al enviar el correo: " . $e->getMessage()); // Error silencioso de mail
+        }
+
+       return redirect()->route('admin.solicitudes.index')->with('ok', 'Solicitud rechazada correctamente y notificación enviada.');
     }
 
 }

@@ -116,7 +116,7 @@
                     {{ $solicitud->rol === 'hotelero' ? 'Datos del hotel' : 'Datos del restaurante' }}
                 </div>
 
-                {{-- Datos del hotel --}}
+                {{-- Dato   s del hotel --}}
                 @if($solicitud->rol === 'hotelero' && isset($hotel))
                     <div class="space-y-2 text-sm">
                         <div class="flex justify-between gap-4">
