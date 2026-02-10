@@ -17,7 +17,8 @@
         </a>
 
         <a href="{{ route('admin.solicitudes.index') }}"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5">
+            class="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors
+            {{ request()->routeIs('admin.solicitudes.*') ? 'bg-emerald-600/30 border border-emerald-400/20' : 'hover:bg-white/5' }}">
             <span>📥</span> Bandeja de Solicitudes
         </a>
 
@@ -49,15 +50,6 @@
             </div>
         </details>
 
-        <a href="#" class="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-white/5">
-            <span class="flex items-center gap-3"><span>🧩</span> Gestión de Servicios</span>
-            <span>›</span>
-        </a>
-
-        <a href="#" class="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-white/5">
-            <span class="flex items-center gap-3"><span>📅</span> Reservas</span>
-            <span>›</span>
-        </a>
 
         <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5">
             <span>📊</span> Reportes
@@ -68,9 +60,5 @@
         </a>
     </nav>
 
-    <div class="mt-auto p-4">
-        <div class="rounded-2xl bg-white/5 p-4 text-xs text-white/70">
-            Ecoaventura © 2026 <br> Turismo Sostenible
-        </div>
-    </div>
+
 </aside>

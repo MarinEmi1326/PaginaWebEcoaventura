@@ -25,6 +25,27 @@ Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 Route::get('/register', [RegisterController::class, 'show'])->name('register');
 Route::post('/register', [RegisterController::class, 'register'])->name('register.post');
 
+// apenas se agrego las vistas 
+Route::get('/destinos', function () {
+    return view('destinos.index');
+})->name('destinos.index');
+
+Route::get('/destinos/{tipo}', function ($tipo) {
+    return view('destinos.index', compact('tipo'));
+})
+->whereIn('tipo', ['turisticos','ecoturisticos','balnearios'])
+->name('destinos.tipo');
+
+// apenas se va a agregar de las vistas 
+Route::get('/servicios', function () {
+    return view('servicios.index');
+})->name('servicios.index');
+
+Route::get('/servicios/{tipo}', function ($tipo) {
+    return view('servicios.index', compact('tipo'));
+})
+->whereIn('tipo', ['hospedaje','restaurantes'])
+->name('servicios.tipo');
 
 /*
 |--------------------------------------------------------------------------

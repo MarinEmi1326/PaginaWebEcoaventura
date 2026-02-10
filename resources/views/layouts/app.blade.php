@@ -62,50 +62,64 @@
           </a>
         </li>
 
-       <li class="relative group">
-          <a href="#"
-            class="rounded-full px-5 py-2 hover:bg-emerald-100/70 hover:text-emerald-900 transition inline-flex items-center gap-1">
-            Destinos <span class="text-xs">▾</span>
-          </a>
-
-          <!-- Contenedor puente (evita que se cierre) -->
-          <div class="absolute left-0 top-full pt-2 hidden group-hover:block">
-            <div class="w-56 rounded-2xl bg-white/80 backdrop-blur-md
-                        ring-1 ring-black/10 shadow-lg p-2">
-
-              <a href="#"
-                class="block rounded-xl px-3 py-2 text-sm hover:bg-emerald-50">
-                Turísticos
-              </a>
-
-              <a href="#"
-                class="block rounded-xl px-3 py-2 text-sm hover:bg-emerald-50">
-                Ecoturísticos
-              </a>
-
-              <a href="#"
-                class="block rounded-xl px-3 py-2 text-sm hover:bg-emerald-50">
-                Balnearios
-              </a>
-            </div>
-          </div>
-        </li>
+     <li class="relative group">
+  <a href="{{ route('destinos.index') }}"
+   class="rounded-full px-5 py-2 hover:bg-emerald-100/70 inline-flex items-center gap-1">
+  Destinos <span class="text-xs">▾</span>
+</a>
 
 
-        <li class="relative group">
-          <a href="#"
-            class="rounded-full px-5 py-2 hover:bg-emerald-100/70 hover:text-emerald-900 transition inline-flex items-center gap-1">
-            Servicios <span class="text-xs">▾</span>
-          </a>
+  <div
+    class="absolute left-0 mt-2 w-56 rounded-2xl
+           bg-white/80 backdrop-blur-md
+           ring-1 ring-black/10 shadow-lg p-2
+           opacity-0 invisible
+           transition-all duration-300 delay-150
+           group-hover:opacity-100 group-hover:visible group-hover:delay-0">
 
-          <div class="absolute left-0 top-full pt-2 hidden group-hover:block">
-            <div class="w-60 rounded-2xl bg-white/80 backdrop-blur-md
-                        ring-1 ring-black/10 shadow-lg p-2">
-              <a href="#" class="block rounded-xl px-3 py-2 text-sm hover:bg-emerald-50">Hospedaje</a>
-              <a href="#" class="block rounded-xl px-3 py-2 text-sm hover:bg-emerald-50">Restaurantes</a>
-            </div>
-          </div>
-        </li>
+    <a href="{{ route('destinos.tipo','turisticos') }}"
+       class="block rounded-xl px-3 py-2 text-sm hover:bg-emerald-50">
+       Turísticos
+    </a>
+
+    <a href="{{ route('destinos.tipo','ecoturisticos') }}"
+       class="block rounded-xl px-3 py-2 text-sm hover:bg-emerald-50">
+       Ecoturísticos
+    </a>
+
+    <a href="{{ route('destinos.tipo','balnearios') }}"
+       class="block rounded-xl px-3 py-2 text-sm hover:bg-emerald-50">
+       Balnearios
+    </a>
+  </div>
+</li>
+
+
+  <li class="relative group">
+<a href="{{ route('servicios.index') }}"
+   class="rounded-full px-5 py-2 hover:bg-emerald-100/70 inline-flex items-center gap-1">
+  Servicios <span class="text-xs">▾</span>
+</a>
+
+  <div
+    class="absolute left-0 mt-2 w-60 rounded-2xl
+           bg-white/80 backdrop-blur-md
+           ring-1 ring-black/10 shadow-lg p-2
+           opacity-0 invisible
+           transition-all duration-300 delay-150
+           group-hover:opacity-100 group-hover:visible group-hover:delay-0">
+
+    <a href="{{ route('servicios.tipo','hospedaje') }}"
+       class="block rounded-xl px-3 py-2 text-sm hover:bg-emerald-50">
+      Hospedaje
+    </a>
+
+    <a href="{{ route('servicios.tipo','restaurantes') }}"
+       class="block rounded-xl px-3 py-2 text-sm hover:bg-emerald-50">
+      Restaurantes
+    </a>
+  </div>
+</li>
 
 
         <li><a href="#" class="rounded-full px-5 py-2 hover:bg-emerald-100/70">Nosotros</a></li>

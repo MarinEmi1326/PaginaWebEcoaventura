@@ -52,13 +52,15 @@
         </a>
 
         {{-- CERRAR SESIÓN --}}
-        <div class="pt-10">
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-rose-300 hover:bg-rose-500/10 transition-colors">
-                    <span class="text-lg">🚪</span> <span class="text-sm font-semibold">Cerrar Sesión</span>
-                </button>
-            </form>
-        </div>
+<div class="pt-10">
+    <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button type="submit" 
+            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all">
+            <span class="text-lg">🚪</span> 
+            <span class="text-sm font-semibold">Cerrar Sesión</span>
+        </button>
+    </form>
+</div>
     </nav>
 </aside>
