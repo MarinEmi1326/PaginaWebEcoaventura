@@ -121,7 +121,7 @@ class RegisterController extends Controller
                     
                 ]);
 
-                 // ✅ Crear restaurante asociado (campos obligatorios => defaults)
+                 //  Crear restaurante asociado (campos obligatorios => defaults)
                 DB::table('restaurante')->insert([
                     'nombre'          => $request->nombre_restaurante,
                     'descripcion'     => 'Pendiente de completar',
@@ -143,7 +143,7 @@ class RegisterController extends Controller
             return back()->withErrors(['register' => 'No se pudo crear el usuario.']);
         }
 
-        // ✅ Si es solicitud: NO loguear, mostrar mensaje
+        //  Si es solicitud: NO loguear, mostrar mensaje
         if (in_array($user->rol, ['hotelero', 'restaurantero'])) {
             return redirect()->route('login')->with(
                 'success',
