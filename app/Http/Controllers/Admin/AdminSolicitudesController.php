@@ -7,18 +7,25 @@ use App\Mail\RechazoSolicitudMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Hash;
 use App\Mail\SolicitudAprobadaMail;
 
 class AdminSolicitudesController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $solicitudes = DB::table('usuario as u')
+        $query = DB::table('usuario as u')
             ->leftJoin('hotelero as h', 'h.id_usuario', '=', 'u.id_usuario')
             ->leftJoin('restaurantero as r', 'r.id_usuario', '=', 'u.id_usuario')
-            ->whereIn('u.rol', ['hotelero', 'restaurantero'])
-            ->where('u.estado', 'pendiente')
-            ->select(
+            ->whereIn('u.rol', ['hotelero', 'restaurantero']);
+
+        // Filtro opcional: si no se pide un estado, podrías mostrar todos
+        // o por defecto los pendientes, pero permitiendo ver los demás.
+        if ($request->has('estado') && $request->estado != 'todos') {
+            $query->where('u.estado', $request->estado);
+        }
+
+        $solicitudes = $query->select(
                 'u.id_usuario',
                 'u.correo',
                 'u.rol',
@@ -86,9 +93,121 @@ class AdminSolicitudesController extends Controller
 }
 
 
+    public function create() {
+    return view('admin.solicitudes.create');
+    }
 
+    public function store(Request $request) {
+        $request->validate([
+            'correo' => 'required|email|unique:usuario,correo',
+            'password' => 'required|min:8',
+            'rol' => 'required|in:hotelero,restaurantero',
+            'nombre' => 'required|string',
+            'apaterno' => 'required|string',
+            'telefono' => 'required|numeric',
+        ]);
 
+        DB::transaction(function () use ($request) {
+            $idUsuario = DB::table('usuario')->insertGetId([
+                'correo' => $request->correo,
+                'password' => Hash::make($request->password),
+                'rol' => $request->rol,
+                'estado' => 'aprobado', // Se crea ya aprobado por el admin
+                'activo' => 1,
+                'fecha_solicitud' => now(),
+                'fecha_respuesta' => now(),
+            ]);
 
+            $tabla = ($request->rol === 'hotelero') ? 'hotelero' : 'restaurantero';
+            
+            DB::table($tabla)->insert([
+                'nombre' => $request->nombre,
+                'apaterno' => $request->apaterno,
+                'amaterno' => $request->amaterno,
+                'telefono' => $request->telefono,
+                'id_usuario' => $idUsuario
+            ]);
+        });
+
+        return redirect()->route('admin.solicitudes.index')->with('ok', 'Usuario creado exitosamente');
+    }
+
+    public function edit($id)
+    {
+        $usuario = DB::table('usuario as u')
+            ->leftJoin('hotelero as h', 'h.id_usuario', '=', 'u.id_usuario')
+            ->leftJoin('restaurantero as r', 'r.id_usuario', '=', 'u.id_usuario')
+            ->where('u.id_usuario', $id)
+            ->select(
+                'u.*', 
+                DB::raw("COALESCE(h.nombre, r.nombre) as nombre"),
+                DB::raw("COALESCE(h.apaterno, r.apaterno) as apaterno"),
+                DB::raw("COALESCE(h.amaterno, r.amaterno) as amaterno"),
+                DB::raw("COALESCE(h.telefono, r.telefono) as telefono")
+            )
+            ->first();
+
+        if (!$usuario) return redirect()->route('admin.solicitudes.index')->with('error', 'Usuario no encontrado');
+
+        return view('admin.solicitudes.edit', compact('usuario'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'correo' => 'required|email',
+            'nombre' => 'required|string',
+            'apaterno' => 'required|string',
+            'rol' => 'required',
+            'telefono' => 'required|numeric',
+        ]);
+
+        DB::transaction(function () use ($request, $id) {
+            // 1. Actualizar tabla Usuario
+            $datosUsuario = [
+                'correo' => $request->correo,
+                'rol' => $request->rol,
+            ];
+
+            // Solo actualizar contraseña si se escribió algo en el campo
+            if ($request->filled('password')) {
+                $datosUsuario['password'] = Hash::make($request->password);
+            }
+
+            DB::table('usuario')->where('id_usuario', $id)->update($datosUsuario);
+
+            // 2. Actualizar tabla de perfil según el rol
+            $tablaPerfil = ($request->rol === 'hotelero') ? 'hotelero' : 'restaurantero';
+            
+            DB::table($tablaPerfil)->where('id_usuario', $id)->update([
+                'nombre' => $request->nombre,
+                'apaterno' => $request->apaterno,
+                'amaterno' => $request->amaterno,
+                'telefono' => $request->telefono,
+            ]);
+        });
+
+        return redirect()->route('admin.solicitudes.index')->with('ok', 'Usuario actualizado correctamente');
+    }
+
+    public function toggleActivo($id)
+    {
+        $usuario = DB::table('usuario')->where('id_usuario', $id)->first();
+
+        if (!$usuario) {
+            return back()->with('error', 'Usuario no encontrado.');
+        }
+
+        // Cambiamos el estado al opuesto
+        $nuevoEstado = $usuario->activo ? 0 : 1;
+        $mensaje = $nuevoEstado ? 'Usuario habilitado con éxito.' : 'Usuario suspendido correctamente.';
+
+        DB::table('usuario')->where('id_usuario', $id)->update([
+            'activo' => $nuevoEstado
+        ]);
+
+        return back()->with('ok', $mensaje);
+    }
     public function aprobar($id)
     {
         // 2. Buscamos los datos básicos del usuario y su nombre real

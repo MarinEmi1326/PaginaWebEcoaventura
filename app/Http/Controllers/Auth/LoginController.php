@@ -5,79 +5,62 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Usuario;
 
 class LoginController extends Controller
 {
-    /**
-     * Muestra la vista de login
-     */
     public function show()
     {
         return view('auth.login');
     }
 
-    /**
-     * Procesa el inicio de sesión
-     */
     public function login(Request $request)
     {
-        // Validación básica
+        // 1. Validar campos
         $request->validate([
-            'correo'   => ['required', 'email'],
-            'password' => ['required'],
+            'correo' => 'required|email',
+            'password' => 'required',
         ]);
 
-        // Credenciales (solo usuarios activos)
+        // 2. Intentar autenticar con la condición de que esté activo
         $credentials = [
-            'correo'  => $request->correo,
-            'password'=> $request->password,
-            'activo'  => 1,
+            'correo' => $request->correo,
+            'password' => $request->password,
+            'activo' => 1 // <--- Solo usuarios habilitados
         ];
 
-        $remember = $request->boolean('remember');
-
-        // Intento de autenticación
-        if (Auth::attempt($credentials, $remember)) {
-
-            // Regenerar sesión por seguridad
+        if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-
-            // Usuario autenticado
-            $user = Auth::user();
-
-            // 👉 Redirección según rol
-            if ($user->rol === 'admin') {
-                return redirect()->route('admin.dashboard');
-            }
-             // ✅ Bloquear si no está aprobado
-            if (in_array($user->rol, ['hotelero','restaurantero']) && $user->estado !== 'aprobado') {
-                Auth::logout();
-                return back()->withErrors([
-                    'correo' => 'Tu cuenta aún no está aprobada por el administrador.',
-                ])->onlyInput('correo');
-            }
-            // Otros roles (por ahora al home)
+            
+            // Redirección según rol
+            $rol = Auth::user()->rol;
+            if ($rol === 'admin') return redirect()->route('admin.dashboard');
+            if ($rol === 'hotelero') return redirect()->route('hotelero.index');
+            if ($rol === 'restaurantero') return redirect()->route('restaurantero.dashboard');
+            
             return redirect()->route('home');
         }
-       
 
+        // 3. Si falla, verificar si fue por estar suspendido
+        $usuarioExistente = Usuario::where('correo', $request->correo)->first();
+        
+        if ($usuarioExistente && !$usuarioExistente->activo) {
+            return back()->withErrors([
+                'correo' => 'Tu cuenta ha sido suspendida o inhabilitada por el administrador.',
+            ]);
+        }
 
-        // Error de credenciales
+        // Falla genérica (contraseña mal o correo inexistente)
         return back()->withErrors([
-            'correo' => 'Credenciales inválidas o usuario inactivo.',
-        ])->onlyInput('correo');
+            'correo' => 'Las credenciales proporcionadas no coinciden con nuestros registros.',
+        ]);
     }
 
-    /**
-     * Cerrar sesión
-     */
     public function logout(Request $request)
     {
         Auth::logout();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
-        return redirect()->route('home');
+        return redirect('/');
     }
 }

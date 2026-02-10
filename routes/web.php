@@ -55,6 +55,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/solicitudes', [AdminSolicitudesController::class, 'index'])
         ->name('solicitudes.index');
 
+        Route::get('/solicitudes/crear', [AdminSolicitudesController::class, 'create'])->name('solicitudes.create');
+        Route::post('/solicitudes/guardar', [AdminSolicitudesController::class, 'store'])->name('solicitudes.store');
+        Route::get('/solicitudes/{id}/edit', [AdminSolicitudesController::class, 'edit'])->name('solicitudes.edit');
+        Route::put('/solicitudes/{id}', [AdminSolicitudesController::class, 'update'])->name('solicitudes.update');
+
+        Route::post('/solicitudes/{id}/toggle-activo', [AdminSolicitudesController::class, 'toggleActivo'])
+        ->name('solicitudes.toggle');
         Route::get('/solicitudes/{id}', [AdminSolicitudesController::class, 'show'])
             ->name('solicitudes.show');
 
@@ -73,10 +80,19 @@ Route::middleware('auth')->group(function () {
     */
     Route::prefix('hotelero')->name('hotelero.')->group(function () {
 
-        Route::get('/dashboard', [HoteleroController::class, 'dashboard'])->name('dashboard');
+        Route::get('/dashboard', [HoteleroController::class, 'dashboard'])->name('index');
         Route::get('/reservas', [HoteleroController::class, 'reservas'])->name('reservas');
         Route::get('/habitaciones', [HoteleroController::class, 'habitaciones'])->name('habitaciones');
         Route::get('/servicios', [HoteleroController::class, 'servicios'])->name('servicios');
+        
+        Route::get('/reservas/crear', [HoteleroController::class, 'createReserva'])->name('reservas.create');
+        Route::post('/reservas/guardar', [HoteleroController::class, 'storeReserva'])->name('reservas.store');
+        Route::get('/reservas/{id}', [HoteleroController::class, 'showReserva'])->name('reservas.show');
+        Route::post('/reservas/{id}/aprobar', [HoteleroController::class, 'aprobarReserva'])->name('reservas.aprobar');
+        Route::post('/reservas/{id}/rechazar', [HoteleroController::class, 'rechazarReserva'])->name('reservas.rechazar');
+        // Perfil
+        Route::get('/perfil', [HoteleroController::class, 'perfil'])->name('perfil');
+        Route::put('/perfil', [HoteleroController::class, 'updatePerfil'])->name('perfil.update');
     });
 
     /*

@@ -1,72 +1,113 @@
+@php $hideNavbar = true; @endphp
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto py-8">
-    <h1 class="text-2xl font-semibold text-gray-900">Mi Perfil</h1>
-    <p class="text-gray-600 mt-2">Gestiona tu información personal</p>
-
-    <!-- Barra lateral -->
-    <div class="w-64 bg-green-700 text-white p-4">
-        <div class="flex justify-between items-center">
-            <h1 class="text-xl font-semibold">Ecoaventura</h1>
-        </div>
-        <ul class="mt-6">
-            <li><a href="{{ route('perfil') }}" class="block py-3 px-4 text-gray-200 hover:bg-green-600">Mi Perfil</a></li>
-            <li><a href="{{ route('publicar.hotel') }}" class="block py-3 px-4 text-gray-200 hover:bg-green-600">Publicar Hotel</a></li>
-            <li><a href="{{ route('hotelero.reservas') }}" class="block py-3 px-4 text-gray-200 hover:bg-green-600">Reservas</a></li>
-            <li><a href="{{ route('reportes') }}" class="block py-3 px-4 text-gray-200 hover:bg-green-600">Reportes</a></li>
-            <li><a href="{{ route('configuracion') }}" class="block py-3 px-4 text-gray-200 hover:bg-green-600">Configuración</a></li>
-            <li><a href="{{ route('cerrar.sesion') }}" class="block py-3 px-4 text-gray-200 hover:bg-green-600">Cerrar sesión</a></li>
-        </ul>
-    </div>
-
-    <!-- Contenido principal -->
-    <div class="flex-1 p-8 bg-gray-100">
-        <div class="bg-white shadow-lg rounded-lg p-6">
-            <h1 class="text-2xl font-semibold text-gray-900">Mi Perfil</h1>
-            <p class="text-gray-600 mt-2">Gestiona tu información personal</p>
-            
-            <!-- Información del perfil -->
-            <div class="flex items-center space-x-4 mt-6">
-                <div class="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center">
-                    <span class="text-2xl font-bold text-white">{{ strtoupper(substr(Auth::user()->nombre, 0, 1)) }}{{ strtoupper(substr(Auth::user()->apaterno, 0, 1)) }}</span>
+<div class="min-h-screen bg-[#f6f4ee]">
+    <div class="flex">
+        {{-- SIDEBAR MODERNO (Copiado de habitaciones) --}}
+        <aside class="w-72 bg-emerald-900 text-white min-h-screen px-6 py-6 fixed left-0 top-0 overflow-y-auto z-50">
+            <div class="flex items-center gap-3 mb-10">
+                <div class="h-11 w-11 rounded-2xl bg-white/10 flex items-center justify-center">
+                    <span class="text-xl">🌿</span>
                 </div>
                 <div>
-                    <h2 class="text-xl font-semibold">{{ Auth::user()->nombre }} {{ Auth::user()->apaterno }}</h2>
-                    <p class="text-gray-500">{{ Auth::user()->correo }}</p>
-                    <p class="text-gray-500">Rol: {{ ucfirst(Auth::user()->rol) }}</p>
-                    <p class="text-gray-500">Miembro desde {{ Auth::user()->created_at->format('F Y') }}</p>
+                    <div class="text-lg font-semibold">Ecoaventura</div>
+                    <div class="text-xs text-white/70 -mt-0.5">Panel de Servicios</div>
                 </div>
             </div>
-        </div>
 
-        <!-- Información personal -->
-        <div class="bg-white shadow-lg rounded-lg p-6 mt-6">
-            <h2 class="text-lg font-semibold text-gray-900">Información Personal</h2>
-            <form action="{{ route('perfil.update') }}" method="POST" class="mt-4">
-                @csrf
-                @method('PUT')
+            <nav class="space-y-2">
+                <a href="{{ route('hotelero.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/80 hover:bg-white/10">
+                    <span>🏠</span> <span class="text-sm font-medium">Inicio</span>
+                </a>
+                {{-- ACTIVO EN PERFIL --}}
+                <a href="{{ route('hotelero.perfil') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-amber-400/95 text-emerald-950 font-semibold">
+                    <span>👤</span> <span class="text-sm font-medium">Mi Perfil</span>
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/80 hover:bg-white/10">
+                    <span> + </span> <span class="text-sm font-medium">Publicar Hotel</span>
+                </a>
+                <a href="{{ route('hotelero.habitaciones') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/80 hover:bg-white/10">
+                    <span>🏨</span> <span class="text-sm font-medium">Mi Hotel</span>
+                </a>
+                <a href="{{ route('hotelero.reservas') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/80 hover:bg-white/10">
+                    <span>📅</span> <span class="text-sm font-medium">Reservas</span>
+                </a>
                 
-                <div class="mb-4">
-                    <label for="nombre_completo" class="block text-sm font-medium text-gray-600">Nombre Completo</label>
-                    <input type="text" id="nombre_completo" name="nombre_completo" value="{{ Auth::user()->nombre }} {{ Auth::user()->apaterno }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" disabled />
+                <div class="pt-6">
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/80 hover:bg-white/10">
+                            <span>🚪</span> <span class="text-sm font-medium">Cerrar Sesión</span>
+                        </button>
+                    </form>
                 </div>
+            </nav>
+        </aside>
 
-                <div class="mb-4">
-                    <label for="correo" class="block text-sm font-medium text-gray-600">Correo Electrónico</label>
-                    <input type="email" id="correo" name="correo" value="{{ Auth::user()->correo }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" disabled />
+        {{-- CONTENIDO PRINCIPAL --}}
+        <main class="flex-1 ml-72">
+            {{-- HEADER TOP (Igual al de habitaciones) --}}
+            <header class="bg-white/60 backdrop-blur border-b border-emerald-900/10 px-10 py-5 flex items-center justify-between">
+                <div class="font-serif text-xl font-semibold text-emerald-950">Mi Perfil</div>
+                <div class="flex items-center gap-4">
+                    <div class="text-right">
+                        <div class="text-sm font-semibold text-slate-800">{{ Auth::user()->nombre }}</div>
+                        <div class="text-xs text-slate-500 uppercase">{{ Auth::user()->rol }}</div>
+                    </div>
+                    <div class="h-10 w-10 rounded-full bg-emerald-800 text-white flex items-center justify-center font-bold">
+                        {{ strtoupper(substr(Auth::user()->nombre, 0, 1)) }}
+                    </div>
                 </div>
+            </header>
 
-                <div class="mb-4">
-                    <label for="telefono" class="block text-sm font-medium text-gray-600">Teléfono</label>
-                    <input type="text" id="telefono" name="telefono" value="{{ $hotelero->telefono }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
-                </div>
+            <section class="px-10 py-10">
+                <div class="max-w-4xl mx-auto">
+                    {{-- TARJETA DE PERFIL --}}
+                    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="p-8 border-b border-slate-100 flex items-center gap-6">
+                            <div class="w-24 h-24 rounded-3xl bg-emerald-100 flex items-center justify-center text-3xl font-bold text-emerald-800">
+                                {{ strtoupper(substr(Auth::user()->nombre, 0, 1)) }}{{ strtoupper(substr(Auth::user()->apaterno, 0, 1)) }}
+                            </div>
+                            <div>
+                                <h1 class="text-3xl font-serif font-bold text-emerald-950">{{ Auth::user()->nombre }} {{ Auth::user()->apaterno }}</h1>
+                                <p class="text-slate-500">{{ Auth::user()->correo }}</p>
+                                <span class="inline-block mt-2 px-3 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full">HOTELERO</span>
+                            </div>
+                        </div>
 
-                <div class="flex justify-end">
-                    <button type="submit" class="px-4 py-2 text-white bg-indigo-600 rounded-md hover:bg-indigo-700">Guardar Cambios</button>
+                        <div class="p-8">
+                            <h2 class="text-lg font-semibold text-emerald-950 mb-6">Información Personal</h2>
+                            <form action="{{ route('hotelero.perfil.update') }}" method="POST" class="space-y-6">
+                                @csrf
+                                @method('PUT')
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-2">Nombre Completo</label>
+                                        <input type="text" value="{{ Auth::user()->nombre }} {{ Auth::user()->apaterno }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-500" disabled />
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-2">Correo Electrónico</label>
+                                        <input type="email" value="{{ Auth::user()->correo }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-500" disabled />
+                                    </div>
+                                    <div>
+                                        <label for="telefono" class="block text-sm font-medium text-slate-700 mb-2">Teléfono de Contacto</label>
+                                        <input type="text" id="telefono" name="telefono" value="{{ $hotelero->telefono ?? '' }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-200 outline-none transition" placeholder="Tu número de teléfono" />
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-end pt-4">
+                                    <button type="submit" class="bg-emerald-800 text-white px-8 py-3 rounded-xl font-semibold hover:bg-emerald-900 transition shadow-lg shadow-emerald-900/20">
+                                        Guardar Cambios
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-            </form>
-        </div>
+            </section>
+        </main>
     </div>
 </div>
 @endsection

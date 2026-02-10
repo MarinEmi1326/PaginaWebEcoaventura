@@ -1,3 +1,5 @@
+@php $hideNavbar = true; @endphp
+
 @extends('layouts.hotelero')
 
 @section('title', 'Dashboard Hotelero')

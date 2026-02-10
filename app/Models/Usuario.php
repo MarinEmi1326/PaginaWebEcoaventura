@@ -32,6 +32,15 @@ class Usuario extends Authenticatable
     ];
 
     /**
+     * Casts para tipos de datos automáticos
+     */
+    protected $casts = [
+        'activo' => 'boolean',
+        'fecha_solicitud' => 'datetime',
+        'fecha_respuesta' => 'datetime',
+    ];
+
+    /**
      * 👇 Le dice a Laravel que el campo de login es "correo"
      * y no "email"
      */

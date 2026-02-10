@@ -84,14 +84,14 @@
                     <div class="flex justify-between gap-4">
                         <span class="text-slate-500">Fecha solicitud</span>
                         <span class="text-slate-900 font-semibold">
-                            {{ $solicitud->fecha_solicitud ? \Carbon\Carbon::parse($solicitud->fecha_solicitud)->format('d/m/Y H:i') : '—' }}
+                            {{ $solicitud->fecha_solicitud ? \Carbon\Carbon::parse($solicitud->fecha_solicitud)->format('d/m/Y') : '—' }}
                         </span>
                     </div>
 
                     <div class="flex justify-between gap-4">
                         <span class="text-slate-500">Fecha respuesta</span>
                         <span class="text-slate-900 font-semibold">
-                            {{ $solicitud->fecha_respuesta ? \Carbon\Carbon::parse($solicitud->fecha_respuesta)->format('d/m/Y H:i') : '—' }}
+                            {{ $solicitud->fecha_respuesta ? \Carbon\Carbon::parse($solicitud->fecha_respuesta)->format('d/m/Y') : '—' }}
                         </span>
                     </div>
 
