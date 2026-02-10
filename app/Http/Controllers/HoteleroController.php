@@ -16,29 +16,106 @@ class HoteleroController extends Controller
     /**
      * Muestra el Dashboard del hotelero con las reservas, habitaciones y servicios.
      */
-    public function dashboard()
+    public function dashboard() 
+    {
+        $user = Auth::user();
+        
+        // 1. Buscamos el perfil de hotelero
+        $hotelero = $user->hotelero; 
+
+        if (!$hotelero) {
+            return redirect()->route('home')->with('error', 'No tienes perfil de hotelero.');
+        }
+
+        // 2. Buscamos el hotel
+        $miHotel = Hotel::where('id_hotelero', $hotelero->id_hotelero)->first();
+
+        // 3. Obtenemos TODAS las reservas de este hotel para que tu INDEX haga los cálculos
+        if ($miHotel) {
+            $reservas = Reserva::whereHas('habitacion', function($q) use ($miHotel) {
+                $q->where('id_hotel', $miHotel->id_hotel);
+            })
+            ->with('turista') // Carga el turista para evitar errores en el bucle
+            ->orderBy('id_reserva', 'desc')
+            ->get();
+        } else {
+            $reservas = collect(); // Colección vacía si no hay hotel
+        }
+
+        // Enviamos 'reservas' (para tus conteos) y 'hotel' (para el cuadro "Mi Servicio")
+        return view('hotelero.index', [
+            'reservas' => $reservas,
+            'hotel' => $miHotel
+        ]);
+    }
+    public function miHotel()
     {
         $user = Auth::user();
         $hotelero = Hotelero::where('id_usuario', $user->id_usuario)->first();
+        
+        if (!$hotelero) return redirect()->back()->with('error', 'Perfil de hotelero no encontrado.');
 
-        if ($hotelero && $hotel = Hotel::where('id_hotelero', $hotelero->id_hotelero)->first()) {
-            $habitaciones = Habitacion::where('id_hotel', $hotel->id_hotel)->get();
-            
-            // Obtenemos las reservas mediante las habitaciones
-            $reservas = Reserva::whereIn('id_habitacion', $habitaciones->pluck('id_habitacion'))->get();
-            
-            // ¡Aquí obtenemos los servicios vinculados al hotel!
-            $servicios = $hotel->servicios; 
-        } else {
-            $hotel = null;
-            $habitaciones = collect();
-            $reservas = collect();
-            $servicios = collect();
+        $hotel = Hotel::where('id_hotelero', $hotelero->id_hotelero)->first();
+
+        return view('hotelero.mi-hotel', compact('hotel'));
+    }
+
+    public function editHotel()
+    {
+        $hotelero = Hotelero::where('id_usuario', Auth::id())->first();
+        $hotel = Hotel::where('id_hotelero', $hotelero->id_hotelero)->first();
+        return view('hotelero.hotel_edit', compact('hotel'));
+    }
+
+   public function update(Request $request)
+    {
+        // 1. Obtenemos al usuario logueado
+        $user = Auth::user();
+
+        // 2. Buscamos al hotelero usando el objeto $user directamente 
+        // Esto es más seguro que usar Auth::id() si hay dudas con la llave primaria
+        $hotelero = Hotelero::where('id_usuario', $user->id_usuario)->first();
+
+        // SI SIGUE DANDO ERROR, vamos a debuguear qué ID está buscando
+        if (!$hotelero) {
+            return "Error: No se encontró un perfil en la tabla 'hotelero' para el usuario con ID: " . $user->id_usuario;
         }
 
-        $hideNavbar = true; // Agregamos esto
-        return view('hotelero.index', compact('hotel', 'reservas', 'habitaciones', 'servicios', 'hideNavbar'));
+        $hotel = Hotel::where('id_hotelero', $hotelero->id_hotelero)->first();
+
+        if (!$hotel) {
+            return "Error: Este hotelero no tiene un hotel asignado en la tabla 'hoteles'.";
+        }
+
+        // 3. Validación y Actualización
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+            'direccion' => 'nullable|string',
+            'telefono' => 'nullable|string|max:20',
+        ]);
+
+        $hotel->update($request->all());
+
+        return back()->with('success', '¡Información actualizada correctamente!');
     }
+    
+   public function suspenderHotel()
+    {
+        $user = Auth::user();
+        $hotelero = Hotelero::where('id_usuario', $user->id_usuario)->firstOrFail();
+        $hotel = Hotel::where('id_hotelero', $hotelero->id_hotelero)->firstOrFail();
+
+        // Lógica de interrupción basada en tu ENUM ('activo', 'inactivo')
+        $nuevoEstado = ($hotel->estado === 'activo') ? 'inactivo' : 'activo';
+        
+        $hotel->update(['estado' => $nuevoEstado]);
+
+        $mensaje = ($nuevoEstado === 'activo') ? '¡Hotel activado nuevamente!' : 'El hotel ha sido suspendido.';
+        
+        return back()->with('success', $mensaje);
+    }
+
     /**
      * Muestra las reservas del hotelero.
      */

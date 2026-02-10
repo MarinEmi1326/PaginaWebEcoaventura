@@ -117,7 +117,7 @@
                             ? 'bg-red-50 text-red-600 border-red-100 hover:bg-red-600 hover:text-white' 
                             : 'bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-600 hover:text-white' 
                         }} shadow-sm">
-                        {{ $s->activo ? '🚫 Suspender' : '✅ Habilitar' }}
+                        {{ $s->activo ? ' Suspender' : ' Habilitar' }}
                       </button>
                     </form>
 

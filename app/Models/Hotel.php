@@ -16,10 +16,16 @@ class Hotel extends Model
         'descripcion', 
         'telefono', 
         'foto', 
-        'id_hotelero'];
+        'id_hotelero',
+        'estado'];
     
     public function servicios()
     {
         return $this->belongsToMany(Servicio::class, 'hotel_servicio', 'id_hotel', 'id_servicio');
+    }
+
+    public function hotelero() 
+    {
+        return $this->belongsTo(Hotelero::class, 'id_hotelero');
     }
 }

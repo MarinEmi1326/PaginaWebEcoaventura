@@ -7,7 +7,7 @@
 @section('content')
 
 @php
-    // Conteos por estado (ajusta los textos si en tu BD son diferentes)
+    // Conteos por estado basados en la colección $reservas que envía el controlador
     $totalReservas = $reservas->count();
     $pendientes    = $reservas->where('estado', 'pendiente')->count();
     $confirmadas   = $reservas->where('estado', 'confirmada')->count();
@@ -109,13 +109,13 @@
                         </div>
 
                         <div class="flex gap-3 mt-5">
-                            <a href="#"
+                            <a href="{{ route('hotelero.mi-hotel') }}"
                                class="px-4 py-2 rounded-xl border border-black/10 hover:bg-gray-50 font-semibold text-sm">
-                                👁 Ver Detalles
+                               👁 Ver Detalles
                             </a>
-                            <a href="#"
+                            <a href="{{ route('hotelero.hotel.edit') }}"
                                class="px-4 py-2 rounded-xl border border-black/10 hover:bg-gray-50 font-semibold text-sm">
-                                ✏️ Editar
+                               ✏️ Editar
                             </a>
                         </div>
                     </div>
@@ -148,11 +148,12 @@
                         default      => 'bg-gray-100 text-gray-700',
                     };
 
-                    // Ajusta a tus columnas reales de reserva_hotel
-                    $cliente  = $r->cliente_nombre ?? $r->nombre_cliente ?? 'Cliente';
-                    $fecha    = $r->fecha ?? optional($r->created_at)->format('d/m/Y');
-                    $hora     = $r->hora ?? '—';
-                    $personas = $r->personas ?? $r->num_personas ?? '—';
+                    // AJUSTE DE SEGURIDAD Y DATOS REALES:
+                    // Usamos la relación 'turista' definida en el modelo Reserva
+                    $cliente  = $r->turista->nombre ?? 'Cliente';
+                    $fecha    = $r->fecha_entrada; 
+                    $hora     = '12:00 PM'; // O la columna que manejes para hora
+                    $personas = '—'; // O la columna de personas si existe
                 @endphp
 
                 <div class="flex items-center justify-between gap-3 px-4 py-4 rounded-2xl hover:bg-gray-50 transition">

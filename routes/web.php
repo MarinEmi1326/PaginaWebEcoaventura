@@ -84,9 +84,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/reservas', [HoteleroController::class, 'reservas'])->name('reservas');
         Route::get('/habitaciones', [HoteleroController::class, 'habitaciones'])->name('habitaciones');
         Route::get('/servicios', [HoteleroController::class, 'servicios'])->name('servicios');
+        Route::get('/mi-hotel', [HoteleroController::class, 'miHotel'])->name('mi-hotel');
+        Route::post('/hotel/actualizar', [HoteleroController::class, 'update'])->name('hotel.update');
         
         Route::get('/reservas/crear', [HoteleroController::class, 'createReserva'])->name('reservas.create');
         Route::post('/reservas/guardar', [HoteleroController::class, 'storeReserva'])->name('reservas.store');
+        Route::get('/hotel/editar', [HoteleroController::class, 'editHotel'])->name('hotel.edit');
+        Route::post('/hotel/suspender', [HoteleroController::class, 'suspenderHotel'])->name('hotel.suspender');
+
         Route::get('/reservas/{id}', [HoteleroController::class, 'showReserva'])->name('reservas.show');
         Route::post('/reservas/{id}/aprobar', [HoteleroController::class, 'aprobarReserva'])->name('reservas.aprobar');
         Route::post('/reservas/{id}/rechazar', [HoteleroController::class, 'rechazarReserva'])->name('reservas.rechazar');
