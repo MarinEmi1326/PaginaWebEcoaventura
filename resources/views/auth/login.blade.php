@@ -132,6 +132,31 @@
                                hover:bg-emerald-950 transition">
                         Iniciar Sesión
                     </button>
+                    {{-- Separador --}}
+<div class="flex items-center my-6">
+    <div class="flex-1 h-px bg-slate-200"></div>
+    <span class="px-3 text-xs text-slate-400 uppercase tracking-wider">o continúa con</span>
+    <div class="flex-1 h-px bg-slate-200"></div>
+</div>
+
+{{-- Botón Google elegante --}}
+<a href="{{ route('google.login') }}"
+   class="w-full flex items-center justify-center gap-3
+          bg-white border border-slate-200 py-3 rounded-xl
+          text-slate-700 text-sm font-medium
+          hover:bg-slate-50 hover:shadow-sm
+          transition duration-200">
+
+    <svg class="w-5 h-5" viewBox="0 0 48 48">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.72 1.22 9.23 3.6l6.88-6.88C35.64 2.23 30.21 0 24 0 14.61 0 6.37 5.4 2.36 13.28l8.01 6.21C12.4 13.27 17.7 9.5 24 9.5z"/>
+        <path fill="#34A853" d="M46.14 24.5c0-1.64-.15-3.21-.43-4.73H24v9h12.44c-.54 2.9-2.18 5.36-4.64 7.01l7.15 5.56C43.97 37.2 46.14 31.36 46.14 24.5z"/>
+        <path fill="#4A90E2" d="M10.37 28.49a14.5 14.5 0 010-8.98l-8.01-6.21A23.94 23.94 0 000 24c0 3.88.93 7.54 2.36 10.7l8.01-6.21z"/>
+        <path fill="#FBBC05" d="M24 48c6.21 0 11.64-2.05 15.52-5.56l-7.15-5.56c-2 1.34-4.56 2.12-8.37 2.12-6.3 0-11.6-3.77-13.63-9.99l-8.01 6.21C6.37 42.6 14.61 48 24 48z"/>
+    </svg>
+
+    Iniciar sesión con Google
+</a>
+
                 </form>
 
             </div>

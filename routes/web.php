@@ -9,7 +9,10 @@ use App\Http\Controllers\HoteleroController;
 use App\Http\Controllers\RestauranteroController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\Admin\AdminSolicitudesController;
-
+use Laravel\Socialite\Facades\Socialite;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\FacebookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,6 +49,38 @@ Route::get('/servicios/{tipo}', function ($tipo) {
 })
 ->whereIn('tipo', ['hospedaje','restaurantes'])
 ->name('servicios.tipo');
+
+Route::get('/mapa', function () {
+    return view('mapa');
+})->name('mapa');
+
+Route::get('/publicar-facebook', [FacebookController::class, 'publicar']);
+Route::get('/ver-facebook', [FacebookController::class, 'verPosts']);
+
+
+
+// LOGIN CON GOOGLE
+Route::get('/auth/google', function () {
+    return Socialite::driver('google')->redirect();
+})->name('google.login');
+
+Route::get('/auth/google/callback', function () {
+    $googleUser = Socialite::driver('google')->user();
+
+    $user = User::updateOrCreate(
+        ['email' => $googleUser->getEmail()],
+        [
+            'name' => $googleUser->getName(),
+            'google_id' => $googleUser->getId(),
+            'password' => bcrypt('12345678'),
+        ]
+    );
+
+    Auth::login($user);
+
+    return redirect()->route('home');
+});
+
 
 /*
 |--------------------------------------------------------------------------

@@ -118,12 +118,20 @@
        class="block rounded-xl px-3 py-2 text-sm hover:bg-emerald-50">
       Restaurantes
     </a>
+    
   </div>
 </li>
 
 
         <li><a href="#" class="rounded-full px-5 py-2 hover:bg-emerald-100/70">Nosotros</a></li>
-        <li><a href="#" class="rounded-full px-5 py-2 hover:bg-emerald-100/70">Contacto</a></li>
+        <li>
+    <a href="{{ url('/ver-facebook') }}" 
+       class="rounded-full px-5 py-2 hover:bg-emerald-100/70">
+        contacto
+    </a>
+</li>
+        <li><a href="{{ route('mapa') }}" class="rounded-full px-5 py-2 hover:bg-emerald-100/70">Mapa</a></li>
+        
       </ul>
 
       <!-- ACCIONES -->
