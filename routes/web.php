@@ -5,6 +5,8 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminSitioController;
+use App\Http\Controllers\HoteleroController;
+use App\Http\Controllers\RestauranteroController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\Admin\AdminSolicitudesController;
 use Laravel\Socialite\Facades\Socialite;
@@ -71,6 +73,7 @@ Route::get('/auth/google/callback', function () {
 });
 
 
+
 /*
 |--------------------------------------------------------------------------
 |  RUTAS PROTEGIDAS (UN SOLO MIDDLEWARE)
@@ -84,6 +87,8 @@ Route::middleware('auth')->group(function () {
     // Perfil (común)
     Route::get('/perfil', [PerfilController::class, 'show'])->name('perfil');
     Route::post('/perfil', [PerfilController::class, 'update']);
+
+    
 
     /*
     |--------------------------------------------------------------------------

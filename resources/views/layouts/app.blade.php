@@ -1,164 +1,122 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Ecoaventura</title>
-
- @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecoaventura</title>
 
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
 
-  <style>
-    body { font-family: 'Inter', sans-serif; }
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    /* Barra glass suave y fija */
-    .glass-bar{
-      background: rgba(255,255,255,0.48);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border-bottom: 1px solid rgba(255,255,255,0.55);
-      box-shadow: 0 4px 14px rgba(0,0,0,0.05);
-    }
-  </style>
+
 </head>
 
-<body class="bg-white text-slate-900">
+<body>
 
-{{-- NAVBAR (se oculta si $hideNavbar = true) --}}
-@if (!isset($hideNavbar) || !$hideNavbar)
+    @if (!isset($hideNavbar) || !$hideNavbar)
+        <nav class="navbar navbar-expand-lg fixed-top navbar-glass">
+            <div class="container">
 
-<!-- NAVBAR FIJO -->
-<header class="fixed top-0 left-0 w-full z-[9999] glass-bar">
-  <div class="max-w-screen-xl mx-auto px-6">
-    <nav class="h-[74px] flex items-center justify-between">
+                <!-- LOGO -->
+                <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url('/') }}">
+                    <img src="{{ asset('img/logo.jpeg') }}" class="rounded-circle">
+                    <span class="fw-semibold text-success">Ecoaventura</span>
+                </a>
 
-      <!-- LOGO -->
-    <a href="{{ url('/') }}" class="flex items-center gap-3">
-  <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-emerald-800 overflow-hidden">
-    <img
-      src="{{ asset('img/logo.jpeg') }}"
-      alt="Logo Ecoaventura"
-      class="h-full w-full object-contain"
-    >
-  </span>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarContenido">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
-  <span class="text-lg font-semibold text-emerald-950">
-    Ecoaventura
-  </span>
-</a>
+                <div class="collapse navbar-collapse" id="navbarContenido">
 
+                    <!-- MENÚ -->
+                    <ul class="navbar-nav mx-auto align-items-lg-center">
 
-      <!-- MENU -->
-      <ul class="hidden md:flex items-center gap-2 text-sm font-medium text-emerald-950/80">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url('/') }}">Inicio</a>
+                        </li>
 
-        <li>
-          <a href="{{ url('/') }}"
-             class="rounded-full px-5 py-2 hover:bg-emerald-100/70 hover:text-emerald-900 transition">
-            Inicio
-          </a>
-        </li>
+                        <!-- DESTINOS -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="{{ route('destinos.index') }}"
+                                data-bs-toggle="dropdown">
+                                Destinos
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item"
+                                        href="{{ route('destinos.tipo', 'turisticos') }}">Turísticos</a></li>
+                                <li><a class="dropdown-item"
+                                        href="{{ route('destinos.tipo', 'ecoturisticos') }}">Ecoturísticos</a></li>
+                                <li><a class="dropdown-item"
+                                        href="{{ route('destinos.tipo', 'balnearios') }}">Balnearios</a></li>
+                            </ul>
+                        </li>
 
-     <li class="relative group">
-  <a href="{{ route('destinos.index') }}"
-   class="rounded-full px-5 py-2 hover:bg-emerald-100/70 inline-flex items-center gap-1">
-  Destinos <span class="text-xs">▾</span>
-</a>
+                        <!-- SERVICIOS -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="{{ route('servicios.index') }}"
+                                data-bs-toggle="dropdown">
+                                Servicios
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item"
+                                        href="{{ route('servicios.tipo', 'hospedaje') }}">Hospedaje</a></li>
+                                <li><a class="dropdown-item"
+                                        href="{{ route('servicios.tipo', 'restaurantes') }}">Restaurantes</a></li>
+                            </ul>
+                        </li>
 
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Nosotros</a>
+                        </li>
 
-  <div
-    class="absolute left-0 mt-2 w-56 rounded-2xl
-           bg-white/80 backdrop-blur-md
-           ring-1 ring-black/10 shadow-lg p-2
-           opacity-0 invisible
-           transition-all duration-300 delay-150
-           group-hover:opacity-100 group-hover:visible group-hover:delay-0">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url('/ver-facebook') }}">Contacto</a>
+                        </li>
 
-    <a href="{{ route('destinos.tipo','turisticos') }}"
-       class="block rounded-xl px-3 py-2 text-sm hover:bg-emerald-50">
-       Turísticos
-    </a>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('mapa') }}">Mapa</a>
+                        </li>
 
-    <a href="{{ route('destinos.tipo','ecoturisticos') }}"
-       class="block rounded-xl px-3 py-2 text-sm hover:bg-emerald-50">
-       Ecoturísticos
-    </a>
+                    </ul>
 
-    <a href="{{ route('destinos.tipo','balnearios') }}"
-       class="block rounded-xl px-3 py-2 text-sm hover:bg-emerald-50">
-       Balnearios
-    </a>
-  </div>
-</li>
+                    <!-- BOTONES -->
+                    <div class="d-flex gap-2">
+                        <a href="{{ route('login') }}" class="btn btn-outline-success btn-login">
+                            Iniciar sesión
+                        </a>
+                        <a href="{{ route('register') }}" class="btn btn-register text-white">
+                            Registrarse
+                        </a>
+                    </div>
 
+                </div>
+            </div>
+        </nav>
 
-  <li class="relative group">
-<a href="{{ route('servicios.index') }}"
-   class="rounded-full px-5 py-2 hover:bg-emerald-100/70 inline-flex items-center gap-1">
-  Servicios <span class="text-xs">▾</span>
-</a>
+        <!-- Espacio para navbar fijo -->
+        <div style="height:75px;"></div>
+    @endif
 
-  <div
-    class="absolute left-0 mt-2 w-60 rounded-2xl
-           bg-white/80 backdrop-blur-md
-           ring-1 ring-black/10 shadow-lg p-2
-           opacity-0 invisible
-           transition-all duration-300 delay-150
-           group-hover:opacity-100 group-hover:visible group-hover:delay-0">
+    @if (request()->is('/'))
+        <main>
+            @yield('content')
+        </main>
+    @else
+        <main class="container py-4">
+            @yield('content')
+        </main>
+    @endif
 
-    <a href="{{ route('servicios.tipo','hospedaje') }}"
-       class="block rounded-xl px-3 py-2 text-sm hover:bg-emerald-50">
-      Hospedaje
-    </a>
-
-    <a href="{{ route('servicios.tipo','restaurantes') }}"
-       class="block rounded-xl px-3 py-2 text-sm hover:bg-emerald-50">
-      Restaurantes
-    </a>
-    
-  </div>
-</li>
-
-
-        <li><a href="#" class="rounded-full px-5 py-2 hover:bg-emerald-100/70">Nosotros</a></li>
-        <li>
-    <a href="{{ url('/ver-facebook') }}" 
-       class="rounded-full px-5 py-2 hover:bg-emerald-100/70">
-        contacto
-    </a>
-</li>
-        <li><a href="{{ route('mapa') }}" class="rounded-full px-5 py-2 hover:bg-emerald-100/70">Mapa</a></li>
-        
-      </ul>
-
-      <!-- ACCIONES -->
-      <div class="flex items-center gap-3">
-        <a href="{{ route('login') }}"
-           class="hidden sm:inline-flex rounded-full bg-white/50 px-5 py-2 text-sm font-semibold ring-1 ring-black/5">
-          Iniciar sesión
-        </a>
-
-        <a href="{{ route('register') }}"
-           class="rounded-full bg-emerald-800 px-5 py-2 text-sm font-semibold text-white">
-          Registrarse
-        </a>
-      </div>
-
-    </nav>
-  </div>
-</header>
-
-<!-- ESPACIO NAVBAR -->
-<div class="h-[74px]"></div>
-
-@endif
-
-<main>
-  @yield('content')
-</main>
+    <!-- Bootstrap JS -->
+    <script src="{{ asset('bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
 </body>
+
 </html>
