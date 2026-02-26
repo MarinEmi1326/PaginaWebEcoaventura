@@ -3,13 +3,14 @@ body {
     background: #ffffff;
 }
 
-/* NAVBAR GLASS */
+
 .navbar-glass {
     background: rgba(255, 255, 255, 0.55);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.6);
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+    
 }
 
 .navbar-brand img {

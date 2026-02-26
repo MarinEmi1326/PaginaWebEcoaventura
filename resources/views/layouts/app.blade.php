@@ -43,48 +43,27 @@
 
                 <!-- DESTINOS -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="{{ route('destinos.index') }}" data-bs-toggle="dropdown">
-                        Destinos
-                    </a>
+                    <a class="nav-link dropdown-toggle" href="{{ route('destinos.index') }}" data-bs-toggle="dropdown">Centros Turísticos</a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="{{ route('destinos.tipo','turisticos') }}">Turísticos</a></li>
                         <li><a class="dropdown-item" href="{{ route('destinos.tipo','ecoturisticos') }}">Ecoturísticos</a></li>
                         <li><a class="dropdown-item" href="{{ route('destinos.tipo','balnearios') }}">Balnearios</a></li>
                     </ul>
                 </li>
-
-                <!-- SERVICIOS -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="{{ route('servicios.index') }}" data-bs-toggle="dropdown">
-                        Servicios
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{{ route('servicios.tipo','hospedaje') }}">Hospedaje</a></li>
-                        <li><a class="dropdown-item" href="{{ route('servicios.tipo','restaurantes') }}">Restaurantes</a></li>
-                    </ul>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Cultura y Patrimonio</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Nosotros</a>
+                    <a class="nav-link" href="{{ url('/ver-facebook') }}">Turismo Responsable</a>
                 </li>
-
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url('/ver-facebook') }}">Contacto</a>
+                    <a class="nav-link" href="{{ url('/ver-facebook') }}">Rutas</a>
                 </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('mapa') }}">Mapa</a>
-                </li>
-
             </ul>
-
-            <!-- BOTONES -->
             <div class="d-flex gap-2">
                 <a href="{{ route('login') }}" class="btn btn-outline-success btn-login">
                     Iniciar sesión
-                </a>
-                <a href="{{ route('register') }}" class="btn btn-register text-white">
-                    Registrarse
                 </a>
             </div>
 
@@ -107,7 +86,7 @@
     </main>
 @endif
 
-<!-- Bootstrap JS -->
+
 <script src="{{ asset('bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
 </body>
