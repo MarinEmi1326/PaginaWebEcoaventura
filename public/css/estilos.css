@@ -21,7 +21,7 @@ body {
 
 .nav-link {
     font-weight: 500;
-    color: #064e3b !important;
+    color: #6b7280 !important;
     padding: 8px 18px !important;
     border-radius: 50px;
     transition: all 0.3s ease;
@@ -45,22 +45,12 @@ body {
     padding: 8px 12px;
 }
 
-.dropdown-item:hover {
-    background: #ecfdf5;
-}
+
 
 .btn-login {
     border-radius: 50px;
     font-weight: 600;
+    background-color: green;
+color: white;
 }
 
-.btn-register {
-    border-radius: 50px;
-    font-weight: 600;
-    background: #065f46;
-    border: none;
-}
-
-.btn-register:hover {
-    background: #064e3b;
-}

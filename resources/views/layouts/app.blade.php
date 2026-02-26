@@ -61,11 +61,9 @@
                     <a class="nav-link" href="{{ url('/ver-facebook') }}">Rutas</a>
                 </li>
             </ul>
-            <div class="d-flex gap-2">
-                <a href="{{ route('login') }}" class="btn btn-outline-success btn-login">
-                    Iniciar sesión
-                </a>
-            </div>
+            <a href="{{ route('login') }}" class="btn btn-success rounded-pill">
+    Iniciar sesión
+</a>
 
         </div>
     </div>
