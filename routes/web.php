@@ -21,7 +21,7 @@ use App\Http\Controllers\FacebookController;
 */
 Route::get('/', fn () => view('home'))->name('home');
 
-
+Route::view('/cultura', 'cultura')->name('cultura'); 
 Route::get('/login', [LoginController::class, 'show'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 
