@@ -45,12 +45,16 @@ body {
     padding: 8px 12px;
 }
 
-
-
 .btn-login {
     border-radius: 50px;
     font-weight: 600;
-    background-color: green;
-color: white;
+    background-color: #306730; 
+    color: white;              
+    border: none;
+}
+
+.btn-login:hover {
+    background-color: #376d37;
+    color: white;
 }
 
