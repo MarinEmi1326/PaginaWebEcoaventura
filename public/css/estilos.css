@@ -260,3 +260,66 @@ body{
   .eco-items{ padding-left: 0; }
 }
 
+
+
+
+/* turismo responsable */
+/* Mejora cards eco */
+.card {
+    transition: all 0.3s ease;
+    border-radius: 1.5rem !important;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(0, 128, 2, 0.12) !important;
+}
+
+/* Badge circular con icono */
+.badge.bg-success {
+    background-color: #008002 !important;
+    font-size: 1.8rem;
+    line-height: 1;
+}
+
+.custom-list {
+    counter-reset: list-item;
+    padding-left: 0;
+}
+
+.custom-list .list-group-item {
+    background-color: #f3f5f3;
+    border: none;
+    border-radius: 1rem;
+    margin-bottom: 1rem;
+    padding: 1rem 1.5rem;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    list-style: none;
+}
+
+.custom-list .list-group-item::before {
+    content: counter(list-item);
+    counter-increment: list-item;
+    background-color: #dfe7e1;
+    color: #008002;
+    font-weight: 600;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+}
+
+/* Espaciado general */
+.py-5 {
+    padding-top: 4rem !important;
+    padding-bottom: 4rem !important;
+}
+
+.shadow-lg {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important;
+}

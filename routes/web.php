@@ -5,8 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminSitioController;
-use App\Http\Controllers\HoteleroController;
-use App\Http\Controllers\RestauranteroController;
+
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\Admin\AdminSolicitudesController;
 use Laravel\Socialite\Facades\Socialite;
@@ -45,9 +44,11 @@ Route::get('/mapa', function () {
     return view('mapa');
 })->name('mapa');
 
-Route::get('/publicar-facebook', [FacebookController::class, 'publicar']);
-Route::get('/ver-facebook', [FacebookController::class, 'verPosts']);
-
+// Route::get('/publicar-facebook', [FacebookController::class, 'publicar']);
+// Route::get('/ver-facebook', [FacebookController::class, 'verPosts']);
+Route::get('/turismo-responsable', function () {
+    return view('turismo-responsable');
+})->name('turismo-responsable');
 
 
 // LOGIN CON GOOGLE

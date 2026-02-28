@@ -63,7 +63,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url('/ver-facebook') }}">Turismo Responsable</a>
+                            <a class="nav-link" href="{{ route('turismo-responsable') }}">Turismo Responsable</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url('/ver-facebook') }}">Rutas</a>
@@ -82,14 +82,16 @@
     @endif
 
     @if (request()->path() == '/')
-        <main>
-            @yield('content')
-        </main>
-    @else
-        <main class="container py-4">
-            @yield('content')
-        </main>
-    @endif
+    <main>
+        @yield('content')
+    </main>
+@else
+    <main class="container py-4">
+        @yield('content')
+    </main>
+@endif
+
+@include('layouts.footer')
 
 
     <script src="{{ asset('bootstrap/js/bootstrap.bundle.min.js') }}"></script>
