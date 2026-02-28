@@ -8,9 +8,10 @@
 
 
     <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap.min.css') }}">
+     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
 
     <!-- Tus estilos -->
-    <link rel="stylesheet" href="{{ asset('css/estilos.css') }}?v={{ filemtime(public_path('css/estilos.css')) }}">
+    
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
