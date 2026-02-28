@@ -6,18 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ecoaventura</title>
 
-
+    <!-- Bootstrap local -->
     <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap.min.css') }}">
-     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
-
-    <!-- Tus estilos -->
-    
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
 
     <!-- Bootstrap  icons local -->
     <link rel="stylesheet" href="{{ asset('bootstrap-icons/bootstrap-icons.min.css') }}">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 
 </head>
@@ -51,9 +48,7 @@
                         <!-- DESTINOS -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="{{ route('destinos.index') }}"
-                                data-bs-toggle="dropdown">
-                                Destinos
-                            </a>
+                                data-bs-toggle="dropdown">Centros Turísticos</a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item"
                                         href="{{ route('destinos.tipo', 'turisticos') }}">Turísticos</a></li>
@@ -63,107 +58,30 @@
                                         href="{{ route('destinos.tipo', 'balnearios') }}">Balnearios</a></li>
                             </ul>
                         </li>
-
-                        <!-- SERVICIOS -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="{{ route('servicios.index') }}"
-                                data-bs-toggle="dropdown">
-                                Servicios
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item"
-                                        href="{{ route('servicios.tipo', 'hospedaje') }}">Hospedaje</a></li>
-                                <li><a class="dropdown-item"
-                                        href="{{ route('servicios.tipo', 'restaurantes') }}">Restaurantes</a></li>
-                            </ul>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Cultura y Patrimonio</a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Nosotros</a>
+                            <a class="nav-link" href="{{ url('/ver-facebook') }}">Turismo Responsable</a>
                         </li>
-
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url('/ver-facebook') }}">Contacto</a>
+                            <a class="nav-link" href="{{ url('/ver-facebook') }}">Rutas</a>
                         </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('mapa') }}">Mapa</a>
-                        </li>
-
                     </ul>
-
-                    <!-- BOTONES -->
-                    <div class="d-flex gap-2">
-                        <a href="{{ route('login') }}" class="btn btn-outline-success btn-login">
-                            Iniciar sesión
-                        </a>
-                        <a href="{{ route('register') }}" class="btn btn-register text-white">
-                            Registrarse
-                        </a>
-                    </div>
-
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url('/ver-facebook') }}">Turismo Responsable</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url('/ver-facebook') }}">Rutas</a>
-                </li>
-            </ul>
-            <a href="{{ route('login') }}" class="btn btn-success rounded-pill">
-    Iniciar sesión
-</a>
-
+                    <a href="{{ route('login') }}" class="btn btn-success rounded-pill">
+                        Iniciar sesión
+                    </a>
 
                 </div>
             </div>
         </nav>
-
 
         <!-- Espacio para navbar fijo -->
         <div style="height:75px;"></div>
     @endif
 
-
-                    <!-- BOTONES -->
-                    <div class="d-flex gap-2">
-                        <a href="{{ route('login') }}" class="btn btn-outline-success btn-login">
-                            Iniciar sesión
-                        </a>
-                        <a href="{{ route('register') }}" class="btn btn-register text-white">
-                            Registrarse
-                        </a>
-                    </div>
-
-                   </li>
-               
-                <a class="nav-link {{ request()->routeIs('cultura') ? 'active' : '' }}"
-                    href="{{ route('cultura') }}">
-                        Cultura y Patrimonio
-                </a>
-                 </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url('/ver-facebook') }}">Turismo Responsable</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url('/ver-facebook') }}">Rutas</a>
-                </li>
-                </ul>
-                <a href="{{ route('login') }}" class="btn btn-success rounded-pill">
-                    Iniciar sesión
-                </a>
-
-
-                </div>
-            </div>
-        </nav>
-
-
-<!-- Espacio para navbar fijo -->
-<div style="height:75px;"></div>
-
-
-    @if (request()->is('/'))
+    @if (request()->path() == '/')
         <main>
             @yield('content')
         </main>
@@ -173,23 +91,9 @@
         </main>
     @endif
 
-    <!-- Bootstrap JS -->
+
     <script src="{{ asset('bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
-@if(request()->is('/'))
-    <main>
-        @yield('content')
-    </main>
-@else
-    <main class="container py-4">
-        @yield('content')
-    </main>
-@endif
-
-
-
-@include('layouts.footer')
-<script src="{{ asset('bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 </body>
 
 </html>
