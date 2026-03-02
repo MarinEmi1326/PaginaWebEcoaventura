@@ -59,7 +59,7 @@
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Cultura y Patrimonio</a>
+                            <a class="nav-link" href="{{route('cultura')}}">Cultura y Patrimonio</a>
                         </li>
 
                         <li class="nav-item">

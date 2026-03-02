@@ -51,6 +51,10 @@ Route::get('/turismo-responsable', function () {
 })->name('turismo-responsable');
 
 
+Route::get('/cultura', function () {
+    return view('cultura');
+})->name('cultura');
+
 // LOGIN CON GOOGLE
 Route::get('/auth/google', function () {
     return Socialite::driver('google')->redirect();
