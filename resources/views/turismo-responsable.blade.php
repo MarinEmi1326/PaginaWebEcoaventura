@@ -20,12 +20,11 @@
                 <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
                     <div class="card-body p-4 p-md-5">
                         <div class="d-flex align-items-center mb-4">
-                            <span
-                                class="badge bg-success rounded-pill fs-3 p-4 me-4 d-flex align-items-center justify-content-center"
-                                style="width: 70px; height: 70px;">
-                                <i class="bi bi-leaf"></i>
+                            <span class="rounded-4 fs-3 p-4 me-4 d-flex align-items-center justify-content-center"
+                                style="width: 70px; height: 70px; background-color: #e9ecef;">
+                                <i class="bi bi-leaf text-success"></i>
                             </span>
-                            <h2 class="card-title mb-0 text-success fw-bold">Conservación Ambiental</h2>
+                            <h2 class="card-title mb-0 fw-bold">Conservación Ambiental</h2>
                         </div>
                         <p class="text-muted mb-4 fs-5">
                             La Selva Lacandona y los ecosistemas de Ocosingo son frágiles. Cada visitante tiene la
@@ -51,12 +50,11 @@
                 <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
                     <div class="card-body p-4 p-md-5">
                         <div class="d-flex align-items-center mb-4">
-                            <span
-                                class="badge bg-success rounded-pill fs-3 p-4 me-4 d-flex align-items-center justify-content-center"
-                                style="width: 70px; height: 70px;">
-                                <i class="bi bi-heart"></i>
+                            <span class="rounded-4 fs-3 p-4 me-4 d-flex align-items-center justify-content-center"
+                                style="width: 70px; height: 70px; background-color: #e9ecef;">
+                                <i class="bi bi-heart text-success"></i>
                             </span>
-                            <h2 class="card-title mb-0 text-success fw-bold">Respeto Cultural</h2>
+                            <h2 class="card-title mb-0 fw-bold">Respeto Cultural</h2>
                         </div>
                         <p class="text-muted mb-4 fs-5">
                             Las comunidades indígenas de la región preservan lenguas, tradiciones y modos de vida que
@@ -83,12 +81,11 @@
                 <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
                     <div class="card-body p-4 p-md-5">
                         <div class="d-flex align-items-center mb-4">
-                            <span
-                                class="badge bg-success rounded-pill fs-3 p-4 me-4 d-flex align-items-center justify-content-center"
-                                style="width: 70px; height: 70px;">
-                                <i class="bi bi-people"></i>
+                            <span class="rounded-4 fs-3 p-4 me-4 d-flex align-items-center justify-content-center"
+                                style="width: 70px; height: 70px; background-color: #e9ecef;">
+                                <i class="bi bi-people text-success"></i>
                             </span>
-                            <h2 class="card-title mb-0 text-success fw-bold">Turismo Comunitario</h2>
+                            <h2 class="card-title mb-0 fw-bold">Turismo Comunitario</h2>
                         </div>
                         <p class="text-muted mb-4 fs-5">
                             El turismo comunitario permite que los beneficios económicos lleguen directamente a las
@@ -115,12 +112,11 @@
                 <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
                     <div class="card-body p-4 p-md-5">
                         <div class="d-flex align-items-center mb-4">
-                            <span
-                                class="badge bg-success rounded-pill fs-3 p-4 me-4 d-flex align-items-center justify-content-center"
-                                style="width: 70px; height: 70px;">
-                                <i class="bi bi-recycle"></i>
+                            <span class="rounded-4 fs-3 p-4 me-4 d-flex align-items-center justify-content-center"
+                                style="width: 70px; height: 70px; background-color: #e9ecef;">
+                                <i class="bi bi-recycle text-success"></i>
                             </span>
-                            <h2 class="card-title mb-0 text-success fw-bold">Prácticas Sostenibles</h2>
+                            <h2 class="card-title mb-0 fw-bold">Prácticas Sostenibles</h2>
                         </div>
                         <p class="text-muted mb-4 fs-5">
                             Pequeñas acciones individuales generan un gran impacto colectivo en la preservación del
@@ -144,7 +140,7 @@
     </div>
     <!-- Sección Cooperativas y Proyectos Comunitarios -->
     <div class="mt-4">
-        <h2 class="text-center fw-bold text-success mb-4">Cooperativas y Proyectos Comunitarios</h2>
+        <h2 class="text-center fw-bold mb-4">Cooperativas y Proyectos Comunitarios</h2>
         <p class="text-center text-muted fs-5 mb-5" style="max-width: 800px; margin: 0 auto;">
             Conoce las organizaciones locales que hacen posible un turismo que beneficia directamente a las comunidades de
             Ocosingo.
@@ -157,12 +153,11 @@
                 <div class="card h-100 border-0 shadow-lg rounded-4 overflow-hidden">
                     <div class="card-body p-4 d-flex flex-column">
                         <div class="d-flex align-items-center mb-3">
-                            <span
-                                class="badge bg-success rounded-pill fs-4 p-3 me-3 d-flex align-items-center justify-content-center"
-                                style="width: 60px; height: 60px;">
-                                <i class="bi bi-people"></i>
+                            <span class="rounded-4 fs-4 p-3 me-3 d-flex align-items-center justify-content-center"
+                                style="width: 60px; height: 60px; background-color: #e9ecef;">
+                                <i class="bi bi-people text-success"></i>
                             </span>
-                            <h5 class="card-title mb-0 text-success fw-bold">
+                            <h5 class="card-title mb-0 fw-bold">
                                 Cooperativa Lacandón de Nahá
                             </h5>
                         </div>
@@ -184,12 +179,11 @@
                 <div class="card h-100 border-0 shadow-lg rounded-4 overflow-hidden">
                     <div class="card-body p-4 d-flex flex-column">
                         <div class="d-flex align-items-center mb-3">
-                            <span
-                                class="badge bg-success rounded-pill fs-4 p-3 me-3 d-flex align-items-center justify-content-center"
-                                style="width: 60px; height: 60px;">
-                                <i class="bi bi-people"></i>
+                            <span class="rounded-4 fs-4 p-3 me-3 d-flex align-items-center justify-content-center"
+                                style="width: 60px; height: 60px; background-color: #e9ecef;">
+                                <i class="bi bi-people text-success"></i>
                             </span>
-                            <h5 class="card-title mb-0 text-success fw-bold">
+                            <h5 class="card-title mb-0 fw-bold">
                                 Café orgánico Tzeltal
                             </h5>
                         </div>
@@ -211,12 +205,11 @@
                 <div class="card h-100 border-0 shadow-lg rounded-4 overflow-hidden">
                     <div class="card-body p-4 d-flex flex-column">
                         <div class="d-flex align-items-center mb-3">
-                            <span
-                                class="badge bg-success rounded-pill fs-4 p-3 me-3 d-flex align-items-center justify-content-center"
-                                style="width: 60px; height: 60px;">
-                                <i class="bi bi-people"></i>
+                            <span class="rounded-4 fs-4 p-3 me-3 d-flex align-items-center justify-content-center"
+                                style="width: 60px; height: 60px; background-color: #e9ecef;">
+                                <i class="bi bi-people text-success"></i>
                             </span>
-                            <h5 class="card-title mb-0 text-success fw-bold">
+                            <h5 class="card-title mb-0 fw-bold">
                                 Artesanas de Ocosingo
                             </h5>
                         </div>
@@ -238,12 +231,11 @@
                 <div class="card h-100 border-0 shadow-lg rounded-4 overflow-hidden">
                     <div class="card-body p-4 d-flex flex-column">
                         <div class="d-flex align-items-center mb-3">
-                            <span
-                                class="badge bg-success rounded-pill fs-4 p-3 me-3 d-flex align-items-center justify-content-center"
-                                style="width: 60px; height: 60px;">
-                                <i class="bi bi-people"></i>
+                            <span class="rounded-4 fs-4 p-3 me-3 d-flex align-items-center justify-content-center"
+                                style="width: 60px; height: 60px; background-color: #e9ecef;">
+                                <i class="bi bi-people text-success"></i>
                             </span>
-                            <h5 class="card-title mb-0 text-success fw-bold">
+                            <h5 class="card-title mb-0 fw-bold">
                                 Guardianes de Miramar
                             </h5>
                         </div>
@@ -262,5 +254,4 @@
 
         </div>
     </div>
-   
 @endsection
