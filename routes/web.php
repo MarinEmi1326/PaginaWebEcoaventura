@@ -100,6 +100,18 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])
             ->name('dashboard');
 
+        Route::get('/aprobacion', function () {
+            return view('admin.aprobacion');
+        })->name('aprobacion');    
+
+        Route::get('/reportes', function () {
+            return view('admin.reportes');
+        })->name('reportes');
+
+        Route::get('/respaldos', function () {
+            return view('admin.respaldos');
+        })->name('respaldos');
+
         //  UNA SOLA LÍNEA: CRUD COMPLETO
         Route::resource('sitios', AdminSitioController::class);
         Route::get('/solicitudes', [AdminSolicitudesController::class, 'index'])
