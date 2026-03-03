@@ -1,71 +1,116 @@
 @extends('layouts.admin')
 
-@section('content')
-<div class="max-w-5xl mx-auto pb-10">
-    <div class="mb-6">
-        <a href="{{ route('admin.solicitudes.index') }}" class="text-emerald-600 font-medium flex items-center gap-2 mb-4">
-            ← Volver al listado
-        </a>
-        <h1 class="text-3xl font-serif font-bold text-slate-900">Editar Usuario</h1>
-        <p class="text-slate-500">Modifica la información de la cuenta de <b>{{ $usuario->correo }}</b></p>
-    </div>
+@section('title', 'Editar Usuario')
 
-    <form action="{{ route('admin.solicitudes.update', $usuario->id_usuario) }}" method="POST" class="space-y-8">
+@section('content')
+
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-10 col-xl-9">
+
+      {{-- Encabezado --}}
+      <div class="mb-4">
+        <a href="{{ route('admin.solicitudes.index') }}"
+           class="text-decoration-none fw-semibold"
+           style="color: var(--ea-green);">
+          ← Volver al listado
+        </a>
+
+        <h1 class="ea-page-title mt-3 mb-1">Editar Usuario</h1>
+        <p class="ea-subtitle mb-0">
+          Modifica la información de la cuenta de <b>{{ $usuario->correo }}</b>
+        </p>
+      </div>
+
+      <form action="{{ route('admin.solicitudes.update', $usuario->id_usuario) }}" method="POST">
         @csrf
         @method('PUT')
 
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 font-semibold text-slate-800">
-                🔑 Credenciales y Acceso
+        {{-- BLOQUE 1 --}}
+        <div class="ea-card p-0 overflow-hidden mb-4">
+          <div class="p-4 border-bottom"
+               style="border-color: var(--ea-line) !important; background: rgba(255,255,255,.25);">
+            <div class="fw-semibold" style="color: var(--ea-text);">
+              🔑 Credenciales y Acceso
             </div>
-            <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2">Correo Electrónico</label>
-                    <input type="email" name="correo" value="{{ $usuario->correo }}" required class="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2">Nueva Contraseña (Opcional)</label>
-                    <input type="password" name="password" placeholder="Dejar en blanco para no cambiar" class="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2">Rol</label>
-                    <select name="rol" class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white outline-none focus:ring-2 focus:ring-emerald-500">
-                        <option value="hotelero" {{ $usuario->rol == 'hotelero' ? 'selected' : '' }}>Hotelero</option>
-                        <option value="restaurantero" {{ $usuario->rol == 'restaurantero' ? 'selected' : '' }}>Restaurantero</option>
-                    </select>
-                </div>
+          </div>
+
+          <div class="p-4">
+            <div class="row g-3">
+              <div class="col-12 col-md-4">
+                <label class="form-label fw-bold">Correo Electrónico</label>
+                <input type="email" name="correo" value="{{ $usuario->correo }}" required
+                       class="form-control rounded-3 py-2">
+              </div>
+
+              <div class="col-12 col-md-4">
+                <label class="form-label fw-bold">Nueva Contraseña (Opcional)</label>
+                <input type="password" name="password"
+                       placeholder="Dejar en blanco para no cambiar"
+                       class="form-control rounded-3 py-2">
+              </div>
+
+              <div class="col-12 col-md-4">
+                <label class="form-label fw-bold">Rol</label>
+                <select name="rol" class="form-select rounded-3 py-2">
+                  <option value="hotelero" {{ $usuario->rol == 'hotelero' ? 'selected' : '' }}>Hotelero</option>
+                  <option value="restaurantero" {{ $usuario->rol == 'restaurantero' ? 'selected' : '' }}>Restaurantero</option>
+                </select>
+              </div>
             </div>
+          </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 font-semibold text-slate-800">
-                👤 Información Personal
+        {{-- BLOQUE 2 --}}
+        <div class="ea-card p-0 overflow-hidden">
+          <div class="p-4 border-bottom"
+               style="border-color: var(--ea-line) !important; background: rgba(255,255,255,.25);">
+            <div class="fw-semibold" style="color: var(--ea-text);">
+              👤 Información Personal
             </div>
-            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2">Nombre(s)</label>
-                    <input type="text" name="nombre" value="{{ $usuario->nombre ?? '' }}" required class="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2">Apellido Paterno</label>
-                    <input type="text" name="apaterno" value="{{ $usuario->apaterno ?? '' }}" required class="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2">Apellido Materno</label>
-                    <input type="text" name="amaterno" value="{{ $usuario->amaterno ?? '' }}" class="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2">Teléfono</label>
-                    <input type="text" name="telefono" value="{{ $usuario->telefono ?? '' }}" required class="w-full px-4 py-3 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-emerald-500 font-mono">
-                </div>
+          </div>
+
+          <div class="p-4">
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <label class="form-label fw-bold">Nombre(s)</label>
+                <input type="text" name="nombre" value="{{ $usuario->nombre ?? '' }}" required
+                       class="form-control rounded-3 py-2">
+              </div>
+
+              <div class="col-12 col-md-6">
+                <label class="form-label fw-bold">Apellido Paterno</label>
+                <input type="text" name="apaterno" value="{{ $usuario->apaterno ?? '' }}" required
+                       class="form-control rounded-3 py-2">
+              </div>
+
+              <div class="col-12 col-md-6">
+                <label class="form-label fw-bold">Apellido Materno</label>
+                <input type="text" name="amaterno" value="{{ $usuario->amaterno ?? '' }}"
+                       class="form-control rounded-3 py-2">
+              </div>
+
+              <div class="col-12 col-md-6">
+                <label class="form-label fw-bold">Teléfono</label>
+                <input type="text" name="telefono" value="{{ $usuario->telefono ?? '' }}" required
+                       class="form-control rounded-3 py-2 font-monospace">
+              </div>
             </div>
+          </div>
         </div>
 
-        <div class="flex justify-end gap-4 mt-10 border-t pt-8">
-            <button type="submit" class="px-10 py-4 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-200">
-                Actualizar Datos del Usuario
-            </button>
+        {{-- Acciones --}}
+        <div class="d-flex justify-content-end mt-4 pt-4 border-top"
+             style="border-color: rgba(15,42,36,.10) !important;">
+          <button type="submit" class="btn ea-btn-green px-4 py-2 rounded-3 fw-semibold">
+            Actualizar Datos del Usuario
+          </button>
         </div>
-    </form>
+
+      </form>
+
+    </div>
+  </div>
 </div>
+
 @endsection
