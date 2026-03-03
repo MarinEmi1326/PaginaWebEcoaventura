@@ -5,6 +5,10 @@ body {
     color: #1E2A22;
     overflow-x: hidden;
 }
+
+
+
+
 .navbar-glass{
   background: rgba(255, 255, 255, 0.55);
   backdrop-filter: blur(18px);
@@ -293,3 +297,4 @@ body {
     color: #991b1b;
     font-weight: 400;
 }
+
