@@ -44,7 +44,7 @@
                     <ul class="navbar-nav mx-auto align-items-lg-center">
 
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url('/') }}">Inicio</a>
+                            <a class="nav-link {{ request()->is('/') ? 'active' : '' }}" href="{{ url('/') }}">Inicio</a>
                         </li>
 
                         <!-- DESTINOS -->
@@ -61,15 +61,14 @@
                             </ul>
                         </li>
                         <li class="nav-item">
-
-                            <a class="nav-link" href="#">Cultura y Patrimonio</a>
+                            <a class="nav-link {{ request()->is('cultura') ? 'active' : '' }}" href="{{url('cultura')}}">Cultura y Patrimonio</a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url('/ver-facebook') }}">Turismo Responsable</a>
+                            <a class="nav-link {{ request()->is('turismo-responsable') ? 'active' : '' }}" href="{{ url('turismo-responsable') }}">Turismo Responsable</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url('/ver-facebook') }}">Rutas</a>
+                            <a class="nav-link {{ request()->is('ruta') ? 'active' : '' }}" href="{{ url('ruta') }}">Rutas</a>
 
                           
                         </li>
@@ -102,10 +101,6 @@
 
 
     <script src="{{ asset('bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-
-<footer>
-      @include('layouts.footer')
-</footer>
 
 </body>
 
