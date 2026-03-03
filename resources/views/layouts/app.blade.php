@@ -61,6 +61,7 @@
                             </ul>
                         </li>
                         <li class="nav-item">
+
                             <a class="nav-link {{ request()->is('cultura') ? 'active' : '' }}" href="{{url('cultura')}}">Cultura y Patrimonio</a>
                         </li>
 
@@ -69,8 +70,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->is('ruta') ? 'active' : '' }}" href="{{ url('ruta') }}">Rutas</a>
-
-                          
+    
                         </li>
                     </ul>
                     <a href="{{ route('login') }}" class="btn btn-success rounded-pill">
