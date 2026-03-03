@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminSitioController;
 
 use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\DestinoController;
 use App\Http\Controllers\Admin\AdminSolicitudesController;
 use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
@@ -54,6 +55,27 @@ Route::get('/turismo-responsable', function () {
 Route::get('/cultura', function () {
     return view('cultura');
 })->name('cultura');
+
+
+Route::get('/ruta', function () {
+    return view('ruta');
+})->name('ruta');
+
+
+
+// apenas se agrego las vistas 
+// Route::get('/destinos', [DestinoController::class, 'index'])->name('destinos.index');
+
+// Route::get('/destinos/{tipo}', [DestinoController::class, 'index'])
+//     ->whereIn('tipo', ['turisticos','ecoturisticos','balnearios'])
+//     ->name('destinos.tipo');
+
+// Route::get('/destino/{slug}', [DestinoController::class, 'show'])
+//     ->name('destinos.show');
+
+
+
+
 
 // LOGIN CON GOOGLE
 Route::get('/auth/google', function () {
