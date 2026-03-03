@@ -62,14 +62,14 @@
                         </li>
                         <li class="nav-item">
 
-                            <a class="nav-link" href="#">Cultura y Patrimonio</a>
+                            <a class="nav-link" href="{{ url('/cultura') }}">Cultura y Patrimonio</a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url('/ver-facebook') }}">Turismo Responsable</a>
+                            <a class="nav-link" href="{{ url('/turismo-responsable') }}">Turismo Responsable</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url('/ver-facebook') }}">Rutas</a>
+                            <a class="nav-link" href="{{ url('/ruta') }}">Rutas</a>
 
                           
                         </li>
