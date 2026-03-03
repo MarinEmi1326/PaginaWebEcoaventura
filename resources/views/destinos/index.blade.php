@@ -2,139 +2,158 @@
 
 @section('content')
 
-{{-- LISTADO DE DESTINOS (como tu diseño) --}}
-<section class="bg-[#eef6fb] py-16">
-  <div class="max-w-7xl mx-auto px-6">
+<section class="destinos-hero py-5">
+  <div class="container py-4">
 
-    {{-- Título --}}
-    <div class="text-center max-w-4xl mx-auto">
-      <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900">
-        Descubre la magia de la naturaleza
-      </h1>
-      <p class="mt-4 text-slate-600">
-        Vive experiencias únicas de ecoturismo. Explora destinos extraordinarios, conecta con la naturaleza y crea recuerdos
-        inolvidables con aventuras sostenibles.
+    {{-- Título (serif + centrado) --}}
+    <div class="text-center mx-auto" style="max-width: 980px;">
+      <h1 class="destinos-title mb-2">Descubre Destinos Increíbles</h1>
+      <p class="destinos-subtitle mb-0">
+        Explora nuestra colección de destinos turísticos, ecoturísticos y balnearios. Cada lugar es una
+        aventura esperando por ti.
       </p>
     </div>
 
-    {{-- Buscador --}}
-    <div class="mt-8 flex justify-center">
-      <div class="w-full max-w-2xl">
-        <div class="relative">
-          <span class="absolute inset-y-0 left-4 flex items-center text-slate-500">
-            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="7"></circle>
-              <path d="M21 21l-4.3-4.3"></path>
-            </svg>
-          </span>
-          <input
-            type="text"
-            placeholder="Buscar destinos..."
-            class="w-full rounded-2xl border border-slate-200 bg-white px-12 py-4 text-slate-900 placeholder:text-slate-500
-                   shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-600/40"
-          >
-        </div>
+    {{-- Buscador (cápsula centrada, sin botón) --}}
+    <form method="GET" class="mt-4 d-flex justify-content-center">
+      <div class="destinos-search">
+        <i class="bi bi-search"></i>
+        <input
+          type="text"
+          name="q"
+          value="{{ $q ?? '' }}"
+          placeholder="Buscar destinos..."
+          aria-label="Buscar destinos"
+        >
       </div>
-    </div>
+    </form>
 
-    {{-- Tabs + filtros --}}
-    <div class="mt-10 flex items-center justify-between gap-4 flex-wrap">
-      <div class="inline-flex items-center gap-2 rounded-2xl bg-emerald-900/10 p-2">
-        <a href="{{ route('destinos.index') }}"
-           class="px-5 py-2 rounded-xl font-semibold {{ request()->routeIs('destinos.index') ? 'bg-white shadow-sm text-emerald-950' : 'text-emerald-950/80 hover:bg-white/60' }}">
+    {{-- Tabs cápsula + botón filtros --}}
+    <div class="mt-5 d-flex align-items-center justify-content-between flex-wrap gap-3">
+
+      <div class="destinos-tabs">
+        <a href="{{ route('destinos.index', ['q' => $q ?? null]) }}"
+           class="destinos-tab {{ empty($tipo) ? 'active' : '' }}">
           Todos
         </a>
 
-        <a href="{{ route('destinos.tipo', 'turisticos') }}"
-           class="px-5 py-2 rounded-xl font-semibold {{ request()->is('destinos/turisticos') ? 'bg-white shadow-sm text-emerald-950' : 'text-emerald-950/80 hover:bg-white/60' }}">
-          Turisticos
+        <a href="{{ route('destinos.tipo', ['tipo' => 'turisticos', 'q' => $q ?? null]) }}"
+           class="destinos-tab {{ ($tipo ?? '') === 'turisticos' ? 'active' : '' }}">
+          Turísticos
         </a>
 
-        <a href="{{ route('destinos.tipo', 'ecoturisticos') }}"
-           class="px-5 py-2 rounded-xl font-semibold {{ request()->is('destinos/ecoturisticos') ? 'bg-white shadow-sm text-emerald-950' : 'text-emerald-950/80 hover:bg-white/60' }}">
-          Ecoturisticos
+        <a href="{{ route('destinos.tipo', ['tipo' => 'ecoturisticos', 'q' => $q ?? null]) }}"
+           class="destinos-tab {{ ($tipo ?? '') === 'ecoturisticos' ? 'active' : '' }}">
+          Ecoturísticos
         </a>
 
-        <a href="{{ route('destinos.tipo', 'balnearios') }}"
-           class="px-5 py-2 rounded-xl font-semibold {{ request()->is('destinos/balnearios') ? 'bg-white shadow-sm text-emerald-950' : 'text-emerald-950/80 hover:bg-white/60' }}">
+        <a href="{{ route('destinos.tipo', ['tipo' => 'balnearios', 'q' => $q ?? null]) }}"
+           class="destinos-tab {{ ($tipo ?? '') === 'balnearios' ? 'active' : '' }}">
           Balnearios
         </a>
       </div>
 
-      <button
-        type="button"
-        class="inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-3 font-semibold text-emerald-950
-               ring-1 ring-slate-200 shadow-sm hover:bg-slate-50 transition"
-      >
-        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M4 6h16M7 12h10M10 18h4"/>
-        </svg>
+      <button type="button" class="destinos-filter-btn">
+        <i class="bi bi-funnel"></i>
         Filtros
       </button>
     </div>
 
-    {{-- Cards demo --}}
-    @php
-      $cards = [
-        ['tipo'=>'Ecoturístico','img'=>'https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1200&auto=format&fit=crop'],
-        ['tipo'=>'Balneario','img'=>'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?q=80&w=1200&auto=format&fit=crop'],
-        ['tipo'=>'Turisticos','img'=>'https://images.unsplash.com/photo-1526772662000-3f88f10405ff?q=80&w=1200&auto=format&fit=crop'],
-      ];
-    @endphp
+    {{-- Cards --}}
+    <div class="row mt-4 g-4">
+      @forelse($cards as $c)
+        <div class="col-12 col-md-6 col-lg-4">
+          <article class="card h-100 shadow-sm border-0 overflow-hidden" style="border-radius: 1.25rem;">
 
-    <div class="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      @foreach($cards as $c)
-        <article class="rounded-3xl bg-white shadow-[0_20px_40px_rgba(2,6,23,0.08)] ring-1 ring-slate-200/70 overflow-hidden">
-          <div class="relative">
-            <img src="{{ $c['img'] }}" class="h-52 w-full object-cover" alt="Destino">
+            <div class="position-relative">
+              <img src="{{ $c['img'] }}" alt="{{ $c['titulo'] }}"
+                   class="w-100"
+                   style="height: 220px; object-fit: cover;">
 
-            <span class="absolute top-4 left-4 rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-emerald-950">
-              {{ $c['tipo'] }}
-            </span>
+              <span class="badge rounded-pill text-bg-light position-absolute top-0 start-0 m-3 px-3 py-2 shadow-sm">
+                <span class="text-success fw-bold">{{ $c['tipo'] }}</span>
+              </span>
 
-            <button class="absolute top-4 right-4 h-10 w-10 rounded-full bg-white/90 flex items-center justify-center">
-              <svg class="h-5 w-5 text-emerald-900" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20.8 4.6c-1.5-1.6-4-1.6-5.5 0L12 7.8 8.7 4.6c-1.5-1.6-4-1.6-5.5 0-1.8 1.9-1.8 4.9 0 6.8L12 21l8.8-9.6c1.8-1.9 1.8-4.9 0-6.8z"/>
-              </svg>
-            </button>
+              {{-- Favorito (gris al inicio, cambia a rojo al click) --}}
+              <button type="button"
+                      class="btn btn-light position-absolute top-0 end-0 m-3 rounded-circle shadow-sm favorite-btn"
+                      style="width: 44px; height: 44px;"
+                      aria-label="Favorito">
+                <i class="bi bi-heart favorite-icon"></i>
+              </button>
 
-            <span class="absolute bottom-4 right-4 rounded-full bg-emerald-900 px-4 py-2 text-sm font-extrabold text-white">
-              Desde $120
-            </span>
-          </div>
-
-          <div class="p-5">
-            <div class="text-xs font-semibold text-slate-500">Ecoturistico</div>
-            <h3 class="mt-1 text-lg font-extrabold text-slate-900">Ruinas Ancestrales</h3>
-            <p class="mt-2 text-sm text-slate-600">Descubre la historia antigua en este sitio arqueológico rodeado de naturaleza,</p>
-
-            <div class="mt-3 flex flex-wrap gap-2">
-              <span class="rounded-lg bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-700 ring-1 ring-slate-200">Museo</span>
-              <span class="rounded-lg bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-700 ring-1 ring-slate-200">Guías expertos</span>
-              <span class="rounded-lg bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-700 ring-1 ring-slate-200">Tiendas</span>
+              <span class="badge bg-success position-absolute bottom-0 end-0 m-3 px-3 py-2 shadow">
+                <span class="fw-bold">Desde ${{ $c['precio'] }}</span>
+              </span>
             </div>
 
-            <div class="mt-4 border-t border-slate-200 pt-4 flex items-center justify-between">
-              <div class="flex items-center gap-2 text-sm font-semibold text-slate-900">
-                <span class="inline-flex items-center gap-1">
-                  <svg class="h-4 w-4 text-emerald-800" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 17.3l-5.4 3 1-6.1-4.4-4.3 6.1-.9L12 3.5l2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-3Z"/>
-                  </svg>
-                  4.9
-                </span>
-                <span class="text-slate-500 font-medium">(312 reseñas)</span>
+            <div class="card-body p-4">
+              <div class="text-muted small fw-semibold">{{ $c['tipo'] }}</div>
+              <h3 class="h5 fw-bold text-dark mt-1 mb-2">{{ $c['titulo'] }}</h3>
+              <p class="text-muted mb-3">{{ $c['descripcion'] }}</p>
+
+              <div class="d-flex flex-wrap gap-2">
+                @foreach($c['chips'] as $chip)
+                  <span class="badge text-bg-light border fw-semibold">{{ $chip }}</span>
+                @endforeach
               </div>
 
-              <a href="#" class="text-sm font-extrabold text-emerald-900 hover:text-emerald-700 transition">
-                Ver detalles
-              </a>
+              <hr class="my-4">
+
+              <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="d-inline-flex align-items-center gap-1 fw-semibold text-dark">
+                    <i class="bi bi-star-fill text-warning"></i>
+                    {{ $c['rating'] }}
+                  </span>
+                  <span class="text-muted">({{ $c['reviews'] }} reseñas)</span>
+                </div>
+
+                <a href="{{ $c['url'] }}" class="fw-bold text-success text-decoration-none">
+                  Ver detalles <i class="bi bi-arrow-right"></i>
+                </a>
+              </div>
+
+              @if(!empty($c['ubicacion']))
+                <div class="text-muted small mt-3">
+                  <i class="bi bi-geo-alt"></i> {{ $c['ubicacion'] }}
+                </div>
+              @endif
             </div>
+
+          </article>
+        </div>
+      @empty
+        <div class="col-12">
+          <div class="alert alert-warning mb-0">
+            No se encontraron destinos con ese filtro.
           </div>
-        </article>
-      @endforeach
+        </div>
+      @endforelse
     </div>
 
   </div>
 </section>
+
+{{-- JS favorito --}}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".favorite-btn").forEach(btn => {
+    btn.addEventListener("click", function () {
+      const icon = this.querySelector(".favorite-icon");
+
+      icon.classList.toggle("active");
+
+      if (icon.classList.contains("active")) {
+        icon.classList.remove("bi-heart");
+        icon.classList.add("bi-heart-fill");
+      } else {
+        icon.classList.remove("bi-heart-fill");
+        icon.classList.add("bi-heart");
+      }
+    });
+  });
+});
+</script>
 
 @endsection

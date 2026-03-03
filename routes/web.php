@@ -5,9 +5,9 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminSitioController;
-use App\Http\Controllers\HoteleroController;
-use App\Http\Controllers\RestauranteroController;
+
 use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\DestinoController;
 use App\Http\Controllers\Admin\AdminSolicitudesController;
 use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
@@ -21,7 +21,7 @@ use App\Http\Controllers\FacebookController;
 */
 Route::get('/', fn () => view('home'))->name('home');
 
-
+Route::view('/cultura', 'cultura')->name('cultura'); 
 Route::get('/login', [LoginController::class, 'show'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 
@@ -45,8 +45,35 @@ Route::get('/mapa', function () {
     return view('mapa');
 })->name('mapa');
 
-Route::get('/publicar-facebook', [FacebookController::class, 'publicar']);
-Route::get('/ver-facebook', [FacebookController::class, 'verPosts']);
+// Route::get('/publicar-facebook', [FacebookController::class, 'publicar']);
+// Route::get('/ver-facebook', [FacebookController::class, 'verPosts']);
+Route::get('/turismo-responsable', function () {
+    return view('turismo-responsable');
+})->name('turismo-responsable');
+
+
+Route::get('/cultura', function () {
+    return view('cultura');
+})->name('cultura');
+
+
+Route::get('/ruta', function () {
+    return view('ruta');
+})->name('ruta');
+
+
+
+// apenas se agrego las vistas 
+// Route::get('/destinos', [DestinoController::class, 'index'])->name('destinos.index');
+
+// Route::get('/destinos/{tipo}', [DestinoController::class, 'index'])
+//     ->whereIn('tipo', ['turisticos','ecoturisticos','balnearios'])
+//     ->name('destinos.tipo');
+
+// Route::get('/destino/{slug}', [DestinoController::class, 'show'])
+//     ->name('destinos.show');
+
+
 
 
 
