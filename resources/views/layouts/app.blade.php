@@ -61,14 +61,15 @@
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->is('cultura') ? 'active' : '' }}" href="{{url('cultura')}}">Cultura y Patrimonio</a>
+
+                            <a class="nav-link" href="{{ url('/cultura') }}">Cultura y Patrimonio</a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->is('turismo-responsable') ? 'active' : '' }}" href="{{ url('turismo-responsable') }}">Turismo Responsable</a>
+                            <a class="nav-link" href="{{ url('/turismo-responsable') }}">Turismo Responsable</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->is('ruta') ? 'active' : '' }}" href="{{ url('ruta') }}">Rutas</a>
+                            <a class="nav-link" href="{{ url('/ruta') }}">Rutas</a>
 
                           
                         </li>
@@ -101,6 +102,8 @@
 
 
     <script src="{{ asset('bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+
+
 
 </body>
 

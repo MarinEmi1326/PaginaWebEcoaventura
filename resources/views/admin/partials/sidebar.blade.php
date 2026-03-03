@@ -1,64 +1,68 @@
-<aside class="w-72 bg-emerald-950 text-white flex flex-col">
-    <div class="px-6 py-6 border-b border-white/10">
-        <div class="flex items-center gap-3">
-            <div class="h-10 w-10 rounded-xl bg-emerald-800 flex items-center justify-center font-bold">E</div>
-            <div>
-                <div class="text-lg font-semibold">Ecoaventura</div>
-                <div class="text-xs text-white/70">Panel Admin</div>
-            </div>
-        </div>
+<aside class="ea-sidebar d-flex flex-column">
+
+  {{-- Logo --}}
+  <div class="px-4 py-3 d-flex align-items-center gap-3 border-bottom" style="border-color: var(--ea-line) !important;">
+    <div class="ea-logo-badge">
+      <i class="bi bi-leaf-fill"></i>
     </div>
+    <div class="fw-semibold">Ecoaventura</div>
+  </div>
 
-    <nav class="px-4 py-5 space-y-1 text-sm">
-        <a href="{{ route('admin.dashboard') }}"
-           class="flex items-center gap-3 px-4 py-3 rounded-xl
-           {{ request()->routeIs('admin.dashboard') ? 'bg-emerald-600/30 border border-emerald-400/20' : 'hover:bg-white/5' }}">
-            <span>🏠</span> Panel De Control
-        </a>
+  {{-- Usuario --}}
+  <div class="px-4 py-3 border-bottom" style="border-color: var(--ea-line) !important;">
+    <div class="fw-semibold">Carlos Administrador</div>
+    <div class="small" style="color: var(--ea-muted);">Administrador General</div>
+  </div>
 
-        <a href="{{ route('admin.solicitudes.index') }}"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors
-            {{ request()->routeIs('admin.solicitudes.*') ? 'bg-emerald-600/30 border border-emerald-400/20' : 'hover:bg-white/5' }}">
-            <span>📥</span> Bandeja de Solicitudes
-        </a>
+  {{-- Menú --}}
+  <nav class="px-3 py-3 d-grid gap-2">
 
-        {{-- Gestión de Destinos (dropdown) --}}
-        <details class="group" {{ request()->routeIs('admin.sitios.*') ? 'open' : '' }}>
-            <summary class="list-none flex items-center justify-between px-4 py-3 rounded-xl hover:bg-white/5 cursor-pointer">
-                <span class="flex items-center gap-3"><span>📍</span> Gestión de Destinos</span>
-                <span class="transition-transform group-open:rotate-180 text-white/70">⌄</span>
-            </summary>
+    <a href="{{ route('admin.dashboard') }}"
+       class="ea-nav-pill {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+      <i class="bi bi-bar-chart-line"></i>
+      <span>Dashboard</span>
+    </a>
 
-            <div class="mt-1 space-y-1">
-                <a href="{{ route('admin.sitios.index', ['categoria' => 'Turistico']) }}"
-                   class="ml-3 flex items-center gap-3 px-4 py-3 rounded-xl
-                   {{ request('categoria') === 'Turistico' ? 'bg-emerald-500 text-emerald-950 font-semibold' : 'hover:bg-white/5' }}">
-                    <span>⛰️</span> Turístico
-                </a>
+    <a href="{{ route('admin.aprobacion') }}"
+        class="ea-nav-pill {{ request()->routeIs('admin.aprobacion') ? 'active' : '' }}">
+        <i class="bi bi-check2-square"></i>
+        <span>Aprobación</span>
+    </a>
 
-                <a href="{{ route('admin.sitios.index', ['categoria' => 'Ecoturistico']) }}"
-                   class="ml-3 flex items-center gap-3 px-4 py-3 rounded-xl
-                   {{ request('categoria') === 'Ecoturistico' ? 'bg-emerald-500 text-emerald-950 font-semibold' : 'hover:bg-white/5' }}">
-                    <span>🌿</span> Ecoturístico
-                </a>
+    <a href="{{ route('admin.solicitudes.index') }}"
+        class="ea-nav-pill {{ request()->routeIs('admin.solicitudes.*') ? 'active' : '' }}">
+        <i class="bi bi-people"></i>
+        <span>Usuarios</span>
+    </a>
 
-                <a href="{{ route('admin.sitios.index', ['categoria' => 'Balneario']) }}"
-                   class="ml-3 flex items-center gap-3 px-4 py-3 rounded-xl
-                   {{ request('categoria') === 'Balneario' ? 'bg-emerald-500 text-emerald-950 font-semibold' : 'hover:bg-white/5' }}">
-                    <span>🌊</span> Balneario
-                </a>
-            </div>
-        </details>
+    <a href="{{ route('admin.reportes') }}"
+        class="ea-nav-pill {{ request()->routeIs('admin.reportes') ? 'active' : '' }}">
+        <i class="bi bi-clipboard-data"></i>
+        <span>Reportes</span>
+    </a>
 
+    <a href="{{ route('admin.respaldos') }}"
+        class="ea-nav-pill {{ request()->routeIs('admin.respaldos') ? 'active' : '' }}">
+        <i class="bi bi-database"></i>
+        <span>Respaldos</span>
+    </a>
 
-        <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5">
-            <span>📊</span> Reportes
-        </a>
+  </nav>
 
-        <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5">
-            <span>👤</span> Perfil del Admin
-        </a>
-    </nav>
+  {{-- Footer --}}
+  <div class="mt-auto px-4 py-3 border-top" style="border-color: var(--ea-line) !important;">
+    <a href="{{ route('home') }}" class="text-decoration-none d-flex align-items-center gap-2" style="color: var(--ea-muted);">
+      <i class="bi bi-house-door"></i>
+      <span>Portal Público</span>
+    </a>
 
+    <form class="mt-3" method="POST" action="{{ route('logout') }}">
+      @csrf
+      <button type="submit" class="btn btn-link p-0 text-decoration-none d-flex align-items-center gap-2" style="color:#d14b3a;">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Cerrar Sesión</span>
+      </button>
+    </form>
+  </div>
 
 </aside>

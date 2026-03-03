@@ -3,209 +3,219 @@
 @section('title', 'Detalle de solicitud')
 
 @section('content')
-<div class="space-y-6">
 
-    <div>
-        <a href="{{ route('admin.solicitudes.index') }} "
-           class="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 hover:text-emerald-900">
-            ← Regresar a solicitudes
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-10 col-xl-9">
+
+      {{-- Header --}}
+      <div class="mb-4">
+        <a href="{{ route('admin.solicitudes.index') }}"
+           class="text-decoration-none fw-semibold"
+           style="color: var(--ea-green);">
+          ← Regresar a solicitudes
         </a>
 
-        <h1 class="mt-3 text-4xl font-serif font-semibold text-slate-900">Detalle de Solicitud</h1>
-        <p class="text-slate-500 mt-1">Revisa la información y aprueba o rechaza la solicitud.</p>
-    </div>
+        <h1 class="ea-page-title mt-3 mb-1">Detalle de Solicitud</h1>
+        <p class="ea-subtitle mb-0">Revisa la información y aprueba o rechaza la solicitud.</p>
+      </div>
 
-    {{-- Mensajes --}}
-    @if (session('ok'))
-        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-800">
-            {{ session('ok') }}
+      {{-- Mensajes --}}
+      @if (session('ok'))
+        <div class="alert alert-success border-0 rounded-4"
+             style="background: rgba(63,125,59,.12); color:#2f6b2c;">
+          {{ session('ok') }}
         </div>
-    @endif
+      @endif
 
-    @if (session('error'))
-        <div class="rounded-2xl border border-red-200 bg-red-50 p-4 text-red-800">
-            {{ session('error') }}
+      @if (session('error'))
+        <div class="alert alert-danger border-0 rounded-4"
+             style="background: rgba(209,75,58,.10); color:#d14b3a;">
+          {{ session('error') }}
         </div>
-    @endif
+      @endif
 
-    {{-- Errores de validación --}}
-    @if ($errors->any())
-        <div class="rounded-2xl border border-red-200 bg-red-50 p-4 text-red-700">
-            <div class="font-semibold mb-2">Revisa los campos:</div>
-            <ul class="list-disc ml-5 space-y-1 text-sm">
-                @foreach ($errors->all() as $e)
-                    <li>{{ $e }}</li>
-                @endforeach
-            </ul>
+      @if ($errors->any())
+        <div class="alert alert-danger border-0 rounded-4"
+             style="background: rgba(209,75,58,.10); color:#d14b3a;">
+          <div class="fw-semibold mb-2">Revisa los campos:</div>
+          <ul class="mb-0">
+            @foreach ($errors->all() as $e)
+              <li>{{ $e }}</li>
+            @endforeach
+          </ul>
         </div>
-    @endif
+      @endif
 
-    {{-- Card --}}
-    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-        <div class="p-6 border-b border-slate-200 flex items-center justify-between gap-4">
-            <div>
-                <div class="text-sm text-slate-500">Solicitante</div>
-                <div class="text-2xl font-serif font-semibold text-slate-900">
-                    {{ trim($solicitud->nombre.' '.$solicitud->apaterno.' '.$solicitud->amaterno) }}
+      {{-- Card principal --}}
+      <div class="ea-card p-0 overflow-hidden">
+
+        <div class="p-4 border-bottom d-flex justify-content-between align-items-start gap-3 flex-wrap"
+             style="border-color: var(--ea-line) !important; background: rgba(255,255,255,.25);">
+
+          <div>
+            <div class="small" style="color: var(--ea-muted);">Solicitante</div>
+            <div class="fw-semibold" style="font-family: Georgia, 'Times New Roman', serif; font-size: 1.6rem;">
+              {{ trim($solicitud->nombre.' '.$solicitud->apaterno.' '.$solicitud->amaterno) }}
+            </div>
+            <div class="small" style="color: var(--ea-muted);">{{ $solicitud->correo }}</div>
+          </div>
+
+          <div class="text-end">
+            <div class="small" style="color: var(--ea-muted);">Tipo</div>
+            <span class="ea-chip gray text-capitalize">{{ $solicitud->rol }}</span>
+
+            <div class="small mt-3" style="color: var(--ea-muted);">Estado</div>
+            @php $estado = strtolower($solicitud->estado ?? 'pendiente'); @endphp
+            <span class="ea-chip
+              {{ $estado === 'aprobado' ? 'green' : '' }}
+              {{ $estado === 'rechazado' ? 'red' : '' }}
+              {{ $estado === 'pendiente' ? 'blue' : '' }}
+              {{ !in_array($estado,['aprobado','rechazado','pendiente']) ? 'gray' : '' }}">
+              {{ ucfirst($estado) }}
+            </span>
+          </div>
+
+        </div>
+
+        <div class="p-4">
+          <div class="row g-3">
+
+            <div class="col-12 col-md-6">
+              <div class="ea-card p-4">
+                <div class="fw-semibold mb-3">Datos personales</div>
+
+                <div class="d-flex justify-content-between mb-2">
+                  <span style="color: var(--ea-muted);">Teléfono</span>
+                  <span class="fw-semibold">{{ $solicitud->telefono ?? '—' }}</span>
                 </div>
-                <div class="text-slate-500 text-sm">{{ $solicitud->correo }}</div>
-            </div>
 
-            <div class="text-right">
-                <div class="text-sm text-slate-500">Tipo</div>
-                <span class="inline-flex items-center px-3 py-1 rounded-full bg-slate-100 text-slate-800 text-xs font-semibold">
-                    {{ $solicitud->rol }}
-                </span>
+                <div class="d-flex justify-content-between mb-2">
+                  <span style="color: var(--ea-muted);">Fecha solicitud</span>
+                  <span class="fw-semibold">
+                    {{ $solicitud->fecha_solicitud ? \Carbon\Carbon::parse($solicitud->fecha_solicitud)->format('d/m/Y') : '—' }}
+                  </span>
+                </div>
 
-                <div class="mt-3 text-sm text-slate-500">Estado</div>
-                @php
-                    $estado = $solicitud->estado ?? 'pendiente';
-                @endphp
-                <span class="inline-flex items-center px-3 py-1 rounded-full
-                    {{ $estado === 'aprobado' ? 'bg-emerald-100 text-emerald-800' : '' }}
-                    {{ $estado === 'rechazado' ? 'bg-red-100 text-red-800' : '' }}
-                    {{ $estado === 'pendiente' ? 'bg-amber-100 text-amber-800' : '' }}
-                    text-xs font-semibold">
-                    {{ ucfirst($estado) }}
-                </span>
-            </div>
-        </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span style="color: var(--ea-muted);">Fecha respuesta</span>
+                  <span class="fw-semibold">
+                    {{ $solicitud->fecha_respuesta ? \Carbon\Carbon::parse($solicitud->fecha_respuesta)->format('d/m/Y') : '—' }}
+                  </span>
+                </div>
 
-        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="rounded-2xl border border-slate-200 p-5">
-                <div class="text-sm font-semibold text-slate-900 mb-3">Datos personales</div>
-
-                <div class="space-y-2 text-sm">
-                    <div class="flex justify-between gap-4">
-                        <span class="text-slate-500">Teléfono</span>
-                        <span class="text-slate-900 font-semibold">{{ $solicitud->telefono ?? '—' }}</span>
-                    </div>
-
-                    <div class="flex justify-between gap-4">
-                        <span class="text-slate-500">Fecha solicitud</span>
-                        <span class="text-slate-900 font-semibold">
-                            {{ $solicitud->fecha_solicitud ? \Carbon\Carbon::parse($solicitud->fecha_solicitud)->format('d/m/Y') : '—' }}
-                        </span>
-                    </div>
-
-                    <div class="flex justify-between gap-4">
-                        <span class="text-slate-500">Fecha respuesta</span>
-                        <span class="text-slate-900 font-semibold">
-                            {{ $solicitud->fecha_respuesta ? \Carbon\Carbon::parse($solicitud->fecha_respuesta)->format('d/m/Y') : '—' }}
-                        </span>
-                    </div>
-
-                    <div class="flex justify-between gap-4">
-                        <span class="text-slate-500">Activo</span>
-                        <span class="text-slate-900 font-semibold">
-                            {{ $solicitud->activo ?? '—' }}
-                        </span>
-                    </div>
+                <div class="d-flex justify-content-between">
+                  <span style="color: var(--ea-muted);">Activo</span>
+                  <span class="fw-semibold">{{ $solicitud->activo ?? '—' }}</span>
                 </div>
 
                 @if(!empty($solicitud->motivo_rechazo))
-                    <div class="mt-4 rounded-xl border border-red-200 bg-red-50 p-4">
-                        <div class="text-sm font-semibold text-red-800">Motivo de rechazo</div>
-                        <div class="text-sm text-red-700 mt-1">{{ $solicitud->motivo_rechazo }}</div>
-                    </div>
+                  <div class="ea-reject-box mt-3">
+                    <div class="ea-reject-label">❗ Motivo de rechazo:</div>
+                    <div class="ea-reject-text">{{ $solicitud->motivo_rechazo }}</div>
+                  </div>
                 @endif
+              </div>
             </div>
 
-            <div class="rounded-2xl border border-slate-200 p-5">
-                <div class="text-sm font-semibold text-slate-900 mb-3">
-                    {{ $solicitud->rol === 'hotelero' ? 'Datos del hotel' : 'Datos del restaurante' }}
+            <div class="col-12 col-md-6">
+              <div class="ea-card p-4">
+                <div class="fw-semibold mb-3">
+                  {{ $solicitud->rol === 'hotelero' ? 'Datos del hotel' : 'Datos del restaurante' }}
                 </div>
 
-                {{-- Dato   s del hotel --}}
                 @if($solicitud->rol === 'hotelero' && isset($hotel))
-                    <div class="space-y-2 text-sm">
-                        <div class="flex justify-between gap-4">
-                            <span class="text-slate-500">Nombre</span>
-                            <span class="text-slate-900 font-semibold">{{ $hotel->nombre ?? '—' }}</span>
-                        </div>
+                  <div class="d-flex justify-content-between mb-2">
+                    <span style="color: var(--ea-muted);">Nombre</span>
+                    <span class="fw-semibold">{{ $hotel->nombre ?? '—' }}</span>
+                  </div>
+                  <div class="d-flex justify-content-between mb-2">
+                    <span style="color: var(--ea-muted);">Dirección</span>
+                    <span class="fw-semibold">{{ $hotel->direccion ?? '—' }}</span>
+                  </div>
+                  <div class="d-flex justify-content-between">
+                    <span style="color: var(--ea-muted);">Teléfono</span>
+                    <span class="fw-semibold">{{ $hotel->telefono ?? '—' }}</span>
+                  </div>
 
-                        <div class="flex justify-between gap-4">
-                            <span class="text-slate-500">Dirección</span>
-                            <span class="text-slate-900 font-semibold">{{ $hotel->direccion ?? '—' }}</span>
-                        </div>
-
-                        <div class="flex justify-between gap-4">
-                            <span class="text-slate-500">Teléfono</span>
-                            <span class="text-slate-900 font-semibold">{{ $hotel->telefono ?? '—' }}</span>
-                        </div>
-                    </div>
-                {{-- Datos del restaurante --}}
                 @elseif($solicitud->rol === 'restaurantero' && isset($restaurante))
-                    <div class="space-y-2 text-sm">
-                        <div class="flex justify-between gap-4">
-                            <span class="text-slate-500">Nombre</span>
-                            <span class="text-slate-900 font-semibold">{{ $restaurante->nombre ?? '—' }}</span>
-                        </div>
+                  <div class="d-flex justify-content-between mb-2">
+                    <span style="color: var(--ea-muted);">Nombre</span>
+                    <span class="fw-semibold">{{ $restaurante->nombre ?? '—' }}</span>
+                  </div>
+                  <div class="d-flex justify-content-between mb-2">
+                    <span style="color: var(--ea-muted);">Dirección</span>
+                    <span class="fw-semibold">{{ $restaurante->direccion ?? '—' }}</span>
+                  </div>
+                  <div class="d-flex justify-content-between">
+                    <span style="color: var(--ea-muted);">Teléfono</span>
+                    <span class="fw-semibold">{{ $restaurante->telefono ?? '—' }}</span>
+                  </div>
 
-                        <div class="flex justify-between gap-4">
-                            <span class="text-slate-500">Dirección</span>
-                            <span class="text-slate-900 font-semibold">{{ $restaurante->direccion ?? '—' }}</span>
-                        </div>
-
-                        <div class="flex justify-between gap-4">
-                            <span class="text-slate-500">Teléfono</span>
-                            <span class="text-slate-900 font-semibold">{{ $restaurante->telefono ?? '—' }}</span>
-                        </div>
-                    </div>
                 @else
-                    <div class="text-sm text-slate-500">
-                        No se encontró información del negocio asociado.
-                    </div>
+                  <div class="small" style="color: var(--ea-muted);">No se encontró información del negocio asociado.</div>
                 @endif
+              </div>
             </div>
+
+          </div>
         </div>
 
         {{-- Acciones --}}
-        <div class="p-6 border-t border-slate-200">
-            @if($solicitud->estado === 'pendiente')
-                <div class="flex flex-col md:flex-row gap-4 md:items-start md:justify-between">
+        <div class="p-4 border-top" style="border-color: var(--ea-line) !important;">
+          @if(($solicitud->estado ?? 'pendiente') === 'pendiente')
 
-                    {{-- Aprobar --}}
-                    <form method="POST" action="{{ route('admin.solicitudes.aprobar', $solicitud->id_usuario) }}">
-                        @csrf
-                        <button type="submit"
-                                class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-700 text-white font-semibold hover:bg-emerald-800 transition">
-                            ✅ Aprobar
-                        </button>
-                    </form>
+            <div class="d-flex flex-column flex-md-row justify-content-between gap-2">
+              {{-- Aprobar --}}
+              <form method="POST" action="{{ route('admin.solicitudes.aprobar', $solicitud->id_usuario) }}">
+                @csrf
+                <button type="submit" class="btn ea-btn-approve rounded-3 px-4 py-2 fw-semibold">
+                  Aprobar
+                </button>
+              </form>
 
-                    {{-- Rechazar --}}
-                    <button onclick="document.getElementById('rechazar-form').style.display = 'block'; document.getElementById('rechazar-form').scrollIntoView({behavior: 'smooth'});"
-                            class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-700 transition">
-                        ❌ Rechazar
-                    </button>
+              {{-- Rechazar --}}
+              <button type="button"
+                      class="btn rounded-3 px-4 py-2 fw-semibold"
+                      style="border:1px solid rgba(209,75,58,.35); background: rgba(209,75,58,.08); color:#d14b3a;"
+                      onclick="document.getElementById('rechazar-form').classList.remove('d-none'); document.getElementById('rechazar-form').scrollIntoView({behavior:'smooth'});">
+                Rechazar
+              </button>
+            </div>
+
+            {{-- Form rechazo --}}
+            <div id="rechazar-form" class="d-none mt-3 ea-card p-4">
+              <form method="POST" action="{{ route('admin.solicitudes.rechazar', $solicitud->id_usuario) }}">
+                @csrf
+
+                <label class="form-label fw-semibold">
+                  Motivo de rechazo <span class="text-danger">*</span>
+                </label>
+
+                <textarea name="motivo_rechazo" rows="4" class="form-control rounded-3"></textarea>
+
+                <div class="d-flex justify-content-end mt-3">
+                  <button type="submit"
+                          onclick="return confirm('¿Seguro que deseas rechazar esta solicitud?')"
+                          class="btn rounded-3 px-4 py-2 fw-semibold"
+                          style="background:#d14b3a; border-color:#d14b3a; color:#fff;">
+                    Confirmar rechazo
+                  </button>
                 </div>
+              </form>
+            </div>
 
-                {{-- Formulario de rechazo que aparece solo si se clickea Rechazar --}}
-                <div id="rechazar-form" class="mt-6 hidden p-6 border border-slate-200 rounded-2xl">
-                    <form method="POST" action="{{ route('admin.solicitudes.rechazar', $solicitud->id_usuario) }}">
-                        @csrf
-                        <label for="motivo_rechazo" class="block text-sm font-semibold text-slate-800 mb-2">
-                            Motivo de rechazo <span class="text-red-500">*</span>
-                        </label>
-                        <textarea name="motivo_rechazo" rows="4" class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-red-600/25 focus:border-red-700"></textarea>
-                        <div class="mt-4 flex justify-end">
-                            <button type="submit"
-                                    onclick="return confirm('¿Seguro que deseas rechazar esta solicitud?')"
-                                    class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-700 transition">
-                                Confirmar rechazo
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-            @else
-                <div class="text-sm text-slate-600">
-                    Esta solicitud ya fue atendida ({{ $solicitud->estado }}).
-                </div>
-            @endif
+          @else
+            <div class="small" style="color: var(--ea-muted);">
+              Esta solicitud ya fue atendida ({{ $solicitud->estado }}).
+            </div>
+          @endif
         </div>
 
+      </div>
+
     </div>
+  </div>
 </div>
+
 @endsection
