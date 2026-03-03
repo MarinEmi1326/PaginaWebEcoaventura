@@ -10,11 +10,13 @@
     <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
 
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <!-- Bootstrap  icons local -->
     <link rel="stylesheet" href="{{ asset('bootstrap-icons/bootstrap-icons.min.css') }}">
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    @stack('styles')
 
 
 </head>
@@ -59,6 +61,7 @@
                             </ul>
                         </li>
                         <li class="nav-item">
+
                             <a class="nav-link" href="#">Cultura y Patrimonio</a>
                         </li>
 
@@ -67,6 +70,8 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url('/ver-facebook') }}">Rutas</a>
+
+                          
                         </li>
                     </ul>
                     <a href="{{ route('login') }}" class="btn btn-success rounded-pill">
@@ -90,6 +95,10 @@
             @yield('content')
         </main>
     @endif
+
+
+    @include('layouts.footer')
+
 
 
     <script src="{{ asset('bootstrap/js/bootstrap.bundle.min.js') }}"></script>
