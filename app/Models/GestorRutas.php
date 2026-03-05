@@ -4,16 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Turista extends Model
+class GestorRutas extends Model
 {
-    protected $table = 'turista';
-    protected $primaryKey = 'id_turista';
+    protected $table = 'gestor_rutas';
+    protected $primaryKey = 'id_gestor_rutas';
     public $timestamps = false;
 
     protected $fillable = [
         'nombre',
         'apaterno',
         'amaterno',
+        'telefono',
         'id_usuario',
     ];
 

@@ -13,7 +13,7 @@ class AdminDashboardController extends Controller
         $serviciosTotales = DB::table('hotel')->count() + DB::table('restaurante')->count();
         $reservasTotales  = DB::table('reserva_hotel')->count();
 
-        return view('admin.dashboard', compact(
+        return view('admin.index', compact(
             'destinosActivos',
             'serviciosTotales',
             'reservasTotales'

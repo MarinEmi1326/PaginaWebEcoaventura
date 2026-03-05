@@ -5,8 +5,8 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Turista;
-use App\Models\Hotelero;
-use App\Models\Restaurantero;
+use App\Models\AdminDestinos;
+use App\Models\GestorRutas;
 
 class Usuario extends Authenticatable
 {
@@ -18,6 +18,8 @@ class Usuario extends Authenticatable
 
     protected $fillable = [
         'correo',
+        'google_id',
+        'foto_perfil',
         'password',
         'rol',
         'activo',
@@ -31,65 +33,74 @@ class Usuario extends Authenticatable
         'password',
     ];
 
-    /**
-     * Casts para tipos de datos automáticos
-     */
     protected $casts = [
-        'activo' => 'boolean',
+        'activo'          => 'boolean',
         'fecha_solicitud' => 'datetime',
         'fecha_respuesta' => 'datetime',
     ];
 
-    /**
-     * 👇 Le dice a Laravel que el campo de login es "correo"
-     * y no "email"
-     */
+    // Le dice a Laravel que el campo login es "correo"
     public function getAuthIdentifierName()
     {
         return 'correo';
     }
 
-    /**
-     * Relación con el modelo Turista.
-     * Un usuario puede ser turista (solo si tiene el rol 'turista')
-     */
+    // ================================
+    // RELACIONES
+    // ================================
+
     public function turista()
     {
         return $this->hasOne(Turista::class, 'id_usuario', 'id_usuario');
     }
 
-    /**
-     * Relación con el modelo Hotelero.
-     * Un usuario puede ser hotelero (solo si tiene el rol 'hotelero')
-     */
-    public function hotelero()
+    public function adminDestinos()
     {
-        return $this->hasOne(Hotelero::class, 'id_usuario', 'id_usuario');
+        return $this->hasOne(AdminDestinos::class, 'id_usuario', 'id_usuario');
     }
 
-    /**
-     * Relación con el modelo Restaurantero.
-     * Un usuario puede ser restaurantero (solo si tiene el rol 'restaurantero')
-     */
-    public function restaurantero()
+    public function gestorRutas()
     {
-        return $this->hasOne(Restaurantero::class, 'id_usuario', 'id_usuario');
+        return $this->hasOne(GestorRutas::class, 'id_usuario', 'id_usuario');
     }
 
-    /**
-     * Acceder al perfil dependiendo del rol del usuario.
-     */
+    // ================================
+    // HELPERS DE ROL
+    // ================================
+
+    public function esAdmin()
+    {
+        return $this->rol === 'admin_general';
+    }
+
+    public function esTurista()
+    {
+        return $this->rol === 'turista';
+    }
+
+    public function esAdminDestinos()
+    {
+        return $this->rol === 'admin_destinos';
+    }
+
+    public function esGestorRutas()
+    {
+        return $this->rol === 'gestor_rutas';
+    }
+
+    public function estaAprobado()
+    {
+        return $this->estado === 'aprobado';
+    }
+
+    // Perfil según rol
     public function getPerfilAttribute()
     {
-        switch ($this->rol) {
-            case 'turista':
-                return $this->turista;
-            case 'hotelero':
-                return $this->hotelero;
-            case 'restaurantero':
-                return $this->restaurantero;
-            default:
-                return null;
-        }
+        return match($this->rol) {
+            'turista'        => $this->turista,
+            'admin_destinos' => $this->adminDestinos,
+            'gestor_rutas'   => $this->gestorRutas,
+            default          => null,
+        };
     }
 }

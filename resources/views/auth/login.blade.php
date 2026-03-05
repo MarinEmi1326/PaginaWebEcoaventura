@@ -1,33 +1,29 @@
 @extends('layouts.app')
 
-@php
-  $hideNavbar = true;
-@endphp
+
 
 @section('content')
-<section class="min-vh-100 d-flex align-items-center justify-content-center" style="background:#F7F6EF;">
+<section class="min-vh-100 d-flex align-items-center justify-content-center">
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-12 col-md-8 col-lg-5">
 
-        <div class="bg-white p-4 p-md-5 rounded-4 shadow-sm">
+        {{-- Icono arriba --}}
+        <div class="text-center mb-4">
+          <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+            style="width:64px; height:64px; background:#e2ece9;">
+            <i class="bi bi-leaf text-success fs-4"></i>
+          </div>
+          <h2 class="fw-bold" style="font-family: Georgia, 'Times New Roman', serif;">Iniciar Sesión</h2>
+          <p class="text-muted small">Ingresa tus credenciales para acceder</p>
+        </div>
 
-          {{-- Volver --}}
-          <a href="{{ route('home') }}" class="text-decoration-none text-secondary small">
-            ← Volver al inicio
-          </a>
-
-          {{-- Título --}}
-          <h2 class="mt-3 fw-semibold" style="font-family: Georgia, 'Times New Roman', serif;">
-            Iniciar Sesión
-          </h2>
-          <p class="text-secondary small mb-4">
-            Ingresa tus credenciales para acceder
-          </p>
+        {{-- Card formulario --}}
+        <div class="rounded-4 p-4 p-md-5" style="background:#f1f5f2;">
 
           {{-- ERRORES --}}
           @if ($errors->any())
-            <div class="alert alert-danger">
+            <div class="alert alert-danger rounded-3">
               <ul class="mb-0">
                 @foreach ($errors->all() as $error)
                   <li>{{ $error }}</li>
@@ -41,54 +37,33 @@
             @csrf
 
             <div class="mb-3">
-              <label class="form-label fw-semibold">Correo electrónico</label>
-              <input
-                type="email"
-                name="correo"
-                value="{{ old('correo') }}"
-                class="form-control form-control-lg"
-                placeholder="tu@email.com"
-                required>
+              <label class="form-label small fw-semibold">Correo electrónico</label>
+              <input type="email" name="correo" value="{{ old('correo') }}"
+                class="form-control form-control-lg bg-white border-0 rounded-3"
+                placeholder="usuario@ecoaventura.mx" required>
             </div>
 
             <div class="mb-3">
-              <label class="form-label fw-semibold">Contraseña</label>
-              <input
-                type="password"
-                name="password"
-                class="form-control form-control-lg"
-                placeholder="••••••••"
-                required>
+              <label class="form-label small fw-semibold">Contraseña</label>
+              <input type="password" name="password"
+                class="form-control form-control-lg bg-white border-0 rounded-3"
+                placeholder="••••••••" required>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-4">
               <div class="form-check">
                 <input class="form-check-input" type="checkbox" name="remember" id="remember">
-                <label class="form-check-label small text-secondary" for="remember">
-                  Recordarme
-                </label>
+                <label class="form-check-label small text-muted" for="remember">Recordarme</label>
               </div>
-
-              <a href="#" class="text-decoration-none text-secondary small">
-                ¿Olvidaste tu contraseña?
-              </a>
+              <a href="#" class="text-decoration-none small text-muted">¿Olvidaste tu contraseña?</a>
             </div>
 
-            <button type="submit"
-                    class="btn w-100 btn-lg text-white"
-                    style="background:#064e3b;">
-              Iniciar Sesión
+            <button type="submit" class="btn w-100 btn-lg text-white rounded-3 mb-3"
+              style="background:#1F6B4B;">
+              <i class="bi bi-box-arrow-in-right me-2"></i>Ingresar al Sistema
             </button>
 
-            {{-- Separador --}}
-            <div class="d-flex align-items-center my-4">
-              <div class="flex-grow-1 border-top"></div>
-              <span class="px-3 small text-secondary text-uppercase" style="letter-spacing:.1em;">
-                o continúa con
-              </span>
-              <div class="flex-grow-1 border-top"></div>
-            </div>
-
+        
             {{-- Google --}}
             <a href="{{ route('google.login') }}"
                class="btn btn-lg w-100 border d-flex align-items-center justify-content-center gap-2">
@@ -101,7 +76,17 @@
               Iniciar sesión con Google
             </a>
 
+            <p class="text-center text-muted small mb-0">
+              Ambiente de demostración. Ingresa tus credenciales para acceder.
+            </p>
+
           </form>
+        </div>
+
+        <div class="text-center mt-3">
+          <a href="{{ route('home') }}" class="text-decoration-none text-muted small">
+            ← Volver al inicio
+          </a>
         </div>
 
       </div>

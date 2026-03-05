@@ -17,7 +17,7 @@
   {{-- Menú --}}
   <nav class="px-3 py-3 d-grid gap-2">
 
-    <a href="{{ route('admin.dashboard') }}"
+    <a href="{{ route('admin.index') }}"
        class="ea-nav-pill {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
       <i class="bi bi-bar-chart-line"></i>
       <span>Dashboard</span>
