@@ -25,8 +25,9 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 
 // REGISTRO TURISTA
-Route::get('/registro', [AuthController::class, 'showRegistroTurista'])->name('register');
-Route::post('/registro', [AuthController::class, 'registroTurista'])->name('register.post');
+Route::get('/registro/turista', [AuthController::class, 'showRegistroTurista'])->name('registro.turista');
+Route::post('/registro/turista', [AuthController::class, 'registroTurista'])->name('registro.turista.post');
+
 
 // REGISTRO ADMIN DESTINOS (footer)
 Route::get('/registro/destinos', [AuthController::class, 'showRegistroDestinos'])->name('registro.destinos');
@@ -65,10 +66,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/perfil', [PerfilController::class, 'show'])->name('perfil');
     Route::post('/perfil', [PerfilController::class, 'update']);
 
-    // Dashboards
-    Route::get('/turista/dashboard', fn () => view('turista.dashboard'))->name('turista.dashboard');
-    Route::get('/destinos/dashboard', fn () => view('destinos.dashboard'))->name('destinos.dashboard');
-    Route::get('/rutas/dashboard', fn () => view('rutas.dashboard'))->name('rutas.dashboard');
+        // // Dashboards
+        // Route::get('/turista/dashboard', fn () => view('turista.dashboard'))->name('turista.dashboard');
+        // Route::get('/destinos/dashboard', fn () => view('destinos.dashboard'))->name('destinos.dashboard');
+        // Route::get('/rutas/dashboard', fn () => view('rutas.dashboard'))->name('rutas.dashboard');
 
     /*
     |--------------------------------------------------------------------------

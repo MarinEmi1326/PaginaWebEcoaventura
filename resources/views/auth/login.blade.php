@@ -63,6 +63,12 @@
                                 style="background:#1F6B4B;">
                                 Iniciar sesión
                             </button>
+                            <p class="text-center small mt-3">
+                                ¿No tienes cuenta?
+                                <a href="{{ route('registro.turista') }}" class="text-decoration-none fw-semibold">
+                                    Regístrate
+                                </a>
+                            </p>
 
 
                             {{-- Google --}}
