@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use App\Models\Usuario;
 
 class LoginController extends Controller
@@ -16,44 +17,47 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
-        // 1. Validar campos
         $request->validate([
             'correo' => 'required|email',
             'password' => 'required',
         ]);
 
-        // 2. Intentar autenticar con la condición de que esté activo
-        $credentials = [
-            'correo' => $request->correo,
-            'password' => $request->password,
-            'activo' => 1 // <--- Solo usuarios habilitados
-        ];
+        $usuario = Usuario::where('correo', $request->correo)->first();
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            
-            // Redirección según rol
-            $rol = Auth::user()->rol;
-            if ($rol === 'admin') return redirect()->route('admin.index');
-            if ($rol === 'hotelero') return redirect()->route('hotelero.index');
-            if ($rol === 'restaurantero') return redirect()->route('restaurantero.dashboard');
-            
-            return redirect()->route('home');
+        if (!$usuario || !Hash::check($request->password, $usuario->password)) {
+            return back()->withInput($request->only('correo'))->withErrors([
+                'correo' => 'Las credenciales proporcionadas no coinciden con nuestros registros.',
+            ]);
         }
 
-        // 3. Si falla, verificar si fue por estar suspendido
-        $usuarioExistente = Usuario::where('correo', $request->correo)->first();
-        
-        if ($usuarioExistente && !$usuarioExistente->activo) {
-            return back()->withErrors([
+        if ($usuario->estado === 'pendiente') {
+            return back()->withInput($request->only('correo'))->withErrors([
+                'correo' => 'Tu cuenta está pendiente de aprobación.',
+            ]);
+        }
+
+        if ($usuario->estado === 'rechazado') {
+            return back()->withInput($request->only('correo'))->withErrors([
+                'correo' => 'Tu cuenta fue rechazada. Contacta al administrador.',
+            ]);
+        }
+
+        if (!$usuario->activo) {
+            return back()->withInput($request->only('correo'))->withErrors([
                 'correo' => 'Tu cuenta ha sido suspendida o inhabilitada por el administrador.',
             ]);
         }
 
-        // Falla genérica (contraseña mal o correo inexistente)
-        return back()->withErrors([
-            'correo' => 'Las credenciales proporcionadas no coinciden con nuestros registros.',
-        ]);
+        Auth::login($usuario);
+        $request->session()->regenerate();
+
+        return match ($usuario->rol) {
+            'admin_general'  => redirect()->route('admin.index'),
+            'admin_destinos' => redirect()->route('destinos.dashboard'),
+            'gestor_rutas'   => redirect()->route('rutas.dashboard'),
+            'turista'        => redirect()->route('turista.dashboard'),
+            default          => redirect()->route('home'),
+        };
     }
 
     public function logout(Request $request)
@@ -61,6 +65,7 @@ class LoginController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect('/');
     }
 }

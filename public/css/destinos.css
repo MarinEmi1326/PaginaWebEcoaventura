@@ -50,3 +50,130 @@
     color: #1a202c;
     background: rgba(255, 255, 255, 0.5);
 }
+
+/* =========================================
+   ADMIN DESTINOS - estilos complementarios
+   ========================================= */
+
+.ea-summary-number{
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--ea-text);
+}
+
+.ea-summary-label{
+    font-size: 0.9rem;
+    color: var(--ea-muted);
+    margin-top: 4px;
+}
+
+.ea-summary-number.is-approved{
+    color: #1f6b4b;
+}
+
+.ea-summary-number.is-pending{
+    color: #2f9ed8;
+}
+
+.ea-summary-number.is-rejected{
+    color: #d14b3a;
+}
+
+.ea-section-heading{
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 800;
+    color: var(--ea-text);
+    margin: 0;
+}
+
+.ea-destination-card{
+    background: rgba(255,255,255,.35);
+    border: 1px solid rgba(15,42,36,.10);
+    border-radius: 16px;
+    padding: 18px;
+}
+
+.ea-destination-title{
+    font-weight: 800;
+    color: var(--ea-text);
+    margin-bottom: 2px;
+    font-size: 1.05rem;
+}
+
+.ea-destination-meta{
+    color: var(--ea-muted);
+    font-size: 0.86rem;
+}
+
+.ea-status.approved{
+    background: #e6f4ea;
+    color: #1f6b4b;
+    border-color: rgba(31,107,75,.12);
+}
+
+.ea-status.pending{
+    background: #e8f4fd;
+    color: #2f9ed8;
+    border-color: rgba(47,158,216,.12);
+}
+
+.ea-status.rejected{
+    background: #fdecea;
+    color: #d14b3a;
+    border-color: rgba(209,75,58,.12);
+}
+
+.ea-status.draft{
+    background: #eef2ef;
+    color: #708176;
+    border-color: rgba(112,129,118,.14);
+}
+
+.ea-actions{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ea-action-btn{
+    color: var(--ea-muted);
+    font-size: 0.95rem;
+    line-height: 1;
+    transition: .2s ease;
+}
+
+.ea-action-btn:hover{
+    color: var(--ea-text);
+}
+
+.ea-action-btn.edit:hover{
+    color: #1e88e5;
+}
+
+.ea-action-btn.send:hover{
+    color: #2f9ed8;
+}
+
+.ea-action-btn.delete:hover{
+    color: #d14b3a;
+}
+
+.ea-card-tight{
+    padding: 14px 16px;
+}
+
+@media (max-width: 767.98px){
+    .ea-summary-number{
+        font-size: 1.6rem;
+    }
+
+    .ea-destination-card{
+        padding: 16px 14px;
+    }
+
+    .ea-actions{
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+}

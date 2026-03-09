@@ -13,8 +13,7 @@ class AdminMiddleware
             return redirect()->route('login');
         }
 
-        // tu usuario tiene columna rol en tabla usuario
-        if (auth()->user()->rol !== 'admin') {
+        if (auth()->user()->rol !== 'admin_general') {
             abort(403, 'No autorizado.');
         }
 

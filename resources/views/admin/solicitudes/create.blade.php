@@ -17,7 +17,9 @@
         </a>
 
         <h1 class="ea-page-title mt-3 mb-1">Registrar Nuevo Usuario</h1>
-        <p class="ea-subtitle mb-0">El usuario creado tendrá acceso inmediato al sistema.</p>
+        <p class="ea-subtitle mb-0">
+          El usuario creado desde este panel quedará aprobado y con acceso inmediato.
+        </p>
       </div>
 
       <form action="{{ route('admin.solicitudes.store') }}" method="POST">
@@ -50,9 +52,15 @@
               <div class="col-12 col-md-4">
                 <label class="form-label fw-bold">Rol del Usuario</label>
                 <select name="rol" required class="form-select rounded-3 py-2">
-                  <option value="hotelero">🏨 Hotelero</option>
-                  <option value="restaurantero">🍴 Restaurantero</option>
+                    <option value="">Seleccione un rol</option>
+                    <option value="admin_destinos" {{ old('rol') == 'admin_destinos' ? 'selected' : '' }}>
+                        Administrador de destinos
+                    </option>
+                    <option value="gestor_rutas" {{ old('rol') == 'gestor_rutas' ? 'selected' : '' }}>
+                        Gestor de rutas
+                    </option>
                 </select>
+              @error('rol') <div class="small text-danger mt-1">{{ $message }}</div> @enderror
               </div>
             </div>
           </div>

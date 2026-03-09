@@ -56,14 +56,16 @@
           <div>
             <div class="small" style="color: var(--ea-muted);">Solicitante</div>
             <div class="fw-semibold" style="font-family: Georgia, 'Times New Roman', serif; font-size: 1.6rem;">
-              {{ trim($solicitud->nombre.' '.$solicitud->apaterno.' '.$solicitud->amaterno) }}
+              {{ trim(($solicitud->nombre ?? '') . ' ' . ($solicitud->apaterno ?? '') . ' ' . ($solicitud->amaterno ?? '')) }}
             </div>
             <div class="small" style="color: var(--ea-muted);">{{ $solicitud->correo }}</div>
           </div>
 
           <div class="text-end">
             <div class="small" style="color: var(--ea-muted);">Tipo</div>
-            <span class="ea-chip gray text-capitalize">{{ $solicitud->rol }}</span>
+            <span class="ea-chip gray">
+              {{ $solicitud->rol === 'admin_destinos' ? 'Administrador de destinos' : 'Gestor de rutas' }}
+            </span>
 
             <div class="small mt-3" style="color: var(--ea-muted);">Estado</div>
             @php $estado = strtolower($solicitud->estado ?? 'pendiente'); @endphp
@@ -71,7 +73,7 @@
               {{ $estado === 'aprobado' ? 'green' : '' }}
               {{ $estado === 'rechazado' ? 'red' : '' }}
               {{ $estado === 'pendiente' ? 'blue' : '' }}
-              {{ !in_array($estado,['aprobado','rechazado','pendiente']) ? 'gray' : '' }}">
+              {{ !in_array($estado, ['aprobado', 'rechazado', 'pendiente']) ? 'gray' : '' }}">
               {{ ucfirst($estado) }}
             </span>
           </div>
@@ -81,32 +83,64 @@
         <div class="p-4">
           <div class="row g-3">
 
+            {{-- Datos personales --}}
             <div class="col-12 col-md-6">
               <div class="ea-card p-4">
                 <div class="fw-semibold mb-3">Datos personales</div>
+
+                <div class="d-flex justify-content-between mb-2">
+                  <span style="color: var(--ea-muted);">Nombre completo</span>
+                  <span class="fw-semibold">
+                    {{ trim(($solicitud->nombre ?? '') . ' ' . ($solicitud->apaterno ?? '') . ' ' . ($solicitud->amaterno ?? '')) ?: '—' }}
+                  </span>
+                </div>
+
+                <div class="d-flex justify-content-between mb-2">
+                  <span style="color: var(--ea-muted);">Correo</span>
+                  <span class="fw-semibold">{{ $solicitud->correo ?? '—' }}</span>
+                </div>
 
                 <div class="d-flex justify-content-between mb-2">
                   <span style="color: var(--ea-muted);">Teléfono</span>
                   <span class="fw-semibold">{{ $solicitud->telefono ?? '—' }}</span>
                 </div>
 
+                <div class="d-flex justify-content-between">
+                  <span style="color: var(--ea-muted);">Rol solicitado</span>
+                  <span class="fw-semibold">
+                    {{ $solicitud->rol === 'admin_destinos' ? 'Administrador de destinos' : 'Gestor de rutas' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {{-- Datos de la solicitud --}}
+            <div class="col-12 col-md-6">
+              <div class="ea-card p-4">
+                <div class="fw-semibold mb-3">Datos de la solicitud</div>
+
                 <div class="d-flex justify-content-between mb-2">
                   <span style="color: var(--ea-muted);">Fecha solicitud</span>
                   <span class="fw-semibold">
-                    {{ $solicitud->fecha_solicitud ? \Carbon\Carbon::parse($solicitud->fecha_solicitud)->format('d/m/Y') : '—' }}
+                    {{ $solicitud->fecha_solicitud ? \Carbon\Carbon::parse($solicitud->fecha_solicitud)->format('d/m/Y H:i') : '—' }}
                   </span>
                 </div>
 
                 <div class="d-flex justify-content-between mb-2">
                   <span style="color: var(--ea-muted);">Fecha respuesta</span>
                   <span class="fw-semibold">
-                    {{ $solicitud->fecha_respuesta ? \Carbon\Carbon::parse($solicitud->fecha_respuesta)->format('d/m/Y') : '—' }}
+                    {{ $solicitud->fecha_respuesta ? \Carbon\Carbon::parse($solicitud->fecha_respuesta)->format('d/m/Y H:i') : '—' }}
                   </span>
+                </div>
+
+                <div class="d-flex justify-content-between mb-2">
+                  <span style="color: var(--ea-muted);">Estado</span>
+                  <span class="fw-semibold">{{ ucfirst($solicitud->estado ?? '—') }}</span>
                 </div>
 
                 <div class="d-flex justify-content-between">
                   <span style="color: var(--ea-muted);">Activo</span>
-                  <span class="fw-semibold">{{ $solicitud->activo ?? '—' }}</span>
+                  <span class="fw-semibold">{{ ($solicitud->activo ?? 0) ? 'Sí' : 'No' }}</span>
                 </div>
 
                 @if(!empty($solicitud->motivo_rechazo))
@@ -114,46 +148,6 @@
                     <div class="ea-reject-label">❗ Motivo de rechazo:</div>
                     <div class="ea-reject-text">{{ $solicitud->motivo_rechazo }}</div>
                   </div>
-                @endif
-              </div>
-            </div>
-
-            <div class="col-12 col-md-6">
-              <div class="ea-card p-4">
-                <div class="fw-semibold mb-3">
-                  {{ $solicitud->rol === 'hotelero' ? 'Datos del hotel' : 'Datos del restaurante' }}
-                </div>
-
-                @if($solicitud->rol === 'hotelero' && isset($hotel))
-                  <div class="d-flex justify-content-between mb-2">
-                    <span style="color: var(--ea-muted);">Nombre</span>
-                    <span class="fw-semibold">{{ $hotel->nombre ?? '—' }}</span>
-                  </div>
-                  <div class="d-flex justify-content-between mb-2">
-                    <span style="color: var(--ea-muted);">Dirección</span>
-                    <span class="fw-semibold">{{ $hotel->direccion ?? '—' }}</span>
-                  </div>
-                  <div class="d-flex justify-content-between">
-                    <span style="color: var(--ea-muted);">Teléfono</span>
-                    <span class="fw-semibold">{{ $hotel->telefono ?? '—' }}</span>
-                  </div>
-
-                @elseif($solicitud->rol === 'restaurantero' && isset($restaurante))
-                  <div class="d-flex justify-content-between mb-2">
-                    <span style="color: var(--ea-muted);">Nombre</span>
-                    <span class="fw-semibold">{{ $restaurante->nombre ?? '—' }}</span>
-                  </div>
-                  <div class="d-flex justify-content-between mb-2">
-                    <span style="color: var(--ea-muted);">Dirección</span>
-                    <span class="fw-semibold">{{ $restaurante->direccion ?? '—' }}</span>
-                  </div>
-                  <div class="d-flex justify-content-between">
-                    <span style="color: var(--ea-muted);">Teléfono</span>
-                    <span class="fw-semibold">{{ $restaurante->telefono ?? '—' }}</span>
-                  </div>
-
-                @else
-                  <div class="small" style="color: var(--ea-muted);">No se encontró información del negocio asociado.</div>
                 @endif
               </div>
             </div>
