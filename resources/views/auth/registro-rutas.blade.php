@@ -3,58 +3,30 @@
 @php $hideNavbar = true; @endphp
 
 @section('content')
-<div class="container-fluid min-vh-100">
-    <div class="row min-vh-100">
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-7 col-xl-6">
 
-        <!-- LADO IZQUIERDO -->
-        <div class="col-lg-6 d-none d-lg-flex align-items-center text-white"
-            style="background: linear-gradient(135deg,#7c2d12,#9a3412,#ea580c);">
-
-            <div class="px-5">
-
-                <div class="d-flex align-items-center gap-3">
-                    <div class="bg-white bg-opacity-25 rounded-circle d-flex align-items-center justify-content-center"
-                        style="width:45px;height:45px;">
-                        <span>🗺️</span>
-                    </div>
-
-                    <span class="fs-4 fw-semibold">Ecoaventura</span>
-                </div>
-
-                <h1 class="mt-5 fw-bold">Gestiona tus rutas</h1>
-
-                <p class="mt-3 opacity-75">
-                    Registra y administra rutas ecoturísticas.
-                </p>
-
-                <div class="alert alert-light mt-4">
-                    ⏳ Tu cuenta quedará <strong>pendiente de aprobación</strong>
-                    hasta que el administrador la revise.
-                </div>
-
-            </div>
-        </div>
-
-
-        <!-- FORMULARIO -->
-        <div class="col-lg-6 d-flex align-items-center justify-content-center bg-light">
-
-            <div style="width:100%; max-width:420px;">
-
+            <div class="mb-4">
                 <a href="{{ route('home') }}" class="text-decoration-none text-muted">
                     ← Volver al inicio
                 </a>
+            </div>
 
-                <h2 class="mt-4 fw-bold">Registro — Gestor de Rutas</h2>
-
-                <p class="text-muted small">
-                    Completa tus datos para enviar tu solicitud
+            <div class="bg-white rounded-4 shadow-sm border p-4 p-md-5">
+                <h2 class="fw-bold mb-2">Registro — Gestor de Rutas</h2>
+                <p class="text-muted mb-4">
+                    Completa tus datos para enviar tu solicitud de registro.
                 </p>
 
+                <div class="alert alert-light border rounded-3 mb-4">
+                    <strong>Importante:</strong> tu cuenta quedará pendiente de aprobación
+                    hasta que el administrador la revise.
+                </div>
 
                 @if ($errors->any())
-                    <div class="alert alert-danger mt-3">
-                        <ul class="mb-0">
+                    <div class="alert alert-danger">
+                        <ul class="mb-0 ps-3">
                             @foreach ($errors->all() as $e)
                                 <li>{{ $e }}</li>
                             @endforeach
@@ -62,20 +34,20 @@
                     </div>
                 @endif
 
-
                 @if (session('success'))
-                    <div class="alert alert-success mt-3">
+                    <div class="alert alert-success">
                         {{ session('success') }}
                     </div>
                 @endif
 
-
-                <form method="POST" action="/registro/rutas" class="mt-3">
+                <form method="POST" action="{{ route('registro.rutas') }}">
                     @csrf
 
                     <div class="mb-3">
-                        <label class="form-label small">Nombre *</label>
-                        <input type="text"
+                        <label for="nombre" class="form-label fw-semibold">Nombre *</label>
+                        <input
+                            type="text"
+                            id="nombre"
                             name="nombre"
                             value="{{ old('nombre') }}"
                             class="form-control"
@@ -84,8 +56,10 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label small">Apellido paterno *</label>
-                        <input type="text"
+                        <label for="apaterno" class="form-label fw-semibold">Apellido paterno *</label>
+                        <input
+                            type="text"
+                            id="apaterno"
                             name="apaterno"
                             value="{{ old('apaterno') }}"
                             class="form-control"
@@ -94,8 +68,10 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label small">Apellido materno</label>
-                        <input type="text"
+                        <label for="amaterno" class="form-label fw-semibold">Apellido materno</label>
+                        <input
+                            type="text"
+                            id="amaterno"
                             name="amaterno"
                             value="{{ old('amaterno') }}"
                             class="form-control"
@@ -103,19 +79,23 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label small">Teléfono *</label>
-                        <input type="text"
+                        <label for="telefono" class="form-label fw-semibold">Teléfono *</label>
+                        <input
+                            type="text"
+                            id="telefono"
                             name="telefono"
                             value="{{ old('telefono') }}"
-                            maxlength="10"
                             class="form-control"
+                            maxlength="10"
                             placeholder="9611234567"
                             required>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label small">Correo electrónico *</label>
-                        <input type="email"
+                        <label for="correo" class="form-label fw-semibold">Correo electrónico *</label>
+                        <input
+                            type="email"
+                            id="correo"
                             name="correo"
                             value="{{ old('correo') }}"
                             class="form-control"
@@ -124,33 +104,34 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label small">Contraseña *</label>
-                        <input type="password"
+                        <label for="password" class="form-label fw-semibold">Contraseña *</label>
+                        <input
+                            type="password"
+                            id="password"
                             name="password"
                             class="form-control"
                             placeholder="••••••••"
                             required>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label small">Confirmar contraseña *</label>
-                        <input type="password"
+                    <div class="mb-4">
+                        <label for="password_confirmation" class="form-label fw-semibold">Confirmar contraseña *</label>
+                        <input
+                            type="password"
+                            id="password_confirmation"
                             name="password_confirmation"
                             class="form-control"
                             placeholder="••••••••"
                             required>
                     </div>
 
-                    <button type="submit" class="btn btn-warning w-100 text-white">
-                        Enviar Solicitud
+                    <button type="submit" class="btn btn-success w-100 py-2 fw-semibold">
+                        Enviar solicitud
                     </button>
-
                 </form>
-
             </div>
 
         </div>
-
     </div>
 </div>
 @endsection
