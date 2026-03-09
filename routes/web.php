@@ -72,12 +72,25 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
+    | PANEL ADMIN DESTINOS (NUEVO)
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/mis-destinos', function () {
+        return view('admin.destinos.index');
+    })->name('misdestinos.index');
+
+    /*
+    |--------------------------------------------------------------------------
     | ADMIN
     |--------------------------------------------------------------------------
     */
-    Route::prefix('admin')->name('admin.')->group(function () {
+    Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
 
         Route::get('/index', [AdminDashboardController::class, 'index'])->name('index');
+
+        Route::get('/destinos', function () {
+            return view('admin.destinos.index');
+        })->name('destinos');
 
         Route::get('/aprobacion', fn () => view('admin.aprobacion'))->name('aprobacion');
         Route::get('/reportes', fn () => view('admin.reportes'))->name('reportes');
@@ -95,4 +108,5 @@ Route::middleware('auth')->group(function () {
         Route::post('/solicitudes/{id}/aprobar', [AdminSolicitudesController::class, 'aprobar'])->name('solicitudes.aprobar');
         Route::post('/solicitudes/{id}/rechazar', [AdminSolicitudesController::class, 'rechazar'])->name('solicitudes.rechazar');
     });
+
 });

@@ -5,20 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>@yield('title', 'Ecoaventura | Panel Admin')</title>
 
- <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap.min.css') }}">
-<link rel="stylesheet" href="{{ asset('bootstrap-icons/bootstrap-icons.min.css') }}">
-<link rel="stylesheet" href="{{ asset('css/estilos.css') }}?v={{ filemtime(public_path('css/estilos.css')) }}">
+  <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('bootstrap-icons/bootstrap-icons.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/estilos.css') }}?v={{ filemtime(public_path('css/estilos.css')) }}">
+  <link rel="stylesheet" href="{{ asset('css/destinos.css') }}?v={{ filemtime(public_path('css/destinos.css')) }}">
 </head>
 
 <body>
   <div class="d-flex ea-shell">
 
-    {{-- Sidebar --}}
-    @include('admin.partials.sidebar')
+    @if(auth()->check() && auth()->user()->rol === 'admin_destinos')
+        @include('admin.partials.sidebar-destinos')
+    @else
+        @include('admin.partials.sidebar')
+    @endif
 
-    {{-- Main --}}
     <div class="flex-grow-1 d-flex flex-column">
-      @include('admin.partials.topbar')
+      @if(auth()->check() && auth()->user()->rol === 'admin_destinos')
+          @include('admin.partials.topbar-destinos')
+      @else
+          @include('admin.partials.topbar')
+      @endif
 
       <main class="container-fluid py-4 px-4 px-lg-5">
         @yield('content')

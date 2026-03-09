@@ -55,6 +55,9 @@ class AuthController extends Controller
             'rol'      => 'turista',
             'activo'   => true,
             'estado'   => 'aprobado',
+            'fecha_solicitud' => now(),
+            'fecha_respuesta' => now(),
+            'motivo_rechazo'  => null,
         ]);
 
         Turista::create([
@@ -70,32 +73,41 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+        $request->validate([
+            'correo'   => 'required|email',
+            'password' => 'required',
+        ]);
+
         $usuario = Usuario::where('correo', $request->correo)->first();
 
         if (!$usuario || !Hash::check($request->password, $usuario->password)) {
-            return back()->with('error', 'Credenciales incorrectas.');
+            return back()->withInput($request->only('correo'))
+                ->with('error', 'Credenciales incorrectas.');
         }
 
         if ($usuario->estado === 'pendiente') {
-            return back()->with('error', 'Tu cuenta está pendiente de aprobación.');
+            return back()->withInput($request->only('correo'))
+                ->with('error', 'Tu cuenta está pendiente de aprobación.');
         }
 
         if ($usuario->estado === 'rechazado') {
-            return back()->with('error', 'Tu cuenta fue rechazada. Contacta al administrador.');
+            return back()->withInput($request->only('correo'))
+                ->with('error', 'Tu cuenta fue rechazada. Contacta al administrador.');
         }
 
         if (!$usuario->activo) {
-            return back()->with('error', 'Tu cuenta está desactivada.');
+            return back()->withInput($request->only('correo'))
+                ->with('error', 'Tu cuenta está desactivada.');
         }
 
         Auth::login($usuario);
 
-        return match($usuario->rol) {
-            'admin_general'  => redirect('/admin/index'),
-            'admin_destinos' => redirect('/destinos/dashboard'),
-            'gestor_rutas'   => redirect('/rutas/dashboard'),
-            'turista'        => redirect('/turista/dashboard'),
-        };
+      return match ($usuario->rol) {
+        'admin_general'  => redirect('/admin/index'),
+        'admin_destinos' => redirect()->route('misdestinos.index'),
+        'gestor_rutas'   => redirect('/rutas/dashboard'),
+        'turista'        => redirect('/turista/dashboard'),
+    };
     }
 
     // ================================
@@ -113,12 +125,14 @@ class AuthController extends Controller
         ]);
 
         $usuario = Usuario::create([
-            'correo'           => $request->correo,
-            'password'         => bcrypt($request->password),
-            'rol'              => 'admin_destinos',
-            'activo'           => true,
-            'estado'           => 'pendiente',
-            'fecha_solicitud'  => now(),
+            'correo'          => $request->correo,
+            'password'        => bcrypt($request->password),
+            'rol'             => 'admin_destinos',
+            'activo'          => false,
+            'estado'          => 'pendiente',
+            'fecha_solicitud' => now(),
+            'fecha_respuesta' => null,
+            'motivo_rechazo'  => null,
         ]);
 
         AdminDestinos::create([
@@ -150,9 +164,11 @@ class AuthController extends Controller
             'correo'          => $request->correo,
             'password'        => bcrypt($request->password),
             'rol'             => 'gestor_rutas',
-            'activo'          => true,
+            'activo'          => false,
             'estado'          => 'pendiente',
             'fecha_solicitud' => now(),
+            'fecha_respuesta' => null,
+            'motivo_rechazo'  => null,
         ]);
 
         GestorRutas::create([
