@@ -126,9 +126,6 @@
 
             <a href="{{ route('registro.turista') }}" class="btn btn-light text-success fw-semibold mt-3 px-4 py-2 rounded-pill">
                 Crear cuenta gratis →
-            <a href="{{ route('register') }}" class="btn btn-light text-success fw-semibold mt-3 px-4 py-2 rounded-pill">
-                Crear cuenta gratis 
-
             </a>
         </div>
     </section>
