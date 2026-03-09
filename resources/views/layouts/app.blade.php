@@ -2,6 +2,8 @@
 <html lang="es">
 
 <head>
+    <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ecoaventura</title>
@@ -29,7 +31,7 @@
 
                 <!-- LOGO -->
                 <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url('/') }}">
-                    <img src="{{ asset('img/logo.jpeg') }}" class="rounded-circle">
+                    <img src="{{ asset('img/ecoaventura-logo.png') }}" class="rounded-circle">
                     <span class="fw-semibold text-success">Ecoaventura</span>
                 </a>
 
