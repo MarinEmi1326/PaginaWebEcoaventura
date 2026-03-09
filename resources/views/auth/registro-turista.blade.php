@@ -73,7 +73,7 @@
                 @endif
 
 
-                <form method="POST" action="/registro" class="mt-3">
+                <form method="POST" action="{{ route('registro.turista.post') }}" class="mt-3">
                     @csrf
 
 

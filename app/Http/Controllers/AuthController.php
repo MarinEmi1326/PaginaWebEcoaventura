@@ -68,7 +68,7 @@ class AuthController extends Controller
         ]);
 
         Auth::login($usuario);
-        return redirect('/turista/dashboard');
+        return redirect('/');
     }
 
     public function login(Request $request)
@@ -101,12 +101,13 @@ class AuthController extends Controller
         }
 
         Auth::login($usuario);
+      
 
       return match ($usuario->rol) {
         'admin_general'  => redirect('/admin/index'),
         'admin_destinos' => redirect()->route('misdestinos.index'),
         'gestor_rutas'   => redirect('/rutas/dashboard'),
-        'turista'        => redirect('/turista/dashboard'),
+        'turista'        => redirect('/'),
     };
     }
 

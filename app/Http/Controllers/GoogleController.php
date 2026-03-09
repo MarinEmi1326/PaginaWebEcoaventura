@@ -63,7 +63,7 @@ class GoogleController extends Controller
             'admin_general'  => redirect('/admin/dashboard'),
             'admin_destinos' => redirect('/destinos/dashboard'),
             'gestor_rutas'   => redirect('/rutas/dashboard'),
-            'turista'        => redirect('/turista/dashboard'),
+            'turista'        => redirect('/'),
         };
     }
 }

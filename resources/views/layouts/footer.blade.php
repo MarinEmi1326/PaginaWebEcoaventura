@@ -4,10 +4,20 @@
         <div class="row g-4 g-lg-5">
 
             {{-- COLUMNA 1 --}}
+
             <div class="col-12 col-md-6 col-lg-3">
                 <div class="navbar-brand d-flex align-items-center gap-2">
                     <div class="eco-footer-logo">
                         <img src="{{ asset('img/logo.jpeg') }}" class="rounded-circle">
+
+            <div class="col-md-6 col-lg-2">
+
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center"
+                         style="width:40px; height:40px; background-color:#ffffff;">
+                        
+                         <img src="{{ asset('img/ecoaventura-logo.png') }}" alt="Ecoaventura" style="width:24px; height:24px;">
+
                     </div>
                     <h5 class="mb-0 fw-semibold eco-footer-brand">Ecoaventura</h5>
                 </div>
@@ -24,7 +34,18 @@
                     <a href="#" class="eco-social-link" aria-label="Instagram">
                         <i class="bi bi-instagram"></i>
                     </a>
+
                     
+
+                    {{-- <a href="#" class="rounded-circle d-flex align-items-center justify-content-center text-white"
+                       style="width:36px; height:36px; background-color:#065f46;">
+                        <i class="bi bi-twitter-x"></i>
+                    </a>
+                    <a href="#" class="rounded-circle d-flex align-items-center justify-content-center text-white"
+                       style="width:36px; height:36px; background-color:#065f46;">
+                        <i class="bi bi-youtube"></i>
+                    </a> --}}
+
                 </div>
             </div>
 
@@ -49,6 +70,7 @@
             </div>
 
             {{-- COLUMNA 4 --}}
+
             <div class="col-12 col-md-6 col-lg-2">
                 <h6 class="eco-footer-title">Contacto</h6>
                 <ul class="list-unstyled eco-footer-contact mb-0">
@@ -64,8 +86,8 @@
                         <i class="bi bi-envelope"></i>
                         <span>info@ecoaventura-ocosingo.mx</span>
                     </li>
-                </ul>
-            </div>
+
+           
 
             {{-- COLUMNA 5 --}}
             <div class="col-12 col-md-6 col-lg-3">
@@ -81,6 +103,9 @@
                                 <div class="eco-business-title">¿Tienes un destino?</div>
                                 <div class="eco-business-text">Regístrate como Admin de Destinos</div>
                             </div>
+
+                            <p class="small text-white-50 mb-0">Regístrate como Administrador de Destinos</p>
+
                         </div>
                     </a>
 
