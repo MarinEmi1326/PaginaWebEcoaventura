@@ -53,7 +53,7 @@
                                 <h5 class="fw-bold">{{ $destino['titulo'] }}</h5>
                                 <p class="text-muted small">{{ $destino['ubicacion'] }}</p>
                                 <a href="#" class="btn btn-outline-success btn-sm rounded-pill">
-                                    Ver más →
+                                    Ver más
                                 </a>
                             </div>
 
@@ -85,7 +85,7 @@
                                 Eco-lodges y hoteles boutique en armonía con la naturaleza.
                             </p>
                             <a href="#" class="btn btn-success btn-sm rounded-pill">
-                                Explorar →
+                                Explorar 
                             </a>
                         </div>
                     </div>
@@ -101,7 +101,7 @@
                                 Restaurantes con cocina tradicional y gourmet.
                             </p>
                             <a href="#" class="btn btn-success btn-sm rounded-pill">
-                                Explorar →
+                                Explorar 
                             </a>
                         </div>
                     </div>
@@ -125,7 +125,7 @@
             </p>
 
             <a href="{{ route('register') }}" class="btn btn-light text-success fw-semibold mt-3 px-4 py-2 rounded-pill">
-                Crear cuenta gratis →
+                Crear cuenta gratis 
             </a>
         </div>
     </section>
