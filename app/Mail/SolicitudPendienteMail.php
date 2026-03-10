@@ -52,6 +52,7 @@ class SolicitudPendienteMail extends Mailable
                 // 2. Usamos el accesor perfil->nombre para no tener errores
                 'nombre' => $this->user->perfil->nombre,
                 'correo' => $this->user->correo,
+                'token'  => $this->user->token_verificacion
             ],
         );
     }

@@ -17,6 +17,13 @@
         <li>Recibirás un correo electrónico notificándote si tu solicitud fue <strong>Aprobada</strong> o <strong>Rechazada</strong>.</li>
     </ul>
 
+    <p style="margin-top:20px;">
+        <a href="{{ url('/verificar-correo/'.$token) }}"
+        style="background:#16a34a;color:white;padding:10px 20px;text-decoration:none;border-radius:6px;">
+            Confirmar correo electrónico
+        </a>
+    </p>
+
     <p>Gracias por tu paciencia.</p>
     <p>Atentamente,<br>El equipo de Ecoaventura</p>
 </body>

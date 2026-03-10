@@ -18,6 +18,13 @@ class Usuario extends Authenticatable
 
     protected $fillable = [
         'correo',
+<<<<<<< Updated upstream
+=======
+        'correo_verificado',
+        'token_verificacion',
+        'google_id',
+        'foto_perfil',
+>>>>>>> Stashed changes
         'password',
         'rol',
         'activo',
@@ -35,9 +42,16 @@ class Usuario extends Authenticatable
      * Casts para tipos de datos automáticos
      */
     protected $casts = [
+<<<<<<< Updated upstream
         'activo' => 'boolean',
         'fecha_solicitud' => 'datetime',
         'fecha_respuesta' => 'datetime',
+=======
+        'activo'             => 'boolean',
+        'correo_verificado'  => 'boolean',
+        'fecha_solicitud'    => 'datetime',
+        'fecha_respuesta'    => 'datetime',
+>>>>>>> Stashed changes
     ];
 
     /**

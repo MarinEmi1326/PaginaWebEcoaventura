@@ -40,11 +40,23 @@ Route::get('/destinos/{tipo}', function ($tipo) {
 ->name('destinos.tipo');
 
 
+<<<<<<< Updated upstream
+=======
+// REGISTRO ADMIN DESTINOS (footer)
+Route::get('/registro/destinos', [AuthController::class, 'showRegistroDestinos'])->name('registro.destinos');
+Route::post('/registro/destinos', [AuthController::class, 'registroDestinos'])->name('registro.destinos.post');
+
+// VISTA DE ÉXITO DEL REGISTRO
+Route::get('/registro/destinos/exito', function () {
+    return view('auth.registro-destinos-exito');
+})->name('registro.destinos.exito');
+>>>>>>> Stashed changes
 
 Route::get('/mapa', function () {
     return view('mapa');
 })->name('mapa');
 
+<<<<<<< Updated upstream
 // Route::get('/publicar-facebook', [FacebookController::class, 'publicar']);
 // Route::get('/ver-facebook', [FacebookController::class, 'verPosts']);
 Route::get('/turismo-responsable', function () {
@@ -98,6 +110,13 @@ Route::get('/auth/google/callback', function () {
 
     return redirect()->route('home');
 });
+=======
+Route::get('/verificar-correo/{token}', [AuthController::class, 'verificarCorreo'])->name('verificar.correo');
+
+// GOOGLE LOGIN
+Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('google.login');
+Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
+>>>>>>> Stashed changes
 
 
 
