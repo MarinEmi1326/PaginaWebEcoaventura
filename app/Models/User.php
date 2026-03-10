@@ -45,4 +45,15 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    // // Relación Admin General
+    // public function adminGeneral()
+    // {
+    //     return $this->hasOne(AdminGeneral::class, 'id_usuario', 'id_usuario');
+    // }
+
+    // //Relación Admin Destinos
+    // public function adminDestinos()
+    // {
+    //     return $this->hasOne(AdminDestinos::class, 'id_usuario', 'id_usuario');
+    // }
 }

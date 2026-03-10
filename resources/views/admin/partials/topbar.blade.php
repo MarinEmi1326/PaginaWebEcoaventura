@@ -1,3 +1,9 @@
+@php
+$usuario = auth()->user();
+$perfil = $usuario->perfil;
+$nombre = $perfil->nombre ?? $usuario->correo;
+$inicial = strtoupper(substr($nombre, 0, 1));
+@endphp
 <header class="ea-topbar d-flex align-items-center px-4 px-lg-5">
   <div class="d-flex align-items-center gap-3 flex-grow-1">
     <a href="#" class="text-decoration-none" style="color: var(--ea-muted);">
@@ -12,7 +18,7 @@
   </div>
 
   <div class="d-flex align-items-center gap-3">
-    <div class="ea-avatar">C</div>
-    <div class="fw-semibold">Carlos Administrador</div>
+    <div class="ea-avatar">{{ $inicial }}</div>
+    <div class="fw-semibold">{{ $nombre }}</div>
   </div>
 </header>
