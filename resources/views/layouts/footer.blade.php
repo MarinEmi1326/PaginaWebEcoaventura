@@ -1,10 +1,10 @@
 <footer class="text-white" style="background-color:#064e3b;">
 
-    <div class="container py-5">
+    <div class="container-fluid py-5 px-5">
         <div class="row g-5">
 
             {{-- COLUMNA 1 --}}
-            <div class="col-md-6 col-lg-2">
+            <div class="col-md-6 col-lg-3">
 
                 <div class="d-flex align-items-center gap-3 mb-4">
                     <div class="rounded-circle d-flex align-items-center justify-content-center"
@@ -43,8 +43,8 @@
             </div>
 
             {{-- COLUMNA 2 --}}
-            <div class="col-md-6 col-lg-2">
-                <h6 class="fw-semibold mb-4">Centros Turísticos</h6>
+            <div class="col-md-6 col-lg-1">
+                <h6 class="fw-semibold mb-4">Destinos</h6>
                 <ul class="list-unstyled small">
                     <li class="mb-3"><a href="#" class="text-white-50 text-decoration-none">Turisticos</a></li>
                     <li class="mb-3"><a href="#" class="text-white-50 text-decoration-none">Ecoturismo</a></li>
@@ -63,18 +63,31 @@
             </div>
 
             {{-- COLUMNA 4 --}}
-            <div class="col-md-6 col-lg-2">
+            <div class="col-md-6 col-lg-3">
                 <h6 class="fw-semibold mb-4">Contacto</h6>
                 <ul class="list-unstyled small text-white-50">
-                    <li class="mb-3"><i class="bi bi-geo-alt me-2"></i>Ocosingo, Chiapas, México</li>
-                    <li class="mb-3"><i class="bi bi-telephone me-2"></i>+52 (919) 123-4567</li>
-                    <li><i class="bi bi-envelope me-2"></i>2025ecoaventura@gmail.com</li>
+
+                    <li class="mb-3 d-flex">
+                        <i class="bi bi-geo-alt me-2"></i>
+                        <span>Ocosingo, Chiapas, México</span>
+                    </li>
+
+                    <li class="mb-3 d-flex">
+                        <i class="bi bi-telephone me-2"></i>
+                        <span>+52 (919) 123-4567</span>
+                    </li>
+
+                    <li class="d-flex">
+                        <i class="bi bi-envelope me-2"></i>
+                        <span>2025ecoaventura@gmail.com</span>
+                    </li>
+
                 </ul>
             </div>
 
             {{-- COLUMNA 5 --}}
-            <div class="col-md-6 col-lg-4">
-                <h6 class="fw-semibold mb-4">¿Tienes un negocio?</h6>
+            <div class="col-md-6 col-lg-3">
+                <h6 class="fw-semibold mb-4">¿Administras un destino o ruta turística?</h6>
                 <div class="d-flex flex-column gap-3">
                     <a href="{{ route('registro.destinos') }}" class="text-decoration-none">
                         <div class="rounded-3 p-3" style="background:#065f46;">

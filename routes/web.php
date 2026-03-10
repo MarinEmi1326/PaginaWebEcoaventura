@@ -86,9 +86,6 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/index', [AdminDashboardController::class, 'index'])->name('index');
 
-        Route::get('/destinos', function () {
-            return view('admin.destinos.index');
-        })->name('destinos');
 
         Route::get('/aprobacion', fn() => view('admin.aprobacion'))->name('aprobacion');
         Route::get('/reportes', fn() => view('admin.reportes'))->name('reportes');

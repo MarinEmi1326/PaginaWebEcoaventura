@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\AdminGeneral;
 use App\Models\Turista;
 use App\Models\AdminDestinos;
 use App\Models\GestorRutas;
@@ -74,6 +75,11 @@ public function getAuthPassword()
         return $this->hasOne(GestorRutas::class, 'id_usuario', 'id_usuario');
     }
 
+    public function adminGeneral()
+    {
+        return $this->hasOne(AdminGeneral::class, 'id_usuario', 'id_usuario');
+    }
+
     // ================================
     // HELPERS DE ROL
     // ================================
@@ -110,6 +116,7 @@ public function getAuthPassword()
             'turista'        => $this->turista,
             'admin_destinos' => $this->adminDestinos,
             'gestor_rutas'   => $this->gestorRutas,
+            'admin_general'  => $this->adminGeneral,
             default          => null,
         };
     }
