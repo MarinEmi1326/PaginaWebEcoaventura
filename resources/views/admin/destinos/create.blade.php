@@ -3,23 +3,19 @@
 @section('title', 'Nuevo Destino')
 
 @section('content')
-<div class="max-w-3xl">
-    {{-- Encabezado --}}
-    <div class="mb-6">
-        <a href="{{ route('admin.sitios.index', ['categoria' => request('categoria')]) }}"
-           class="inline-flex items-center gap-2 mb-4 text-sm font-semibold text-emerald-700 hover:text-emerald-900">
-            ← Regresar a destinos
-        </a>
 
-        <h1 class="text-3xl font-serif font-semibold text-slate-900">Nuevo Destino</h1>
-        <p class="text-slate-500 mt-1">Completa la información para crear un nuevo destino</p>
+    <div class="mb-4">
+        <a href="{{ route('misdestinos.index') }}" class="text-decoration-none fw-semibold" style="color: var(--ea-green);">
+            ← Regresar a mis destinos
+        </a>
+        <h1 class="ea-page-title mt-3 mb-1">Crear Nuevo Destino</h1>
+        <p class="ea-subtitle mb-0">Completa la información para registrar un nuevo destino turístico.</p>
     </div>
 
-    {{-- Errores --}}
     @if ($errors->any())
-        <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-red-700">
-            <div class="font-semibold mb-2">Revisa los campos:</div>
-            <ul class="list-disc ml-5 space-y-1 text-sm">
+        <div class="alert alert-danger rounded-3 mb-4">
+            <div class="fw-semibold mb-1">Revisa los campos:</div>
+            <ul class="mb-0 ps-3">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
@@ -27,249 +23,258 @@
         </div>
     @endif
 
-    {{-- Form --}}
-    <form method="POST"
-          action="{{ route('admin.sitios.store') }}"
-          enctype="multipart/form-data"
-          class="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 space-y-6">
+    <form action="{{ route('destinos.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
-        {{-- Nombre --}}
-        <div>
-            <label class="block text-sm font-semibold text-slate-800 mb-2">
-                Nombre del Destino <span class="text-red-500">*</span>
-            </label>
-            <input type="text" name="nombre" value="{{ old('nombre') }}"
-                   placeholder="Ej: Reserva Natural El Bosque"
-                   class="w-full rounded-xl border border-slate-300 px-4 py-3
-                          outline-none focus:ring-2 focus:ring-emerald-600/40
-                          focus:border-emerald-700"
-                   required maxlength="45">
-        </div>
-
-        {{-- Dirección --}}
-        <div>
-            <label class="block text-sm font-semibold text-slate-800 mb-2">
-                Dirección <span class="text-red-500">*</span>
-            </label>
-            <input type="text" name="direccion" value="{{ old('direccion') }}"
-                   placeholder="Ej: Carretera Ocosingo - Palenque Km 15"
-                   class="w-full rounded-xl border border-slate-300 px-4 py-3
-                          outline-none focus:ring-2 focus:ring-emerald-600/40
-                          focus:border-emerald-700"
-                   required maxlength="120">
-        </div>
-
-        {{-- Comunidad + Ciudad --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div>
-                <label class="block text-sm font-semibold text-slate-800 mb-2">
-                    Comunidad <span class="text-red-500">*</span>
-                </label>
-                <input type="text" name="comunidad" value="{{ old('comunidad') }}"
-                       placeholder="Ej: Lacanjá Chansayab"
-                       class="w-full rounded-xl border border-slate-300 px-4 py-3
-                              outline-none focus:ring-2 focus:ring-emerald-600/40
-                              focus:border-emerald-700"
-                       required maxlength="45">
+        {{-- BLOQUE 1: Información básica --}}
+        <div class="ea-card p-0 overflow-hidden mb-4">
+            <div class="p-4 border-bottom" style="border-color: var(--ea-line) !important; background: rgba(255,255,255,.25);">
+                <div class="fw-semibold" style="color: var(--ea-text);">📍 Información del Destino</div>
             </div>
-
-            <div>
-                <label class="block text-sm font-semibold text-slate-800 mb-2">
-                    Ciudad <span class="text-red-500">*</span>
-                </label>
-                <input type="text" name="ciudad" value="{{ old('ciudad') }}"
-                       placeholder="Ej: Ocosingo"
-                       class="w-full rounded-xl border border-slate-300 px-4 py-3
-                              outline-none focus:ring-2 focus:ring-emerald-600/40
-                              focus:border-emerald-700"
-                       required maxlength="45">
-            </div>
-        </div>
-
-        {{-- Descripción --}}
-        <div>
-            <label class="block text-sm font-semibold text-slate-800 mb-2">
-                Descripción <span class="text-red-500">*</span>
-            </label>
-            <textarea name="descripcion" rows="4"
-                      placeholder="Describe el destino..."
-                      class="w-full rounded-xl border border-slate-300 px-4 py-3
-                             outline-none focus:ring-2 focus:ring-emerald-600/40
-                             focus:border-emerald-700"
-                      required>{{ old('descripcion') }}</textarea>
-        </div>
-
-        {{-- Categoría + Costo --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-            {{-- Categoría (oculta si viene desde filtro) --}}
-            <div>
-                <label class="block text-sm font-semibold text-slate-800 mb-2">
-                    Categoría <span class="text-red-500">*</span>
-                </label>
-
-                @php
-                    $catDefault = old('categoria') ?? ($categoria ?? null);
-                @endphp
-
-                @if(!empty($categoria))
-                    <input type="hidden" name="categoria" value="{{ $categoria }}">
-                    <div class="w-full rounded-xl border border-slate-300 px-4 py-3 bg-slate-100 text-slate-700">
-                        {{ $categoria }}
+            <div class="p-4">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label fw-bold">Nombre del destino <span class="text-danger">*</span></label>
+                        <input type="text" name="nombre" value="{{ old('nombre') }}"
+                               class="form-control rounded-3 py-2"
+                               placeholder="Ej. Zona Arqueológica de Toniná"
+                               required maxlength="120">
+                        @error('nombre') <div class="small text-danger mt-1">{{ $message }}</div> @enderror
                     </div>
-                    <p class="text-xs text-slate-500 mt-1">La categoría se asigna automáticamente por el filtro.</p>
-                @else
-                    <select name="categoria"
-                            class="w-full rounded-xl border border-slate-300 px-4 py-3
-                                   outline-none focus:ring-2 focus:ring-emerald-600/40
-                                   focus:border-emerald-700"
-                            required>
-                        <option value="" disabled {{ $catDefault ? '' : 'selected' }}>
-                            Selecciona una categoría
-                        </option>
-                        <option value="Turistico" {{ $catDefault === 'Turistico' ? 'selected' : '' }}>Turístico</option>
-                        <option value="Ecoturistico" {{ $catDefault === 'Ecoturistico' ? 'selected' : '' }}>Ecoturístico</option>
-                        <option value="Balneario" {{ $catDefault === 'Balneario' ? 'selected' : '' }}>Balneario</option>
-                    </select>
-                @endif
-            </div>
-
-            {{-- Costo --}}
-            <div>
-                <label class="block text-sm font-semibold text-slate-800 mb-2">
-                    Costo (MXN) <span class="text-red-500">*</span>
-                </label>
-                <input type="number" step="0.01" min="0"
-                       name="costo" value="{{ old('costo', '0.00') }}"
-                       placeholder="Ej: 150.00"
-                       class="w-full rounded-xl border border-slate-300 px-4 py-3
-                              outline-none focus:ring-2 focus:ring-emerald-600/40
-                              focus:border-emerald-700"
-                       required>
-            </div>
-        </div>
-
-        {{-- Teléfono + Horario --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div>
-                <label class="block text-sm font-semibold text-slate-800 mb-2">
-                    Teléfono <span class="text-red-500">*</span>
-                </label>
-                <input type="text" name="telefono" value="{{ old('telefono') }}"
-                       placeholder="Ej: 9611234567"
-                       class="w-full rounded-xl border border-slate-300 px-4 py-3
-                              outline-none focus:ring-2 focus:ring-emerald-600/40
-                              focus:border-emerald-700"
-                       required maxlength="10">
-            </div>
-
-            <div>
-                <label class="block text-sm font-semibold text-slate-800 mb-2">
-                    Horario <span class="text-red-500">*</span>
-                </label>
-                <input type="text" name="horario" value="{{ old('horario') }}"
-                       placeholder="Ej: 08:00 - 17:00"
-                       class="w-full rounded-xl border border-slate-300 px-4 py-3
-                              outline-none focus:ring-2 focus:ring-emerald-600/40
-                              focus:border-emerald-700"
-                       required maxlength="45">
-            </div>
-        </div>
-
-        {{-- Foto --}}
-        <div>
-            <div class="mb-2">
-                <label class="block text-sm font-semibold text-slate-800">
-                    Foto principal <span class="text-red-500">*</span>
-                </label>
-                <p class="text-xs text-slate-500 mt-1">Sube una foto (JPG/PNG) máx. 5MB.</p>
-            </div>
-
-            <input id="fotoInput" type="file" name="foto"
-                   accept="image/png,image/jpeg"
-                   class="hidden"
-                   onchange="previewFoto(event)"
-                   required>
-
-            <div id="dropzone"
-                 class="rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50
-                        p-8 text-center cursor-pointer hover:bg-slate-100 transition">
-                <div class="mx-auto h-12 w-12 rounded-2xl bg-emerald-100 flex items-center justify-center mb-3">
-                    <span class="text-emerald-800 text-xl">⬆️</span>
+                    <div class="col-12">
+                        <label class="form-label fw-bold">Descripción completa <span class="text-danger">*</span></label>
+                        <textarea name="descripcion" rows="4" class="form-control rounded-3 py-2"
+                                  placeholder="Descripción detallada del destino..." required>{{ old('descripcion') }}</textarea>
+                        @error('descripcion') <div class="small text-danger mt-1">{{ $message }}</div> @enderror
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label fw-bold">Teléfono <span class="text-muted small fw-normal">(opcional)</span></label>
+                        <input type="text" name="telefono" value="{{ old('telefono') }}"
+                               class="form-control rounded-3 py-2 font-monospace"
+                               placeholder="Ej. 9611234567" maxlength="20">
+                        @error('telefono') <div class="small text-danger mt-1">{{ $message }}</div> @enderror
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-bold">Recomendaciones <span class="text-muted small fw-normal">(opcional)</span></label>
+                        <textarea name="recomendaciones" rows="3" class="form-control rounded-3 py-2"
+                                  placeholder="Ej. Llevar repelente, calzado cómodo, agua...">{{ old('recomendaciones') }}</textarea>
+                        @error('recomendaciones') <div class="small text-danger mt-1">{{ $message }}</div> @enderror
+                    </div>
                 </div>
-                <div class="text-sm font-semibold text-slate-800">Haz clic para subir o arrastra una imagen</div>
-                <div class="text-xs text-slate-500 mt-1">PNG, JPG hasta 5MB</div>
-
-                <img id="preview" src="" alt="Vista previa"
-                     class="hidden mt-6 mx-auto max-h-56 rounded-xl border border-slate-200 object-cover" />
             </div>
-
-            <script>
-                const dropzone = document.getElementById('dropzone');
-                const fotoInput = document.getElementById('fotoInput');
-
-                dropzone.addEventListener('click', () => fotoInput.click());
-
-                dropzone.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    dropzone.classList.add('border-emerald-500');
-                });
-
-                dropzone.addEventListener('dragleave', () => {
-                    dropzone.classList.remove('border-emerald-500');
-                });
-
-                dropzone.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    dropzone.classList.remove('border-emerald-500');
-
-                    const file = e.dataTransfer.files?.[0];
-                    if (!file) return;
-
-                    fotoInput.files = e.dataTransfer.files;
-                    previewFoto({ target: { files: [file] } });
-                });
-
-                function previewFoto(e) {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-
-                    const img = document.getElementById('preview');
-                    img.src = URL.createObjectURL(file);
-                    img.classList.remove('hidden');
-                }
-            </script>
         </div>
 
-        {{-- Info guía --}}
-        <div>
-            <label class="block text-sm font-semibold text-slate-800 mb-2">
-                Información de guía (opcional)
-            </label>
-            <textarea name="info_guia" rows="3"
-                      placeholder="Ej: recomendaciones, guía local, etc."
-                      class="w-full rounded-xl border border-slate-300 px-4 py-3
-                             outline-none focus:ring-2 focus:ring-emerald-600/40
-                             focus:border-emerald-700">{{ old('info_guia') }}</textarea>
+        {{-- BLOQUE 2: Ubicación --}}
+        <div class="ea-card p-0 overflow-hidden mb-4">
+            <div class="p-4 border-bottom" style="border-color: var(--ea-line) !important; background: rgba(255,255,255,.25);">
+                <div class="fw-semibold" style="color: var(--ea-text);">🗺️ Ubicación</div>
+            </div>
+            <div class="p-4">
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <label class="form-label fw-bold">Latitud <span class="text-muted small fw-normal">(opcional)</span></label>
+                        <input type="number" step="0.0000001" name="lat" value="{{ old('lat') }}"
+                               class="form-control rounded-3 py-2 font-monospace" placeholder="Ej. 16.9076543">
+                        @error('lat') <div class="small text-danger mt-1">{{ $message }}</div> @enderror
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label fw-bold">Longitud <span class="text-muted small fw-normal">(opcional)</span></label>
+                        <input type="number" step="0.0000001" name="lng" value="{{ old('lng') }}"
+                               class="form-control rounded-3 py-2 font-monospace" placeholder="Ej. -92.1234567">
+                        @error('lng') <div class="small text-danger mt-1">{{ $message }}</div> @enderror
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-bold">Google Place ID <span class="text-muted small fw-normal">(opcional)</span></label>
+                        <input type="text" name="google_place_id" value="{{ old('google_place_id') }}"
+                               class="form-control rounded-3 py-2 font-monospace"
+                               placeholder="Ej. ChIJN1t_tDeuEmsRUsoyG83frY4" maxlength="120">
+                        @error('google_place_id') <div class="small text-danger mt-1">{{ $message }}</div> @enderror
+                    </div>
+                </div>
+            </div>
         </div>
 
-        {{-- Botones --}}
-        <div class="pt-2 flex items-center justify-end gap-3">
-            <a href="{{ route('admin.sitios.index', ['categoria' => request('categoria')]) }}"
-               class="px-5 py-3 rounded-xl border-2 border-slate-400
-                      text-slate-800 font-semibold
-                      hover:bg-slate-100 hover:border-slate-500
-                      transition">
+        {{-- BLOQUE 3: Actividades --}}
+        <div class="ea-card p-0 overflow-hidden mb-4">
+            <div class="p-4 border-bottom" style="border-color: var(--ea-line) !important; background: rgba(255,255,255,.25);">
+                <div class="fw-semibold" style="color: var(--ea-text);">🏃 Actividades</div>
+            </div>
+            <div class="p-4">
+
+                {{-- Actividades existentes --}}
+                @if ($actividadesExistentes->count() > 0)
+                    <div class="mb-4">
+                        <label class="form-label fw-bold mb-2">Selecciona actividades existentes</label>
+                        <div class="row g-2">
+                            @foreach ($actividadesExistentes as $act)
+                                <div class="col-12 col-md-6">
+                                    <label class="d-flex align-items-start gap-2 p-3 rounded-3 border"
+                                           style="cursor:pointer; background:#f7f9f7;"
+                                           onmouseover="this.style.borderColor='var(--ea-green)'"
+                                           onmouseout="this.style.borderColor=''">
+                                        <input type="checkbox"
+                                               name="actividades_existentes[]"
+                                               value="{{ $act->id_actividad }}"
+                                               class="form-check-input mt-1 flex-shrink-0"
+                                               {{ in_array($act->id_actividad, old('actividades_existentes', [])) ? 'checked' : '' }}>
+                                        <div>
+                                            <div class="fw-semibold small">{{ $act->nombre }}</div>
+                                            <div class="text-muted" style="font-size:.75rem;">
+                                                Dificultad: {{ ucfirst($act->dificultad) }}
+                                                @if ($act->duracion_estimada) · {{ $act->duracion_estimada }} @endif
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    <hr style="border-color: var(--ea-line);">
+                @endif
+
+                {{-- Nueva actividad --}}
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="fw-bold small" style="color: var(--ea-text);">¿No encuentras la actividad? Crea una nueva</span>
+                    <button type="button" class="btn btn-sm ea-btn-green rounded-3" onclick="agregarActividad()">
+                        <i class="bi bi-plus-lg me-1"></i> Nueva actividad
+                    </button>
+                </div>
+
+                <div id="nuevas-actividades-container"></div>
+
+                <div id="sin-nuevas" class="text-muted small text-center py-2">
+                    <i class="bi bi-info-circle me-1"></i> Haz clic en "Nueva actividad" para agregar una que no esté en el listado.
+                </div>
+
+            </div>
+        </div>
+
+        {{-- BLOQUE 4: Imágenes --}}
+        <div class="ea-card p-0 overflow-hidden mb-4">
+            <div class="p-4 border-bottom" style="border-color: var(--ea-line) !important; background: rgba(255,255,255,.25);">
+                <div class="fw-semibold" style="color: var(--ea-text);">🖼️ Imágenes del Destino</div>
+            </div>
+            <div class="p-4">
+                <p class="text-muted small mb-3">Puedes subir varias imágenes (JPG/PNG, máx. 5MB c/u).</p>
+                <input type="file" id="fotosInput" name="fotos[]" accept="image/png,image/jpeg" class="d-none" multiple>
+                <div id="dropzone"
+                     class="rounded-3 border border-2 border-dashed p-5 text-center"
+                     style="border-color: #cdd8cd !important; background: #f7f9f7; cursor:pointer;"
+                     onclick="document.getElementById('fotosInput').click()">
+                    <div class="mx-auto mb-3 rounded-3 d-inline-flex align-items-center justify-content-center"
+                         style="width:48px;height:48px;background:#e2ece9;">
+                        <i class="bi bi-cloud-arrow-up text-success fs-4"></i>
+                    </div>
+                    <div class="fw-semibold text-dark">Haz clic para subir o arrastra imágenes</div>
+                    <div class="small text-muted mt-1">PNG, JPG hasta 5MB cada una</div>
+                </div>
+                <div id="previews" class="d-flex flex-wrap gap-2 mt-3"></div>
+                @error('fotos') <div class="small text-danger mt-1">{{ $message }}</div> @enderror
+                @error('fotos.*') <div class="small text-danger mt-1">{{ $message }}</div> @enderror
+            </div>
+        </div>
+
+        {{-- Acciones --}}
+        <div class="d-flex flex-column flex-md-row justify-content-end gap-2 mt-2 pt-4 border-top"
+             style="border-color: rgba(15,42,36,.10) !important;">
+            <a href="{{ route('misdestinos.index') }}" class="btn btn-light border rounded-3 px-4 py-2 fw-semibold">
                 Cancelar
             </a>
-
-            <button type="submit"
-                    class="px-6 py-3 rounded-xl bg-emerald-700 text-white font-semibold hover:bg-emerald-800 transition">
-                Crear
+            <button type="submit" class="btn ea-btn-green rounded-3 px-4 py-2 fw-semibold">
+                <i class="bi bi-send me-1"></i> Crear Destino
             </button>
         </div>
 
     </form>
-</div>
+
+<script>
+    let contador = 0;
+
+    function agregarActividad() {
+        contador++;
+        const i = contador;
+        document.getElementById('sin-nuevas').classList.add('d-none');
+
+        const html = `
+        <div class="ea-card p-0 overflow-hidden mb-3 border" id="nueva-act-${i}">
+            <div class="p-3 border-bottom d-flex justify-content-between align-items-center"
+                 style="border-color: var(--ea-line) !important; background: rgba(255,255,255,.15);">
+                <span class="fw-semibold small" style="color: var(--ea-text);">Nueva actividad #${i}</span>
+                <button type="button" class="btn btn-sm btn-outline-danger rounded-3" onclick="eliminarActividad(${i})">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+            <div class="p-3">
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <label class="form-label fw-bold small">Nombre <span class="text-danger">*</span></label>
+                        <input type="text" name="nuevas_actividades[${i}][nombre]"
+                               class="form-control rounded-3 py-2"
+                               placeholder="Ej. Senderismo, Kayak, Rappel..." maxlength="80" required>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <label class="form-label fw-bold small">Dificultad <span class="text-danger">*</span></label>
+                        <select name="nuevas_actividades[${i}][dificultad]" class="form-select rounded-3 py-2" required>
+                            <option value="baja">Baja</option>
+                            <option value="media">Media</option>
+                            <option value="alta">Alta</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <label class="form-label fw-bold small">Duración estimada</label>
+                        <input type="text" name="nuevas_actividades[${i}][duracion]"
+                               class="form-control rounded-3 py-2" placeholder="Ej. 2 horas" maxlength="50">
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label class="form-label fw-bold small">Mínimo de personas</label>
+                        <input type="number" name="nuevas_actividades[${i}][min_personas]"
+                               class="form-control rounded-3 py-2" min="1" placeholder="Ej. 2">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-bold small">Recomendación</label>
+                        <textarea name="nuevas_actividades[${i}][recomendacion]"
+                                  class="form-control rounded-3 py-2" rows="2"
+                                  placeholder="Ej. No recomendado para personas con vértigo..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+
+        document.getElementById('nuevas-actividades-container').insertAdjacentHTML('beforeend', html);
+    }
+
+    function eliminarActividad(i) {
+        document.getElementById('nueva-act-' + i).remove();
+        if (document.getElementById('nuevas-actividades-container').children.length === 0) {
+            document.getElementById('sin-nuevas').classList.remove('d-none');
+        }
+    }
+
+    // Imágenes
+    const fotosInput = document.getElementById('fotosInput');
+    const dropzone   = document.getElementById('dropzone');
+    const previews   = document.getElementById('previews');
+
+    function mostrarPreviews(files) {
+        previews.innerHTML = '';
+        Array.from(files).forEach(file => {
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            img.className = 'rounded-3 border';
+            img.style.cssText = 'width:100px;height:80px;object-fit:cover;';
+            previews.appendChild(img);
+        });
+    }
+
+    fotosInput.addEventListener('change', e => mostrarPreviews(e.target.files));
+    dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.style.borderColor = '#1F6B4B'; });
+    dropzone.addEventListener('dragleave', () => { dropzone.style.borderColor = '#cdd8cd'; });
+    dropzone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropzone.style.borderColor = '#cdd8cd';
+        fotosInput.files = e.dataTransfer.files;
+        mostrarPreviews(e.dataTransfer.files);
+    });
+</script>
+
 @endsection

@@ -40,10 +40,20 @@ class Usuario extends Authenticatable
     ];
 
     // Le dice a Laravel que el campo login es "correo"
-    public function getAuthIdentifierName()
-    {
-        return 'correo';
-    }
+   public function getAuthIdentifierName()
+{
+    return 'id_usuario';
+}
+
+public function getAuthIdentifier()
+{
+    return $this->id_usuario;
+}
+
+public function getAuthPassword()
+{
+    return $this->password;
+}
 
     // ================================
     // RELACIONES
