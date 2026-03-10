@@ -9,14 +9,14 @@ class AdminDashboardController extends Controller
 {
     public function index()
     {
-        $destinosActivos  = DB::table('sitio')->count();
-        $serviciosTotales = DB::table('hotel')->count() + DB::table('restaurante')->count();
-        $reservasTotales  = DB::table('reserva_hotel')->count();
+        $destinosActivos = DB::table('destino')->count();
+        $rutasTotales    = DB::table('ruta')->count();
+        $actividadesTotales = DB::table('actividad')->count();
 
-        return view('admin.dashboard', compact(
+        return view('admin.index', compact(
             'destinosActivos',
-            'serviciosTotales',
-            'reservasTotales'
+            'rutasTotales',
+            'actividadesTotales'
         ));
     }
 }

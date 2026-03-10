@@ -14,7 +14,7 @@
             </div>
 
             <div class="bg-white rounded-4 shadow-sm border p-4 p-md-5">
-                <h2 class="fw-bold mb-2">Registro — Admin Destinos</h2>
+                <h2 class="fw-bold mb-2">Registro — Gestor de Rutas</h2>
                 <p class="text-muted mb-4">
                     Completa tus datos para enviar tu solicitud de registro.
                 </p>
@@ -40,7 +40,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('registro.destinos.post') }}">
+                <form method="POST" action="{{ route('registro.rutas') }}">
                     @csrf
 
                     <div class="mb-3">
@@ -75,7 +75,7 @@
                             name="amaterno"
                             value="{{ old('amaterno') }}"
                             class="form-control"
-                            placeholder="Apellido materno">
+                            placeholder="Apellido materno (opcional)">
                     </div>
 
                     <div class="mb-3">

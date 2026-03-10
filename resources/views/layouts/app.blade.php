@@ -2,6 +2,8 @@
 <html lang="es">
 
 <head>
+    <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ecoaventura</title>
@@ -29,7 +31,7 @@
 
                 <!-- LOGO -->
                 <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url('/') }}">
-                    <img src="{{ asset('img/logo.jpeg') }}" class="rounded-circle">
+                    <img src="{{ asset('img/ecoaventura-logo.png') }}" class="rounded-circle">
                     <span class="fw-semibold text-success">Ecoaventura</span>
                 </a>
 
@@ -44,7 +46,8 @@
                     <ul class="navbar-nav mx-auto align-items-lg-center">
 
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url('/') }}">Inicio</a>
+                            <a class="nav-link {{ request()->is('/') ? 'active' : '' }}"
+                                href="{{ url('/') }}">Inicio</a>
                         </li>
 
                         <!-- DESTINOS -->
@@ -62,21 +65,47 @@
                         </li>
                         <li class="nav-item">
 
-                            <a class="nav-link" href="#">Cultura y Patrimonio</a>
+                            <a class="nav-link {{ request()->is('cultura') ? 'active' : '' }}"
+                                href="{{ url('cultura') }}">Cultura y Patrimonio</a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url('/ver-facebook') }}">Turismo Responsable</a>
+                            <a class="nav-link {{ request()->is('turismo-responsable') ? 'active' : '' }}"
+                                href="{{ url('turismo-responsable') }}">Turismo Responsable</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url('/ver-facebook') }}">Rutas</a>
+                            <a class="nav-link {{ request()->is('ruta') ? 'active' : '' }}"
+                                href="{{ url('ruta') }}">Rutas</a>
 
-                          
                         </li>
                     </ul>
-                    <a href="{{ route('login') }}" class="btn btn-success rounded-pill">
-                        Iniciar sesión
-                    </a>
+                    @auth
+                        <div class="dropdown">
+                            <button class="btn btn-success rounded-pill dropdown-toggle" type="button"
+                                data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle me-1"></i>
+                                {{ Auth::user()->turista->nombre ?? Auth::user()->correo }}
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="/turista/dashboard">Mi perfil</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="bi bi-box-arrow-right me-1"></i>Cerrar sesión
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    @else
+                        <a href="{{ route('login') }}" class="btn btn-success rounded-pill">
+                            Iniciar sesión
+                        </a>
+                    @endauth
 
                 </div>
             </div>
@@ -102,10 +131,6 @@
 
 
     <script src="{{ asset('bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-
-<footer>
-      @include('layouts.footer')
-</footer>
 
 </body>
 

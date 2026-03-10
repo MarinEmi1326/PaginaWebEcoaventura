@@ -4,86 +4,106 @@
         <div class="row g-5">
 
             {{-- COLUMNA 1 --}}
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6 col-lg-2">
 
                 <div class="d-flex align-items-center gap-3 mb-4">
                     <div class="rounded-circle d-flex align-items-center justify-content-center"
-                         style="width:40px; height:40px; background-color:#065f46;">
-                        🌿
+                         style="width:40px; height:40px; background-color:#ffffff;">
+                        
+                         <img src="{{ asset('img/ecoaventura-logo.png') }}" alt="Ecoaventura" style="width:24px; height:24px;">
                     </div>
                     <h5 class="mb-0 fw-semibold">Ecoaventura</h5>
                 </div>
 
                 <p class="small text-white-50">
-                    Descubre la magia de la naturaleza con experiencias únicas de ecoturismo.
-                    Aventura, sostenibilidad y conexión con el medio ambiente.
+                    Plataforma de difusión cultural y turística de Ocosingo, Chiapas.
+                    Conoce, comprende y valora este territorio antes de visitarlo.
                 </p>
 
                 <div class="d-flex gap-3 mt-4">
-                    <a href="#" class="rounded-circle d-flex align-items-center justify-content-center text-white text-decoration-none"
-                       style="width:36px; height:36px; background-color:#065f46;">
-                        f
+                    <a href="#"
+                        class="rounded-circle d-flex align-items-center justify-content-center text-white"
+                        style="width:36px; height:36px; background-color:#065f46;">
+                        <i class="bi bi-facebook"></i>
                     </a>
-                    <a href="#" class="rounded-circle d-flex align-items-center justify-content-center text-white text-decoration-none"
+                    <a href="#" class="rounded-circle d-flex align-items-center justify-content-center text-white"
                        style="width:36px; height:36px; background-color:#065f46;">
-                        ⌁
+                        <i class="bi bi-instagram"></i>
                     </a>
-                    <a href="#" class="rounded-circle d-flex align-items-center justify-content-center text-white text-decoration-none"
+                    {{-- <a href="#" class="rounded-circle d-flex align-items-center justify-content-center text-white"
                        style="width:36px; height:36px; background-color:#065f46;">
-                        x
+                        <i class="bi bi-twitter-x"></i>
                     </a>
-                    <a href="#" class="rounded-circle d-flex align-items-center justify-content-center text-white text-decoration-none"
+                    <a href="#" class="rounded-circle d-flex align-items-center justify-content-center text-white"
                        style="width:36px; height:36px; background-color:#065f46;">
-                        ▶
-                    </a>
+                        <i class="bi bi-youtube"></i>
+                    </a> --}}
                 </div>
 
             </div>
 
             {{-- COLUMNA 2 --}}
-            <div class="col-md-6 col-lg-3">
-                <h6 class="fw-semibold mb-4">Destinos</h6>
+            <div class="col-md-6 col-lg-2">
+                <h6 class="fw-semibold mb-4">Centros Turísticos</h6>
                 <ul class="list-unstyled small">
-                    <li class="mb-3"><a href="#" class="text-white-50 text-decoration-none">Turísticos</a></li>
-                    <li class="mb-3"><a href="#" class="text-white-50 text-decoration-none">Ecoturísticos</a></li>
+                    <li class="mb-3"><a href="#" class="text-white-50 text-decoration-none">Turisticos</a></li>
+                    <li class="mb-3"><a href="#" class="text-white-50 text-decoration-none">Ecoturismo</a></li>
                     <li><a href="#" class="text-white-50 text-decoration-none">Balnearios</a></li>
                 </ul>
             </div>
 
             {{-- COLUMNA 3 --}}
-            <div class="col-md-6 col-lg-3">
-                <h6 class="fw-semibold mb-4">Servicios</h6>
-                <ul class="list-unstyled small mb-4">
-                    <li class="mb-3"><a href="#" class="text-white-50 text-decoration-none">Hospedaje</a></li>
-                    <li><a href="#" class="text-white-50 text-decoration-none">Restaurantes</a></li>
-                </ul>
-
-                <h6 class="fw-semibold mb-4">Empresa</h6>
+            <div class="col-md-6 col-lg-2">
+                <h6 class="fw-semibold mb-4">Explora</h6>
                 <ul class="list-unstyled small">
-                    <li class="mb-3"><a href="#" class="text-white-50 text-decoration-none">Sobre Nosotros</a></li>
-                    <li class="mb-3"><a href="#" class="text-white-50 text-decoration-none">Contacto</a></li>
-                    <li class="mb-3"><a href="#" class="text-white-50 text-decoration-none">Blog</a></li>
-                    <li><a href="#" class="text-white-50 text-decoration-none">Política de Privacidad</a></li>
+                    <li class="mb-3"><a href="#" class="text-white-50 text-decoration-none">Cultura y Patrimonio</a></li>
+                    <li class="mb-3"><a href="#" class="text-white-50 text-decoration-none">Turismo Responsable</a></li>
+                    <li><a href="#" class="text-white-50 text-decoration-none">Rutas y Planificación</a></li>
                 </ul>
             </div>
 
             {{-- COLUMNA 4 --}}
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6 col-lg-2">
                 <h6 class="fw-semibold mb-4">Contacto</h6>
                 <ul class="list-unstyled small text-white-50">
-                    <li class="mb-3">📍 Av. Naturaleza 123, Centro Histórico, Ciudad Verde</li>
-                    <li class="mb-3">📞 +52 (123) 456-7890</li>
-                    <li>✉️ info@ecoaventura.com</li>
+                    <li class="mb-3"><i class="bi bi-geo-alt me-2"></i>Ocosingo, Chiapas, México</li>
+                    <li class="mb-3"><i class="bi bi-telephone me-2"></i>+52 (919) 123-4567</li>
+                    <li><i class="bi bi-envelope me-2"></i>2025ecoaventura@gmail.com</li>
                 </ul>
+            </div>
+
+            {{-- COLUMNA 5 --}}
+            <div class="col-md-6 col-lg-4">
+                <h6 class="fw-semibold mb-4">¿Tienes un negocio?</h6>
+                <div class="d-flex flex-column gap-3">
+                    <a href="{{ route('registro.destinos') }}" class="text-decoration-none">
+                        <div class="rounded-3 p-3" style="background:#065f46;">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <i class="bi bi-geo-alt text-white"></i>
+                                <span class="small fw-semibold text-white">¿Tienes un destino?</span>
+                            </div>
+                            <p class="small text-white-50 mb-0">Regístrate como Administrador de Destinos</p>
+                        </div>
+                    </a>
+                    <a href="{{ route('registro.rutas') }}" class="text-decoration-none">
+                        <div class="rounded-3 p-3" style="background:#065f46;">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <i class="bi bi-map text-white"></i>
+                                <span class="small fw-semibold text-white">¿Tienes una ruta?</span>
+                            </div>
+                            <p class="small text-white-50 mb-0">Regístrate como Gestor de Rutas</p>
+                        </div>
+                    </a>
+                </div>
             </div>
 
         </div>
     </div>
 
-    {{-- BOTTOM BAR --}}
+    {{-- BOTTOM --}}
     <div class="border-top border-light border-opacity-25">
         <div class="container py-3 d-flex flex-column flex-md-row justify-content-between align-items-center small text-white-50">
-            <p class="mb-2 mb-md-0">© 2026 Ecoaventura. Todos los derechos reservados.</p>
+            <p class="mb-2 mb-md-0">© 2026 Ecoaventura. Todos los dereccios reservados.</p>
             <p class="mb-0">Comprometidos con el turismo sostenible 🌿</p>
         </div>
     </div>

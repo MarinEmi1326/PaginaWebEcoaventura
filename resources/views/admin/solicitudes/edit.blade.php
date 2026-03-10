@@ -52,9 +52,13 @@
 
               <div class="col-12 col-md-4">
                 <label class="form-label fw-bold">Rol</label>
-                <select name="rol" class="form-select rounded-3 py-2">
-                  <option value="hotelero" {{ $usuario->rol == 'hotelero' ? 'selected' : '' }}>Hotelero</option>
-                  <option value="restaurantero" {{ $usuario->rol == 'restaurantero' ? 'selected' : '' }}>Restaurantero</option>
+                <select name="rol" class="form-select rounded-3 py-2" required>
+                  <option value="admin_destinos" {{ $usuario->rol == 'admin_destinos' ? 'selected' : '' }}>
+                      Administrador de destinos
+                  </option>
+                  <option value="gestor_rutas" {{ $usuario->rol == 'gestor_rutas' ? 'selected' : '' }}>
+                      Gestor de rutas
+                  </option>
                 </select>
               </div>
             </div>

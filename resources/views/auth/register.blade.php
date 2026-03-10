@@ -6,7 +6,7 @@
 @endphp
 
 @section('content')
-<div class="min-h-screen grid grid-cols-1 lg:grid-cols-2">
+<div class="min-h-screen grid grid-cols-1 lg:grid-coles-2">
 
     {{-- LADO IZQUIERDO --}}
     <section class="relative overflow-hidden bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-600 text-white">
