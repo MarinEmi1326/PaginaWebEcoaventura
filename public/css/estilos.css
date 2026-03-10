@@ -163,10 +163,9 @@ color: white;
 
 /* Pastillas (un solo bloque, sin duplicados) */
 .eco-items{
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding-left: 1px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
 }
 
 .eco-pill{
@@ -182,13 +181,22 @@ color: white;
   transition: background-color .25s ease,
               box-shadow .25s ease,
               transform .25s ease;
-  cursor: pointer;
+  cursor: default;
 }
 
-.eco-pill:hover{
+ .eco-pill:hover{
   background-color: #E3ECE6;
-  box-shadow: 0 6px 14px rgba(0,0,0,.06);
-  transform: translateY(-1px);
+  box-shadow: none;
+  transform: none;
+ }
+
+.eco-pill-static,
+.eco-pill-static *,
+.eco-pill-static:hover,
+.eco-pill-static:focus,
+.eco-pill-static:active{
+    cursor: default !important;
+    pointer-events: none !important;
 }
 
 .eco-pin i{
@@ -217,6 +225,11 @@ color: white;
   .eco-items{ padding-left: 0; }
 }
 
+/*Evita que las pastillas aparezcan como botones */
+.eco-pill,
+.eco-pill:hover {
+  cursor: default !important;
+}
 
 
 
