@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Laravel\Socialite\Facades\Socialite;
@@ -36,7 +37,6 @@ class GoogleController extends Controller
                 'apaterno'   => $googleUser->user['family_name'] ?? 'Sin apellido',
                 'id_usuario' => $usuario->id_usuario,
             ]);
-
         } else {
             // Ya existe → verificar estado
             if ($usuario->estado === 'pendiente') {
@@ -59,9 +59,9 @@ class GoogleController extends Controller
         Auth::login($usuario);
 
         // Redirigir según rol
-        return match($usuario->rol) {
-            'admin_general'  => redirect('/admin/dashboard'),
-            'admin_destinos' => redirect('/destinos/dashboard'),
+        return match ($usuario->rol) {
+            'admin_general'  => redirect('/admin/index'),
+            'admin_destinos' => redirect()->route('misdestinos.index'),
             'gestor_rutas'   => redirect('/rutas/dashboard'),
             'turista'        => redirect('/'),
         };

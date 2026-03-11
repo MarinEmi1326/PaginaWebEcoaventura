@@ -72,7 +72,7 @@ Route::middleware('auth')->group(function () {
     // // Dashboards
     // Route::get('/turista/dashboard', fn () => view('turista.dashboard'))->name('turista.dashboard');
     // Route::get('/destinos/dashboard', fn () => view('destinos.dashboard'))->name('destinos.dashboard');
-    // Route::get('/rutas/dashboard', fn () => view('rutas.dashboard'))->name('rutas.dashboard');
+    Route::get('/rutas/dashboard', fn () => view('rutas.dashboard'))->name('rutas.dashboard');
 
     // PANEL ADMIN DESTINOS
     Route::get('/mis-destinos', [AdminDestinoController::class, 'index'])->name('misdestinos.index');
