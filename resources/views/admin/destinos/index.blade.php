@@ -5,9 +5,14 @@
 @section('content')
 
     @if (session('success'))
-        <div class="alert alert-success rounded-3 mb-4">{{ session('success') }}</div>
+        <div class="alert alert-success rounded-3 mb-4" id="alerta-exito">{{ session('success') }}</div>
+        <script>
+            setTimeout(() => {
+                const alerta = document.getElementById('alerta-exito');
+                if (alerta) alerta.remove();
+            }, 3000);
+        </script>
     @endif
-
     {{-- Cards resumen --}}
     <div class="row g-3 mb-4">
         <div class="col-12 col-md-6">
@@ -36,7 +41,6 @@
     <div class="d-grid gap-3">
 
         @forelse ($destinos as $destino)
-
             <div class="ea-destination-card">
                 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start gap-3">
 
@@ -56,17 +60,17 @@
                         @endif
 
                         <div class="ea-actions">
-                            <a href="{{ route('destinos.edit', $destino->id_destino) }}"
-                               class="ea-action-btn edit" title="Editar">
+                            <a href="{{ route('destinos.edit', $destino->id_destino) }}" class="ea-action-btn edit"
+                                title="Editar">
                                 <i class="bi bi-pencil-square"></i>
                             </a>
 
-                            <form action="{{ route('destinos.destroy', $destino->id_destino) }}"
-                                  method="POST" class="d-inline"
-                                  onsubmit="return confirm('¿Eliminar este destino?')">
+                            <form action="{{ route('destinos.destroy', $destino->id_destino) }}" method="POST"
+                                class="d-inline" onsubmit="return confirm('¿Eliminar este destino?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="ea-action-btn delete border-0 bg-transparent p-0" title="Eliminar">
+                                <button type="submit" class="ea-action-btn delete border-0 bg-transparent p-0"
+                                    title="Eliminar">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>
@@ -85,7 +89,6 @@
                     <i class="bi bi-plus-lg me-1"></i> Crear mi primer destino
                 </a>
             </div>
-
         @endforelse
 
     </div>

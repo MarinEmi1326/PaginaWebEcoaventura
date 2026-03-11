@@ -35,29 +35,37 @@ class AdminDestinoController extends Controller
     public function create()
     {
         $actividadesExistentes = DB::table('actividad')->orderBy('nombre')->get();
-        return view('admin.destinos.create', compact('actividadesExistentes'));
+        $categorias            = DB::table('categoria')->orderBy('nombre')->get();
+        return view('admin.destinos.create', compact('actividadesExistentes', 'categorias'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'nombre'                       => ['required', 'max:120'],
-            'descripcion'                  => ['required'],
-            'telefono'                     => ['nullable', 'max:20'],
-            'recomendaciones'              => ['nullable'],
-            'lat'                          => ['nullable', 'numeric'],
-            'lng'                          => ['nullable', 'numeric'],
-            'google_place_id'              => ['nullable', 'max:120'],
-            'fotos'                        => ['nullable', 'array'],
-            'fotos.*'                      => ['image', 'mimes:jpg,jpeg,png', 'max:5120'],
-            'actividades_existentes'       => ['nullable', 'array'],
-            'actividades_existentes.*'     => ['integer'],
-            'nuevas_actividades'                    => ['nullable', 'array'],
-            'nuevas_actividades.*.nombre'           => ['required_with:nuevas_actividades', 'max:80'],
-            'nuevas_actividades.*.dificultad'       => ['required_with:nuevas_actividades', 'in:baja,media,alta'],
-            'nuevas_actividades.*.duracion'         => ['nullable', 'max:50'],
-            'nuevas_actividades.*.min_personas'     => ['nullable', 'integer', 'min:1'],
-            'nuevas_actividades.*.recomendacion'    => ['nullable'],
+            'nombre'                            => ['required', 'max:120'],
+            'descripcion'                       => ['required'],
+            'telefono'                          => ['nullable', 'max:20'],
+            'recomendaciones'                   => ['nullable'],
+            'lat'                               => ['nullable', 'numeric'],
+            'lng'                               => ['nullable', 'numeric'],
+            'google_place_id'                   => ['nullable', 'max:120'],
+            'fotos'                             => ['nullable', 'array'],
+            'fotos.*'                           => ['image', 'mimes:jpg,jpeg,png', 'max:5120'],
+            'categorias'                        => ['nullable', 'array'],
+            'categorias.*'                      => ['integer'],
+            'actividades_existentes'            => ['nullable', 'array'],
+            'actividades_existentes.*'          => ['integer'],
+            'nuevas_actividades'                => ['nullable', 'array'],
+            'nuevas_actividades.*.nombre'       => ['required_with:nuevas_actividades', 'max:80'],
+            'nuevas_actividades.*.dificultad'   => ['required_with:nuevas_actividades', 'in:baja,media,alta'],
+            'nuevas_actividades.*.duracion'     => ['nullable', 'max:50'],
+            'nuevas_actividades.*.min_personas' => ['nullable', 'integer', 'min:1'],
+            'nuevas_actividades.*.recomendacion'=> ['nullable'],
+            'paquetes'                          => ['nullable', 'array'],
+            'paquetes.*.nombre'                 => ['required_with:paquetes', 'max:120'],
+            'paquetes.*.descripcion'            => ['nullable'],
+            'paquetes.*.precio'                 => ['nullable', 'numeric', 'min:0'],
+            'paquetes.*.minimo_personas'        => ['nullable', 'integer', 'min:1'],
         ]);
 
         // 1. Insertar destino
@@ -74,7 +82,7 @@ class AdminDestinoController extends Controller
             'fecha_creacion'  => now(),
         ]);
 
-        // 2. Guardar imágenes
+        // 2. Imágenes
         if ($request->hasFile('fotos')) {
             foreach ($request->file('fotos') as $foto) {
                 $ruta = $foto->store('destinos', 'public');
@@ -88,7 +96,17 @@ class AdminDestinoController extends Controller
             }
         }
 
-        // 3. Relacionar actividades existentes seleccionadas
+        // 3. Categorías
+        if ($request->filled('categorias')) {
+            foreach ($request->categorias as $idCategoria) {
+                DB::table('destino_categoria')->insertOrIgnore([
+                    'id_destino'   => $idDestino,
+                    'id_categoria' => $idCategoria,
+                ]);
+            }
+        }
+
+        // 4. Actividades existentes
         if ($request->filled('actividades_existentes')) {
             foreach ($request->actividades_existentes as $idActividad) {
                 DB::table('destino_actividad')->insertOrIgnore([
@@ -98,14 +116,11 @@ class AdminDestinoController extends Controller
             }
         }
 
-        // 4. Crear nuevas actividades y relacionarlas
+        // 5. Nuevas actividades
         if ($request->filled('nuevas_actividades')) {
             foreach ($request->nuevas_actividades as $act) {
                 if (empty($act['nombre'])) continue;
-
-                // Si ya existe por nombre, reutilizar
                 $actividad = DB::table('actividad')->where('nombre', $act['nombre'])->first();
-
                 if ($actividad) {
                     $idActividad = $actividad->id_actividad;
                 } else {
@@ -117,10 +132,24 @@ class AdminDestinoController extends Controller
                         'recomendacion'     => $act['recomendacion'] ?? null,
                     ]);
                 }
-
                 DB::table('destino_actividad')->insertOrIgnore([
                     'id_destino'   => $idDestino,
                     'id_actividad' => $idActividad,
+                ]);
+            }
+        }
+
+        // 6. Paquetes
+        if ($request->filled('paquetes')) {
+            foreach ($request->paquetes as $paq) {
+                if (empty($paq['nombre'])) continue;
+                DB::table('paquete')->insert([
+                    'id_destino'      => $idDestino,
+                    'nombre'          => $paq['nombre'],
+                    'descripcion'     => $paq['descripcion'] ?? null,
+                    'precio'          => $paq['precio'] ?? null,
+                    'minimo_personas' => $paq['minimo_personas'] ?? null,
+                    'activo'          => 'activo',
                 ]);
             }
         }
@@ -138,19 +167,17 @@ class AdminDestinoController extends Controller
 
         abort_if(!$destino, 404);
 
-        $imagenes = DB::table('imagen')
-            ->where('entidad', 'destino')
-            ->where('id_destino', $id)
-            ->get();
-
+        $imagenes              = DB::table('imagen')->where('entidad', 'destino')->where('id_destino', $id)->get();
+        $categorias            = DB::table('categoria')->orderBy('nombre')->get();
         $actividadesExistentes = DB::table('actividad')->orderBy('nombre')->get();
+        $actividadesDelDestino = DB::table('destino_actividad')->where('id_destino', $id)->pluck('id_actividad')->toArray();
+        $categoriasDelDestino  = DB::table('destino_categoria')->where('id_destino', $id)->pluck('id_categoria')->toArray();
+        $paquetes              = DB::table('paquete')->where('id_destino', $id)->get();
 
-        $actividadesDelDestino = DB::table('destino_actividad')
-            ->where('id_destino', $id)
-            ->pluck('id_actividad')
-            ->toArray();
-
-        return view('admin.destinos.edit', compact('destino', 'imagenes', 'actividadesExistentes', 'actividadesDelDestino'));
+        return view('admin.destinos.edit', compact(
+            'destino', 'imagenes', 'categorias', 'actividadesExistentes',
+            'actividadesDelDestino', 'categoriasDelDestino', 'paquetes'
+        ));
     }
 
     public function update(Request $request, $id)
@@ -163,23 +190,30 @@ class AdminDestinoController extends Controller
         abort_if(!$destino, 404);
 
         $request->validate([
-            'nombre'                       => ['required', 'max:120'],
-            'descripcion'                  => ['required'],
-            'telefono'                     => ['nullable', 'max:20'],
-            'recomendaciones'              => ['nullable'],
-            'lat'                          => ['nullable', 'numeric'],
-            'lng'                          => ['nullable', 'numeric'],
-            'google_place_id'              => ['nullable', 'max:120'],
-            'fotos'                        => ['nullable', 'array'],
-            'fotos.*'                      => ['image', 'mimes:jpg,jpeg,png', 'max:5120'],
-            'actividades_existentes'       => ['nullable', 'array'],
-            'actividades_existentes.*'     => ['integer'],
-            'nuevas_actividades'                    => ['nullable', 'array'],
-            'nuevas_actividades.*.nombre'           => ['required_with:nuevas_actividades', 'max:80'],
-            'nuevas_actividades.*.dificultad'       => ['required_with:nuevas_actividades', 'in:baja,media,alta'],
-            'nuevas_actividades.*.duracion'         => ['nullable', 'max:50'],
-            'nuevas_actividades.*.min_personas'     => ['nullable', 'integer', 'min:1'],
-            'nuevas_actividades.*.recomendacion'    => ['nullable'],
+            'nombre'                            => ['required', 'max:120'],
+            'descripcion'                       => ['required'],
+            'telefono'                          => ['nullable', 'max:20'],
+            'recomendaciones'                   => ['nullable'],
+            'lat'                               => ['nullable', 'numeric'],
+            'lng'                               => ['nullable', 'numeric'],
+            'google_place_id'                   => ['nullable', 'max:120'],
+            'fotos'                             => ['nullable', 'array'],
+            'fotos.*'                           => ['image', 'mimes:jpg,jpeg,png', 'max:5120'],
+            'categorias'                        => ['nullable', 'array'],
+            'categorias.*'                      => ['integer'],
+            'actividades_existentes'            => ['nullable', 'array'],
+            'actividades_existentes.*'          => ['integer'],
+            'nuevas_actividades'                => ['nullable', 'array'],
+            'nuevas_actividades.*.nombre'       => ['required_with:nuevas_actividades', 'max:80'],
+            'nuevas_actividades.*.dificultad'   => ['required_with:nuevas_actividades', 'in:baja,media,alta'],
+            'nuevas_actividades.*.duracion'     => ['nullable', 'max:50'],
+            'nuevas_actividades.*.min_personas' => ['nullable', 'integer', 'min:1'],
+            'nuevas_actividades.*.recomendacion'=> ['nullable'],
+            'paquetes'                          => ['nullable', 'array'],
+            'paquetes.*.nombre'                 => ['required_with:paquetes', 'max:120'],
+            'paquetes.*.descripcion'            => ['nullable'],
+            'paquetes.*.precio'                 => ['nullable', 'numeric', 'min:0'],
+            'paquetes.*.minimo_personas'        => ['nullable', 'integer', 'min:1'],
         ]);
 
         DB::table('destino')->where('id_destino', $id)->update([
@@ -192,7 +226,7 @@ class AdminDestinoController extends Controller
             'google_place_id' => $request->google_place_id,
         ]);
 
-        // Nuevas imágenes
+        // Imágenes nuevas
         if ($request->hasFile('fotos')) {
             foreach ($request->file('fotos') as $foto) {
                 $ruta = $foto->store('destinos', 'public');
@@ -206,9 +240,19 @@ class AdminDestinoController extends Controller
             }
         }
 
+        // Reemplazar categorías
+        DB::table('destino_categoria')->where('id_destino', $id)->delete();
+        if ($request->filled('categorias')) {
+            foreach ($request->categorias as $idCategoria) {
+                DB::table('destino_categoria')->insertOrIgnore([
+                    'id_destino'   => $id,
+                    'id_categoria' => $idCategoria,
+                ]);
+            }
+        }
+
         // Reemplazar actividades
         DB::table('destino_actividad')->where('id_destino', $id)->delete();
-
         if ($request->filled('actividades_existentes')) {
             foreach ($request->actividades_existentes as $idActividad) {
                 DB::table('destino_actividad')->insertOrIgnore([
@@ -217,13 +261,10 @@ class AdminDestinoController extends Controller
                 ]);
             }
         }
-
         if ($request->filled('nuevas_actividades')) {
             foreach ($request->nuevas_actividades as $act) {
                 if (empty($act['nombre'])) continue;
-
                 $actividad = DB::table('actividad')->where('nombre', $act['nombre'])->first();
-
                 if ($actividad) {
                     $idActividad = $actividad->id_actividad;
                 } else {
@@ -235,10 +276,25 @@ class AdminDestinoController extends Controller
                         'recomendacion'     => $act['recomendacion'] ?? null,
                     ]);
                 }
-
                 DB::table('destino_actividad')->insertOrIgnore([
                     'id_destino'   => $id,
                     'id_actividad' => $idActividad,
+                ]);
+            }
+        }
+
+        // Reemplazar paquetes
+        DB::table('paquete')->where('id_destino', $id)->delete();
+        if ($request->filled('paquetes')) {
+            foreach ($request->paquetes as $paq) {
+                if (empty($paq['nombre'])) continue;
+                DB::table('paquete')->insert([
+                    'id_destino'      => $id,
+                    'nombre'          => $paq['nombre'],
+                    'descripcion'     => $paq['descripcion'] ?? null,
+                    'precio'          => $paq['precio'] ?? null,
+                    'minimo_personas' => $paq['minimo_personas'] ?? null,
+                    'activo'          => 'activo',
                 ]);
             }
         }
@@ -273,17 +329,15 @@ class AdminDestinoController extends Controller
 
         abort_if(!$destino, 404);
 
-        $imagenes = DB::table('imagen')
-            ->where('entidad', 'destino')
-            ->where('id_destino', $id)
-            ->get();
-
+        $imagenes = DB::table('imagen')->where('entidad', 'destino')->where('id_destino', $id)->get();
         foreach ($imagenes as $img) {
             Storage::disk('public')->delete($img->ruta_archivo);
         }
 
         DB::table('imagen')->where('id_destino', $id)->delete();
         DB::table('destino_actividad')->where('id_destino', $id)->delete();
+        DB::table('destino_categoria')->where('id_destino', $id)->delete();
+        DB::table('paquete')->where('id_destino', $id)->delete();
         DB::table('destino')->where('id_destino', $id)->delete();
 
         return redirect()->route('misdestinos.index')

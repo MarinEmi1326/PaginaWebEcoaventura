@@ -8,12 +8,19 @@ use App\Http\Controllers\DestinosController;
 use App\Http\Controllers\Admin\AdminSolicitudesController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GoogleController;
-
+use App\Http\Controllers\ComentarioController;
 /*
 |--------------------------------------------------------------------------
 | RUTAS PÚBLICAS
 |--------------------------------------------------------------------------
 */
+
+
+use App\Http\Controllers\RutaController;
+
+Route::resource('rutas', RutaController::class)->only(['index', 'create', 'store']);
+
+
 
 Route::get('/', fn() => view('home'))->name('home');
 
@@ -41,9 +48,6 @@ Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('google.
 Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
 
 Route::get('/centros', [DestinosController::class, 'index'])->name('destinos.index');
-Route::get('/centros/{tipo}', [DestinosController::class, 'tipo'])
-    ->whereIn('tipo', ['turisticos', 'ecoturisticos', 'balnearios'])
-    ->name('destinos.tipo');
 Route::get('/centros/{id}', [DestinosController::class, 'show'])->name('destinos.show');
 
 // OTRAS VISTAS
@@ -70,13 +74,19 @@ Route::middleware('auth')->group(function () {
     // Route::get('/destinos/dashboard', fn () => view('destinos.dashboard'))->name('destinos.dashboard');
     // Route::get('/rutas/dashboard', fn () => view('rutas.dashboard'))->name('rutas.dashboard');
 
-   // PANEL ADMIN DESTINOS
+    // PANEL ADMIN DESTINOS
     Route::get('/mis-destinos', [AdminDestinoController::class, 'index'])->name('misdestinos.index');
     Route::get('/destinos/crear', [AdminDestinoController::class, 'create'])->name('destinos.create');
     Route::post('/destinos/crear', [AdminDestinoController::class, 'store'])->name('destinos.store');
+    Route::delete('/destinos/imagen/{id}', [AdminDestinoController::class, 'destroyImagen'])->name('destinos.imagen.destroy');
     Route::get('/destinos/{id}/editar', [AdminDestinoController::class, 'edit'])->name('destinos.edit');
     Route::put('/destinos/{id}', [AdminDestinoController::class, 'update'])->name('destinos.update');
     Route::delete('/destinos/{id}', [AdminDestinoController::class, 'destroy'])->name('destinos.destroy');
+
+
+
+    Route::post('/centros/{id}/comentar', [ComentarioController::class, 'storeDestino'])->name('comentarios.destino.store');
+    Route::delete('/comentarios/{id}', [ComentarioController::class, 'destroy'])->name('comentarios.destroy');
     /*
     |--------------------------------------------------------------------------
     | ADMIN
@@ -91,7 +101,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/reportes', fn() => view('admin.reportes'))->name('reportes');
         Route::get('/respaldos', fn() => view('admin.respaldos'))->name('respaldos');
 
-        
+
 
         Route::get('/solicitudes', [AdminSolicitudesController::class, 'index'])->name('solicitudes.index');
         Route::get('/solicitudes/crear', [AdminSolicitudesController::class, 'create'])->name('solicitudes.create');
@@ -106,9 +116,9 @@ Route::middleware('auth')->group(function () {
 
 
 
-    Route::get('/mis-destinos/crear', function () {
-        return view('admin.destinos.create');
-    })->name('misdestinos.create');
+    // Route::get('/mis-destinos/crear', function () {
+    //     return view('admin.destinos.create');
+    // })->name('misdestinos.create');
 
-    
+
 });
