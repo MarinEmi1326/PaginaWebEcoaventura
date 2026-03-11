@@ -40,7 +40,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('registro.destinos') }}">
+                <form method="POST" action="{{ route('registro.destinos.post') }}">
                     @csrf
 
                     <div class="mb-3">
@@ -75,7 +75,7 @@
                             name="amaterno"
                             value="{{ old('amaterno') }}"
                             class="form-control"
-                            placeholder="Apellido materno ">
+                            placeholder="Apellido materno">
                     </div>
 
                     <div class="mb-3">

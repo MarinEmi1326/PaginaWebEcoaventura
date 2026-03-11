@@ -19,6 +19,8 @@ class Usuario extends Authenticatable
 
     protected $fillable = [
         'correo',
+        'correo_verificado',
+        'token_verificacion',
         'google_id',
         'foto_perfil',
         'password',
@@ -35,9 +37,10 @@ class Usuario extends Authenticatable
     ];
 
     protected $casts = [
-        'activo'          => 'boolean',
-        'fecha_solicitud' => 'datetime',
-        'fecha_respuesta' => 'datetime',
+        'activo'             => 'boolean',
+        'correo_verificado'  => 'boolean',
+        'fecha_solicitud'    => 'datetime',
+        'fecha_respuesta'    => 'datetime',
     ];
 
     // Le dice a Laravel que el campo login es "correo"
@@ -112,7 +115,7 @@ public function getAuthPassword()
     // Perfil según rol
     public function getPerfilAttribute()
     {
-        return match($this->rol) {
+        return match ($this->rol) {
             'turista'        => $this->turista,
             'admin_destinos' => $this->adminDestinos,
             'gestor_rutas'   => $this->gestorRutas,

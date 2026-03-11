@@ -9,18 +9,15 @@ use App\Http\Controllers\Admin\AdminSolicitudesController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\ComentarioController;
+use App\Http\Controllers\RutaController;
+
 /*
 |--------------------------------------------------------------------------
 | RUTAS PÚBLICAS
 |--------------------------------------------------------------------------
 */
 
-
-use App\Http\Controllers\RutaController;
-
 Route::resource('rutas', RutaController::class)->only(['index', 'create', 'store']);
-
-
 
 Route::get('/', fn() => view('home'))->name('home');
 
@@ -34,14 +31,21 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::get('/registro/turista', [AuthController::class, 'showRegistroTurista'])->name('registro.turista');
 Route::post('/registro/turista', [AuthController::class, 'registroTurista'])->name('registro.turista.post');
 
-
-// REGISTRO ADMIN DESTINOS (footer)
+// REGISTRO ADMIN DESTINOS
 Route::get('/registro/destinos', [AuthController::class, 'showRegistroDestinos'])->name('registro.destinos');
-Route::post('/registro/destinos', [AuthController::class, 'registroDestinos']);
+Route::post('/registro/destinos', [AuthController::class, 'registroDestinos'])->name('registro.destinos.post');
 
-// REGISTRO GESTOR RUTAS (footer)
+// VISTA DE ÉXITO DEL REGISTRO
+Route::get('/registro/destinos/exito', function () {
+    return view('auth.registro-destinos-exito');
+})->name('registro.destinos.exito');
+
+// REGISTRO GESTOR RUTAS
 Route::get('/registro/rutas', [AuthController::class, 'showRegistroRutas'])->name('registro.rutas');
 Route::post('/registro/rutas', [AuthController::class, 'registroRutas']);
+
+// VERIFICAR CORREO
+Route::get('/verificar-correo/{token}', [AuthController::class, 'verificarCorreo'])->name('verificar.correo');
 
 // GOOGLE LOGIN
 Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('google.login');
@@ -69,9 +73,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/perfil', [PerfilController::class, 'show'])->name('perfil');
     Route::post('/perfil', [PerfilController::class, 'update']);
 
-    // // Dashboards
-    // Route::get('/turista/dashboard', fn () => view('turista.dashboard'))->name('turista.dashboard');
-    // Route::get('/destinos/dashboard', fn () => view('destinos.dashboard'))->name('destinos.dashboard');
+    // Dashboard rutas
     Route::get('/rutas/dashboard', fn () => view('rutas.dashboard'))->name('rutas.dashboard');
 
     // PANEL ADMIN DESTINOS
@@ -83,10 +85,10 @@ Route::middleware('auth')->group(function () {
     Route::put('/destinos/{id}', [AdminDestinoController::class, 'update'])->name('destinos.update');
     Route::delete('/destinos/{id}', [AdminDestinoController::class, 'destroy'])->name('destinos.destroy');
 
-
-
+    // Comentarios
     Route::post('/centros/{id}/comentar', [ComentarioController::class, 'storeDestino'])->name('comentarios.destino.store');
     Route::delete('/comentarios/{id}', [ComentarioController::class, 'destroy'])->name('comentarios.destroy');
+
     /*
     |--------------------------------------------------------------------------
     | ADMIN
@@ -96,12 +98,9 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/index', [AdminDashboardController::class, 'index'])->name('index');
 
-
         Route::get('/aprobacion', fn() => view('admin.aprobacion'))->name('aprobacion');
         Route::get('/reportes', fn() => view('admin.reportes'))->name('reportes');
         Route::get('/respaldos', fn() => view('admin.respaldos'))->name('respaldos');
-
-
 
         Route::get('/solicitudes', [AdminSolicitudesController::class, 'index'])->name('solicitudes.index');
         Route::get('/solicitudes/crear', [AdminSolicitudesController::class, 'create'])->name('solicitudes.create');
@@ -113,12 +112,4 @@ Route::middleware('auth')->group(function () {
         Route::post('/solicitudes/{id}/aprobar', [AdminSolicitudesController::class, 'aprobar'])->name('solicitudes.aprobar');
         Route::post('/solicitudes/{id}/rechazar', [AdminSolicitudesController::class, 'rechazar'])->name('solicitudes.rechazar');
     });
-
-
-
-    // Route::get('/mis-destinos/crear', function () {
-    //     return view('admin.destinos.create');
-    // })->name('misdestinos.create');
-
-
 });
