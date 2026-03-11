@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\AdminGeneral;
 use App\Models\Turista;
 use App\Models\AdminDestinos;
 use App\Models\GestorRutas;
@@ -43,10 +44,20 @@ class Usuario extends Authenticatable
     ];
 
     // Le dice a Laravel que el campo login es "correo"
-    public function getAuthIdentifierName()
-    {
-        return 'correo';
-    }
+   public function getAuthIdentifierName()
+{
+    return 'id_usuario';
+}
+
+public function getAuthIdentifier()
+{
+    return $this->id_usuario;
+}
+
+public function getAuthPassword()
+{
+    return $this->password;
+}
 
     // ================================
     // RELACIONES
@@ -65,6 +76,11 @@ class Usuario extends Authenticatable
     public function gestorRutas()
     {
         return $this->hasOne(GestorRutas::class, 'id_usuario', 'id_usuario');
+    }
+
+    public function adminGeneral()
+    {
+        return $this->hasOne(AdminGeneral::class, 'id_usuario', 'id_usuario');
     }
 
     // ================================
@@ -103,6 +119,7 @@ class Usuario extends Authenticatable
             'turista'        => $this->turista,
             'admin_destinos' => $this->adminDestinos,
             'gestor_rutas'   => $this->gestorRutas,
+            'admin_general'  => $this->adminGeneral,
             default          => null,
         };
     }

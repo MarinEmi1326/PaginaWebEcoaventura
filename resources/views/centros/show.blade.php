@@ -1,42 +1,54 @@
 @extends('layouts.app')
 
 @section('content')
+
     {{-- BREADCRUMB --}}
     <nav aria-label="breadcrumb" class="py-3">
         <div class="container">
             <ol class="breadcrumb mb-0 small">
-                <li class="breadcrumb-item"><a href="{{ url('/') }}" class="text-success text-decoration-none">Inicio</a>
-                </li>
-                <li class="breadcrumb-item"><a href="{{ route('destinos.index') }}"
-                        class="text-success text-decoration-none">Centros Turísticos</a></li>
-                <li class="breadcrumb-item active">Zona Arqueológica de Toniná</li>
+                <li class="breadcrumb-item"><a href="{{ url('/') }}" class="text-success text-decoration-none">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('destinos.index') }}" class="text-success text-decoration-none">Centros Turísticos</a></li>
+                <li class="breadcrumb-item active">{{ $destino->nombre }}</li>
             </ol>
         </div>
     </nav>
 
-    {{-- GALERÍA --}}
+    {{-- CARRUSEL DE IMÁGENES --}}
     <section class="pb-4">
         <div class="container">
-            <div class="row g-3">
-                <div class="col-md-8">
-                    <div class="rounded-4 overflow-hidden" style="height: 420px;">
-                        <img src="{{ asset('img/turisticos/tonina-1.png') }}" class="w-100 h-100 object-fit-cover"
-                            alt="Zona Arqueológica de Toniná">
+            @if ($imagenes->count() > 0)
+                <div id="carruselDestino" class="carousel slide rounded-4 overflow-hidden" data-bs-ride="carousel">
+                    <div class="carousel-indicators">
+                        @foreach ($imagenes as $i => $img)
+                            <button type="button" data-bs-target="#carruselDestino"
+                                data-bs-slide-to="{{ $i }}"
+                                class="{{ $i === 0 ? 'active' : '' }}"></button>
+                        @endforeach
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="d-flex flex-column gap-3 h-100">
-                        <div class="rounded-4 overflow-hidden flex-fill" style="min-height: 200px;">
-                            <img src="{{ asset('img/turisticos/tonina-1.png') }}" class="w-100 h-100 object-fit-cover"
-                                alt="Toniná 2">
-                        </div>
-                        <div class="rounded-4 overflow-hidden flex-fill" style="min-height: 200px;">
-                            <img src="{{ asset('img/turisticos/tonina-1.png') }}" class="w-100 h-100 object-fit-cover"
-                                alt="Toniná 3">
-                        </div>
+                    <div class="carousel-inner" style="height: 420px;">
+                        @foreach ($imagenes as $i => $img)
+                            <div class="carousel-item {{ $i === 0 ? 'active' : '' }} h-100">
+                                <img src="{{ Storage::url($img->ruta_archivo) }}"
+                                     class="d-block w-100 h-100 object-fit-cover"
+                                     alt="{{ $destino->nombre }}">
+                            </div>
+                        @endforeach
                     </div>
+                    @if ($imagenes->count() > 1)
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carruselDestino" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon"></span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carruselDestino" data-bs-slide="next">
+                            <span class="carousel-control-next-icon"></span>
+                        </button>
+                    @endif
                 </div>
-            </div>
+            @else
+                <div class="rounded-4 d-flex align-items-center justify-content-center"
+                     style="height:300px; background:#e2ece9;">
+                    <i class="bi bi-image text-muted fs-1"></i>
+                </div>
+            @endif
         </div>
     </section>
 
@@ -44,69 +56,64 @@
     <section class="pb-5">
         <div class="container">
 
-            {{-- Badge + Título --}}
+            {{-- Categorías + Título --}}
             <div class="mb-4">
-                <div class="d-flex flex-wrap align-items-center gap-3 mb-2">
-                    <span class="badge rounded-pill px-3 py-2" style="background:#e2ece9; color:#1F6B4B; font-weight:500;">
-                        <i class="bi bi-building me-1"></i>Zona Arqueológica
-                    </span>
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                    @foreach ($categorias as $cat)
+                        <span class="badge rounded-pill px-3 py-2"
+                              style="background:#e2ece9; color:#1F6B4B; font-weight:500;">
+                            <i class="bi bi-tag me-1"></i>{{ $cat }}
+                        </span>
+                    @endforeach
                     <span class="text-muted"><i class="bi bi-geo-alt me-1"></i>Ocosingo, Chiapas</span>
                 </div>
-                <h1 class="fw-bold display-5 mb-0">Zona Arqueológica de Toniná</h1>
-            </div>
-
-            {{-- Stats --}}
-            <div class="row g-3 mb-4">
-                <div class="col-6 col-md-3">
-                    <div class="rounded-3 text-center p-3" style="background:#f1f5f2;">
-                        <i class="bi bi-clock text-success fs-5 mb-1 d-block"></i>
-                        <p class="small text-muted mb-0">Duración</p>
-                        <p class="fw-semibold small mb-0">3-4 horas</p>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="rounded-3 text-center p-3" style="background:#f1f5f2;">
-                        <i class="bi bi-compass text-success fs-5 mb-1 d-block"></i>
-                        <p class="small text-muted mb-0">Dificultad</p>
-                        <p class="fw-semibold small mb-0">Moderada</p>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="rounded-3 text-center p-3" style="background:#f1f5f2;">
-                        <i class="bi bi-sun text-success fs-5 mb-1 d-block"></i>
-                        <p class="small text-muted mb-0">Mejor época</p>
-                        <p class="fw-semibold small mb-0">Nov - Abr</p>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="rounded-3 text-center p-3" style="background:#f1f5f2;">
-                        <i class="bi bi-ticket-perforated text-success fs-5 mb-1 d-block"></i>
-                        <p class="small text-muted mb-0">Costo aprox.</p>
-                        <p class="fw-semibold small mb-0">$85 MXN</p>
-                    </div>
-                </div>
+                <h1 class="fw-bold display-5 mb-0">{{ $destino->nombre }}</h1>
+                @if ($destino->telefono)
+                    <p class="text-muted mt-2 mb-0">
+                        <i class="bi bi-telephone me-1 text-success"></i>{{ $destino->telefono }}
+                    </p>
+                @endif
             </div>
 
             {{-- TABS --}}
             <div class="rounded-3 p-1 mb-4" style="background:#e8ede9;">
                 <ul class="nav" id="detalleTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-descripcion"
-                            type="button">Descripción</button>
+                    <li class="nav-item">
+                        <button class="nav-link active px-4 py-2" data-bs-toggle="tab"
+                            data-bs-target="#tab-descripcion" type="button">Descripción</button>
                     </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-practica"
-                            type="button">Info Práctica</button>
+                    @if ($actividades->count() > 0)
+                    <li class="nav-item">
+                        <button class="nav-link px-4 py-2" data-bs-toggle="tab"
+                            data-bs-target="#tab-actividades" type="button">
+                            Actividades
+                            <span class="badge rounded-pill ms-1" style="background:#1F6B4B; font-size:.7rem;">{{ $actividades->count() }}</span>
+                        </button>
                     </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-recomendaciones"
-                            type="button">Recomendaciones</button>
+                    @endif
+                    @if ($paquetes->count() > 0)
+                    <li class="nav-item">
+                        <button class="nav-link px-4 py-2" data-bs-toggle="tab"
+                            data-bs-target="#tab-paquetes" type="button">
+                            Paquetes
+                            <span class="badge rounded-pill ms-1" style="background:#1F6B4B; font-size:.7rem;">{{ $paquetes->count() }}</span>
+                        </button>
                     </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-mapa" type="button">
+                    @endif
+                    @if ($destino->recomendaciones)
+                    <li class="nav-item">
+                        <button class="nav-link px-4 py-2" data-bs-toggle="tab"
+                            data-bs-target="#tab-recomendaciones" type="button">Recomendaciones</button>
+                    </li>
+                    @endif
+                    @if ($destino->lat && $destino->lng)
+                    <li class="nav-item">
+                        <button class="nav-link px-4 py-2" data-bs-toggle="tab"
+                            data-bs-target="#tab-mapa" type="button">
                             <i class="bi bi-map me-1"></i>Ubicación
                         </button>
                     </li>
+                    @endif
                 </ul>
             </div>
 
@@ -114,226 +121,219 @@
 
                 {{-- DESCRIPCIÓN --}}
                 <div class="tab-pane fade show active" id="tab-descripcion" role="tabpanel">
-                    <p class="lh-lg mb-4">
-                        Toniná, cuyo nombre significa "Casa de Piedra" en tzeltal, fue una poderosa ciudad-estado maya
-                        que floreció entre los siglos VI y IX d.C. Su acrópolis de siete plataformas alcanza los 75 metros
-                        de altura, superando en elevación a la Pirámide del Sol en Teotihuacán.
-                    </p>
-                    <p class="lh-lg mb-4">
-                        El sitio incluye templos, palacios, juegos de pelota y una rica colección de esculturas y relieves
-                        que narran la historia política y militar de la ciudad. El museo de sitio exhibe piezas únicas
-                        como el mural de estuco de los Cuatro Soles.
-                    </p>
-                    <div class="rounded-3 p-4" style="background:#f1f5f2;">
-                        <h6 class="fw-bold mb-2">
-                            <i class="bi bi-leaf me-2 text-success"></i>Valor cultural y ambiental
-                        </h6>
-                        <p class="text-muted mb-0">
-                            Centro político y ceremonial maya que rivalizó con Palenque. Sus relieves y esculturas son
-                            testimonio invaluable de la cosmovisión y organización social maya del período Clásico.
-                        </p>
-                    </div>
+                    <p class="lh-lg mb-0">{{ $destino->descripcion }}</p>
                 </div>
 
-                {{-- INFO PRÁCTICA --}}
-                <div class="tab-pane fade" id="tab-practica" role="tabpanel">
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <h6 class="fw-bold mb-3"><i class="bi bi-clock me-2 text-success"></i>Horarios</h6>
-                            <ul class="list-unstyled text-muted small">
-                                <li class="mb-1"><i class="bi bi-dot"></i>Martes a domingo</li>
-                                <li class="mb-1"><i class="bi bi-dot"></i>9:00 AM - 5:00 PM</li>
-                                <li class="mb-1"><i class="bi bi-dot"></i>Cerrado lunes y días festivos</li>
-                            </ul>
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="fw-bold mb-3"><i class="bi bi-ticket-perforated me-2 text-success"></i>Costos</h6>
-                            <ul class="list-unstyled text-muted small">
-                                <li class="mb-1"><i class="bi bi-dot"></i>General: $85 MXN</li>
-                                <li class="mb-1"><i class="bi bi-dot"></i>Estudiantes y maestros: Gratis</li>
-                                <li class="mb-1"><i class="bi bi-dot"></i>Adultos mayores (INAPAM): Gratis</li>
-                            </ul>
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="fw-bold mb-3"><i class="bi bi-car-front me-2 text-success"></i>Como llegar</h6>
-                            <ul class="list-unstyled text-muted small">
-                                <li class="mb-1"><i class="bi bi-dot"></i>Desde Ocosingo: 14 km por carretera</li>
-                                <li class="mb-1"><i class="bi bi-dot"></i>Taxi colectivo desde el mercado central</li>
-                                <li class="mb-1"><i class="bi bi-dot"></i>Señalización desde la ciudad</li>
-                            </ul>
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="fw-bold mb-3"><i class="bi bi-shield-check me-2 text-success"></i>Servicios</h6>
-                            <ul class="list-unstyled text-muted small">
-                                <li class="mb-1"><i class="bi bi-dot"></i>Museo de sitio incluido</li>
-                                <li class="mb-1"><i class="bi bi-dot"></i>Guías locales disponibles</li>
-                                <li class="mb-1"><i class="bi bi-dot"></i>Estacionamiento gratuito</li>
-                                <li class="mb-1"><i class="bi bi-dot"></i>Sanitarios en sitio</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- RECOMENDACIONES --}}
-                {{-- RECOMENDACIONES --}}
-                <div class="tab-pane fade" id="tab-recomendaciones" role="tabpanel">
+                {{-- ACTIVIDADES --}}
+                @if ($actividades->count() > 0)
+                <div class="tab-pane fade" id="tab-actividades" role="tabpanel">
                     <div class="d-flex flex-column gap-3">
-                        <div class="rounded-3 p-3" style="background:#f1f5f2;">
-                            <div class="d-flex align-items-center gap-3">
-                                <i class="bi bi-exclamation-triangle text-success fs-5"></i>
-                                <span>Llegar temprano para evitar el calor intenso</span>
+                        @foreach ($actividades as $act)
+                            <div class="rounded-3 p-4" style="background:#f1f5f2;">
+                                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+                                    <h6 class="fw-bold mb-0">{{ $act->nombre }}</h6>
+                                    <span class="badge rounded-pill
+                                        {{ $act->dificultad === 'alta' ? 'bg-danger' : ($act->dificultad === 'media' ? 'bg-warning text-dark' : 'bg-success') }}">
+                                        {{ ucfirst($act->dificultad) }}
+                                    </span>
+                                </div>
+                                <div class="d-flex flex-wrap gap-3 text-muted small mb-2">
+                                    @if ($act->duracion_estimada)
+                                        <span><i class="bi bi-clock me-1"></i>{{ $act->duracion_estimada }}</span>
+                                    @endif
+                                    @if ($act->minimo_personas)
+                                        <span><i class="bi bi-people me-1"></i>Mín. {{ $act->minimo_personas }} personas</span>
+                                    @endif
+                                </div>
+                                @if ($act->recomendacion)
+                                    <p class="text-muted small mb-0">
+                                        <i class="bi bi-lightbulb me-1 text-success"></i>{{ $act->recomendacion }}
+                                    </p>
+                                @endif
                             </div>
-                        </div>
-                        <div class="rounded-3 p-3" style="background:#f1f5f2;">
-                            <div class="d-flex align-items-center gap-3">
-                                <i class="bi bi-exclamation-triangle text-success fs-5"></i>
-                                <span>Llevar agua, protector solar y calzado comodo</span>
-                            </div>
-                        </div>
-                        <div class="rounded-3 p-3" style="background:#f1f5f2;">
-                            <div class="d-flex align-items-center gap-3">
-                                <i class="bi bi-exclamation-triangle text-success fs-5"></i>
-                                <span>Contratar guia local para comprender la historia</span>
-                            </div>
-                        </div>
-                        <div class="rounded-3 p-3" style="background:#f1f5f2;">
-                            <div class="d-flex align-items-center gap-3">
-                                <i class="bi bi-exclamation-triangle text-success fs-5"></i>
-                                <span>Visitar el museo de sitio antes de recorrer las ruinas</span>
-                            </div>
-                        </div>
-                        <div class="rounded-3 p-3" style="background:#f1f5f2;">
-                            <div class="d-flex align-items-center gap-3">
-                                <i class="bi bi-exclamation-triangle text-success fs-5"></i>
-                                <span>Respetar las areas restringidas y no subir a estructuras fragiles</span>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
+                @endif
+
+                {{-- PAQUETES --}}
+                @if ($paquetes->count() > 0)
+                <div class="tab-pane fade" id="tab-paquetes" role="tabpanel">
+                    <div class="row g-3">
+                        @foreach ($paquetes as $paq)
+                            <div class="col-md-6">
+                                <div class="rounded-3 p-4 h-100" style="background:#f1f5f2;">
+                                    <h6 class="fw-bold mb-2">🎒 {{ $paq->nombre }}</h6>
+                                    @if ($paq->descripcion)
+                                        <p class="text-muted small mb-3">{{ $paq->descripcion }}</p>
+                                    @endif
+                                    <div class="d-flex flex-wrap gap-3 text-muted small">
+                                        @if ($paq->precio)
+                                            <span class="fw-semibold text-success">
+                                                <i class="bi bi-tag me-1"></i>${{ number_format($paq->precio, 2) }} MXN
+                                            </span>
+                                        @endif
+                                        @if ($paq->minimo_personas)
+                                            <span><i class="bi bi-people me-1"></i>Mín. {{ $paq->minimo_personas }} personas</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
+                {{-- RECOMENDACIONES --}}
+                @if ($destino->recomendaciones)
+                <div class="tab-pane fade" id="tab-recomendaciones" role="tabpanel">
+                    <div class="rounded-3 p-4" style="background:#f1f5f2;">
+                        <i class="bi bi-exclamation-triangle text-success me-2"></i>
+                        {{ $destino->recomendaciones }}
+                    </div>
+                </div>
+                @endif
 
                 {{-- MAPA --}}
+                @if ($destino->lat && $destino->lng)
                 <div class="tab-pane fade" id="tab-mapa" role="tabpanel">
                     <div class="rounded-4 overflow-hidden" style="height: 380px;">
                         <iframe width="100%" height="100%" style="border:0;" loading="lazy" allowfullscreen
                             referrerpolicy="no-referrer-when-downgrade"
-                           src="https://www.google.com/maps/embed/v1/place?key={{ env('GOOGLE_MAPS_API_KEY') }}&q=Zona+Arqueologica+Tonina,Ocosingo,Chiapas,Mexico&zoom=13">
+                            src="https://www.google.com/maps/embed/v1/view?key={{ config('services.google_maps.key') }}&center={{ $destino->lat }},{{ $destino->lng }}&zoom=14&maptype=roadmap">
                         </iframe>
                     </div>
                     <p class="small text-muted mt-2">
                         <i class="bi bi-geo-alt me-1 text-success"></i>
-                        Carretera Ocosingo-Altamirano Km 14, Chiapas, Mexico
+                        {{ $destino->lat }}, {{ $destino->lng }}
                     </p>
                 </div>
+                @endif
 
             </div>
 
             {{-- BOTONES --}}
             <div class="d-flex flex-wrap gap-3 mb-5 pt-3 border-top">
-                <button class="btn btn-outline-success rounded-3 px-4 py-2">
-                    <i class="bi bi-envelope me-2"></i>Solicitar información
-                </button>
-                <a href="{{ route('login') }}" class="btn btn-success rounded-3 px-4 py-2">
-                    <i class="bi bi-send me-2"></i>Solicitar reservación o interés
-                </a>
-            </div>
-
-            {{-- RESEÑAS --}}
-            <div class="mb-5">
-                <h5 class="fw-bold mb-1">
-                    <i class="bi bi-chat-square-text me-2 text-success"></i>Comentarios y Calificaciones
-                </h5>
-                <div class="d-flex align-items-center gap-2 mb-4">
-                    <div class="text-warning small">
-                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-half"></i>
-                    </div>
-                    <span class="fw-semibold">4.5</span>
-                    <span class="text-muted small">(2 reseñas)</span>
-                </div>
-
-                <div class="rounded-3 p-4 mb-4 text-center" style="background:#f1f5f2;">
-                    <p class="text-muted small mb-2">Inicia sesión como Turista para comentar y calificar</p>
-                    <a href="{{ route('login') }}" class="btn btn-outline-success btn-sm rounded-pill px-4">
-                        <i class="bi bi-person me-1"></i>Iniciar Sesión
+                @auth
+                    @if(auth()->user()->rol === 'turista')
+                        <a href="#comentarios" class="btn btn-success rounded-3 px-4 py-2">
+                            <i class="bi bi-chat me-2"></i>Dejar un comentario
+                        </a>
+                    @endif
+                @else
+                    <a href="{{ route('login') }}" class="btn btn-success rounded-3 px-4 py-2">
+                        <i class="bi bi-person me-2"></i>Inicia sesión para comentar
                     </a>
-                </div>
+                @endauth
+            </div>
 
-                <div class="d-flex flex-column gap-3">
-                    <div class="rounded-3 p-4" style="background:#f1f5f2;">
+            {{-- COMENTARIOS --}}
+            <div class="mb-5" id="comentarios">
+                <h5 class="fw-bold mb-4">
+                    <i class="bi bi-chat-square-text me-2 text-success"></i>
+                    Comentarios
+                    <span class="badge rounded-pill ms-1" style="background:#e2ece9; color:#1F6B4B; font-size:.8rem;">{{ $comentarios->count() }}</span>
+                </h5>
+
+                {{-- Mensajes --}}
+                @if (session('success'))
+                    <div class="alert alert-success rounded-3 mb-3" id="alerta-com">{{ session('success') }}</div>
+                    <script>
+                        setTimeout(() => {
+                            const a = document.getElementById('alerta-com');
+                            if (a) { a.style.transition='opacity .5s'; a.style.opacity='0'; setTimeout(()=>a.remove(),500); }
+                        }, 3000);
+                    </script>
+                @endif
+                @if (session('error'))
+                    <div class="alert alert-danger rounded-3 mb-3">{{ session('error') }}</div>
+                @endif
+
+                {{-- Formulario solo para turistas --}}
+                @auth
+                    @if(auth()->user()->rol === 'turista')
+                        <div class="rounded-3 p-4 mb-4" style="background:#f1f5f2;">
+                            <form action="{{ route('comentarios.destino.store', $destino->id_destino) }}" method="POST">
+                                @csrf
+                                <label class="form-label fw-bold small">Tu comentario</label>
+                                <textarea name="comentario" rows="3"
+                                    class="form-control rounded-3 mb-3 @error('comentario') is-invalid @enderror"
+                                    placeholder="Comparte tu experiencia en este destino...">{{ old('comentario') }}</textarea>
+                                @error('comentario')
+                                    <div class="invalid-feedback mb-2">{{ $message }}</div>
+                                @enderror
+                                <button type="submit" class="btn btn-success rounded-3 px-4">
+                                    <i class="bi bi-send me-1"></i> Publicar comentario
+                                </button>
+                            </form>
+                        </div>
+                    @endif
+                @else
+                    <div class="rounded-3 p-4 mb-4 text-center" style="background:#f1f5f2;">
+                        <p class="text-muted small mb-2">Inicia sesión como Turista para comentar</p>
+                        <a href="{{ route('login') }}" class="btn btn-outline-success btn-sm rounded-pill px-4">
+                            <i class="bi bi-person me-1"></i>Iniciar Sesión
+                        </a>
+                    </div>
+                @endauth
+
+                {{-- Lista de comentarios --}}
+                @forelse ($comentarios as $com)
+                    <div class="rounded-3 p-4 mb-3" style="background:#f1f5f2;">
                         <div class="d-flex justify-content-between align-items-start mb-2">
                             <div class="d-flex align-items-center gap-2">
                                 <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold"
                                     style="width:36px; height:36px; background:#d1d9d4; color:#1F6B4B; font-size:0.85rem;">
-                                    A</div>
+                                    {{ strtoupper(substr($com->nombre, 0, 1)) }}
+                                </div>
                                 <div>
-                                    <p class="fw-semibold mb-0 small">Ana García</p>
-                                    <p class="text-muted mb-0" style="font-size:0.75rem;">2026-02-10</p>
+                                    <p class="fw-semibold mb-0 small">{{ $com->nombre }} {{ $com->apaterno }}</p>
+                                    <p class="text-muted mb-0" style="font-size:0.75rem;">
+                                        {{ \Carbon\Carbon::parse($com->fecha)->format('d/m/Y H:i') }}
+                                    </p>
                                 </div>
                             </div>
-                            <div class="text-warning small">
-                                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                            </div>
+                            {{-- Botón eliminar solo para admin_general --}}
+                            @auth
+                                @if(auth()->user()->rol === 'admin_general')
+                                    <form action="{{ route('comentarios.destroy', $com->id_comentario) }}" method="POST"
+                                          onsubmit="return confirm('¿Eliminar este comentario?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-3">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                @endif
+                            @endauth
                         </div>
-                        <p class="text-muted small mb-0">Un lugar increible, la historia que se respira es impresionante.
-                            Totalmente recomendado.</p>
+                        <p class="text-muted small mb-0">{{ $com->comentario }}</p>
                     </div>
-
-                    <div class="rounded-3 p-4" style="background:#f1f5f2;">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold"
-                                    style="width:36px; height:36px; background:#d1d9d4; color:#1F6B4B; font-size:0.85rem;">
-                                    R</div>
-                                <div>
-                                    <p class="fw-semibold mb-0 small">Roberto Díaz</p>
-                                    <p class="text-muted mb-0" style="font-size:0.75rem;">2026-02-05</p>
-                                </div>
-                            </div>
-                            <div class="text-warning small">
-                                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star"></i>
-                            </div>
-                        </div>
-                        <p class="text-muted small mb-0">Muy buena experiencia. Los guias locales hacen la diferencia.
-                            Llevar agua y protector solar.</p>
+                @empty
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-chat fs-2 d-block mb-2"></i>
+                        Sé el primero en comentar este destino.
                     </div>
-                </div>
+                @endforelse
             </div>
 
-            {{-- SERVICIOS RELACIONADOS --}}
-            <div class="rounded-3 p-4 mb-5" style="background:#f1f5f2;">
-                <h6 class="fw-bold mb-3">Servicios relacionados</h6>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <div class="rounded-3 p-3 bg-white">
-                            <div class="d-flex align-items-center gap-2 mb-2">
-                                <i class="bi bi-house-heart fs-5 text-success"></i>
-                                <p class="fw-semibold mb-0">Hospedaje cercano</p>
-                            </div>
-                            <p class="text-muted small mb-0">Cabanas ecologicas y hospedaje comunitario disponible en la
-                                zona.</p>
+            {{-- OTROS DESTINOS --}}
+            @if ($otrosDestinos->count() > 0)
+            <div class="mb-5">
+                <h5 class="fw-bold mb-4">Otros destinos que podrían interesarte</h5>
+                <div class="row g-4">
+                    @foreach ($otrosDestinos as $od)
+                        <div class="col-md-6 col-lg-4">
+                            @include('centros._card', ['d' => $od])
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="rounded-3 p-3 bg-white">
-                            <div class="d-flex align-items-center gap-2 mb-2">
-                                <i class="bi bi-cup-hot fs-5 text-success"></i>
-                                <p class="fw-semibold mb-0">Restaurantes</p>
-                            </div>
-                            <p class="text-muted small mb-0">Comedores locales con gastronomia regional chiapaneca.</p>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
             </div>
-
-
+            @endif
 
         </div>
     </section>
+
 @endsection
 
 @push('styles')

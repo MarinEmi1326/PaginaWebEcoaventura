@@ -15,12 +15,10 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Bootstrap  icons local -->
+    <!-- Bootstrap icons local -->
     <link rel="stylesheet" href="{{ asset('bootstrap-icons/bootstrap-icons.min.css') }}">
 
     @stack('styles')
-
-
 </head>
 
 <body>
@@ -31,7 +29,7 @@
 
                 <!-- LOGO -->
                 <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url('/') }}">
-                    <img src="{{ asset('img/ecoaventura-logo.png') }}" class="rounded-circle">
+                    <img src="{{ asset('img/ecoaventura-logo.png') }}" class="rounded-circle" alt="Ecoaventura Logo">
                     <span class="fw-semibold text-success">Ecoaventura</span>
                 </a>
 
@@ -46,65 +44,118 @@
                     <ul class="navbar-nav mx-auto align-items-lg-center">
 
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->is('/') ? 'active' : '' }}"
-                                href="{{ url('/') }}">Inicio</a>
+                            <a class="nav-link {{ request()->is('/') ? 'active' : '' }}" href="{{ url('/') }}">
+                                Inicio
+                            </a>
                         </li>
 
                         <!-- DESTINOS -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="{{ route('destinos.index') }}"
-                                data-bs-toggle="dropdown">Centros Turísticos</a>
+                                data-bs-toggle="dropdown">
+                                Centros Turísticos
+                            </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item"
-                                        href="{{ route('destinos.tipo', 'turisticos') }}">Turísticos</a></li>
-                                <li><a class="dropdown-item"
-                                        href="{{ route('destinos.tipo', 'ecoturisticos') }}">Ecoturísticos</a></li>
-                                <li><a class="dropdown-item"
-                                        href="{{ route('destinos.tipo', 'balnearios') }}">Balnearios</a></li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('destinos.index') }}">Ver todos</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('destinos.index') }}?cat=1">Turísticos</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                        href="{{ route('destinos.index') }}?cat=2">Ecoturísticos</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('destinos.index') }}?cat=3">Balnearios</a>
+                                </li>
                             </ul>
                         </li>
-                        <li class="nav-item">
 
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->is('cultura') ? 'active' : '' }}"
-                                href="{{ url('cultura') }}">Cultura y Patrimonio</a>
+                                href="{{ url('cultura') }}">
+                                Cultura y Patrimonio
+                            </a>
                         </li>
 
                         <li class="nav-item">
                             <a class="nav-link {{ request()->is('turismo-responsable') ? 'active' : '' }}"
-                                href="{{ url('turismo-responsable') }}">Turismo Responsable</a>
+                                href="{{ url('turismo-responsable') }}">
+                                Turismo Responsable
+                            </a>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link {{ request()->is('ruta') ? 'active' : '' }}"
-                                href="{{ url('ruta') }}">Rutas</a>
-
+                                href="{{ url('ruta') }}">
+                                Rutas
+                            </a>
                         </li>
+
                     </ul>
+
                     @auth
+
+                        @php
+                            $user = auth()->user();
+                            $nombre = $user->correo;
+                            $panel = '/';
+
+                            if ($user->rol == 'turista' && $user->turista) {
+                                $nombre = $user->turista->nombre;
+                                $panel = route('perfil');
+                            } elseif ($user->rol == 'admin_general' && $user->adminGeneral) {
+                                $nombre = $user->adminGeneral->nombre;
+                                $panel = route('admin.index');
+                            } elseif ($user->rol == 'admin_destinos' && $user->adminDestinos) {
+                                $nombre = $user->adminDestinos->nombre;
+                                $panel = route('misdestinos.index');
+                            } elseif ($user->rol == 'gestor_rutas' && $user->gestorRutas) {
+                                $nombre = $user->gestorRutas->nombre;
+                                $panel = route('rutas.dashboard');
+                            }
+                        @endphp
+
                         <div class="dropdown">
+
                             <button class="btn btn-success rounded-pill dropdown-toggle" type="button"
                                 data-bs-toggle="dropdown">
                                 <i class="bi bi-person-circle me-1"></i>
-                                {{ Auth::user()->turista->nombre ?? Auth::user()->correo }}
+                                {{ $nombre }}
                             </button>
+
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="/turista/dashboard">Mi perfil</a></li>
+
+                                <li>
+                                    <a class="dropdown-item" href="{{ $panel }}">
+                                        <i class="bi bi-speedometer2 me-1"></i>
+                                        Ir a mi panel
+                                    </a>
+                                </li>
+
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
+
                                 <li>
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
                                         <button type="submit" class="dropdown-item text-danger">
-                                            <i class="bi bi-box-arrow-right me-1"></i>Cerrar sesión
+                                            <i class="bi bi-box-arrow-right me-1"></i>
+                                            Cerrar sesión
                                         </button>
                                     </form>
                                 </li>
+
                             </ul>
+
                         </div>
                     @else
                         <a href="{{ route('login') }}" class="btn btn-success rounded-pill">
                             Iniciar sesión
                         </a>
+
                     @endauth
 
                 </div>
@@ -115,7 +166,8 @@
         <div style="height:75px;"></div>
     @endif
 
-    @if (request()->path() == '/')
+
+    @if (request()->is('/'))
         <main>
             @yield('content')
         </main>
@@ -127,7 +179,6 @@
 
 
     @include('layouts.footer')
-
 
 
     <script src="{{ asset('bootstrap/js/bootstrap.bundle.min.js') }}"></script>

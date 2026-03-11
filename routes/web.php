@@ -2,19 +2,24 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminDashboardController;
-use App\Http\Controllers\Admin\AdminSitioController;
+use App\Http\Controllers\AdminDestinoController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\DestinosController;
 use App\Http\Controllers\Admin\AdminSolicitudesController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GoogleController;
+use App\Http\Controllers\ComentarioController;
+use App\Http\Controllers\RutaController;
 
 /*
 |--------------------------------------------------------------------------
 | RUTAS PÚBLICAS
 |--------------------------------------------------------------------------
 */
-Route::get('/', fn () => view('home'))->name('home');
+
+Route::resource('rutas', RutaController::class)->only(['index', 'create', 'store']);
+
+Route::get('/', fn() => view('home'))->name('home');
 
 Route::view('/cultura', 'cultura')->name('cultura');
 
@@ -47,15 +52,12 @@ Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('google.
 Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
 
 Route::get('/centros', [DestinosController::class, 'index'])->name('destinos.index');
-Route::get('/centros/{tipo}', [DestinosController::class, 'tipo'])
-    ->whereIn('tipo', ['turisticos', 'ecoturisticos', 'balnearios'])
-    ->name('destinos.tipo');
 Route::get('/centros/{id}', [DestinosController::class, 'show'])->name('destinos.show');
 
 // OTRAS VISTAS
-Route::get('/mapa', fn () => view('mapa'))->name('mapa');
-Route::get('/turismo-responsable', fn () => view('turismo-responsable'))->name('turismo-responsable');
-Route::get('/ruta', fn () => view('ruta'))->name('ruta');
+Route::get('/mapa', fn() => view('mapa'))->name('mapa');
+Route::get('/turismo-responsable', fn() => view('turismo-responsable'))->name('turismo-responsable');
+Route::get('/ruta', fn() => view('ruta'))->name('ruta');
 
 /*
 |--------------------------------------------------------------------------
@@ -71,14 +73,21 @@ Route::middleware('auth')->group(function () {
     Route::get('/perfil', [PerfilController::class, 'show'])->name('perfil');
     Route::post('/perfil', [PerfilController::class, 'update']);
 
-    /*
-    |--------------------------------------------------------------------------
-    | PANEL ADMIN DESTINOS
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/mis-destinos', function () {
-        return view('admin.destinos.index');
-    })->name('misdestinos.index');
+    // Dashboard rutas
+    Route::get('/rutas/dashboard', fn () => view('rutas.dashboard'))->name('rutas.dashboard');
+
+    // PANEL ADMIN DESTINOS
+    Route::get('/mis-destinos', [AdminDestinoController::class, 'index'])->name('misdestinos.index');
+    Route::get('/destinos/crear', [AdminDestinoController::class, 'create'])->name('destinos.create');
+    Route::post('/destinos/crear', [AdminDestinoController::class, 'store'])->name('destinos.store');
+    Route::delete('/destinos/imagen/{id}', [AdminDestinoController::class, 'destroyImagen'])->name('destinos.imagen.destroy');
+    Route::get('/destinos/{id}/editar', [AdminDestinoController::class, 'edit'])->name('destinos.edit');
+    Route::put('/destinos/{id}', [AdminDestinoController::class, 'update'])->name('destinos.update');
+    Route::delete('/destinos/{id}', [AdminDestinoController::class, 'destroy'])->name('destinos.destroy');
+
+    // Comentarios
+    Route::post('/centros/{id}/comentar', [ComentarioController::class, 'storeDestino'])->name('comentarios.destino.store');
+    Route::delete('/comentarios/{id}', [ComentarioController::class, 'destroy'])->name('comentarios.destroy');
 
     /*
     |--------------------------------------------------------------------------
@@ -89,15 +98,9 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/index', [AdminDashboardController::class, 'index'])->name('index');
 
-        Route::get('/destinos', function () {
-            return view('admin.destinos.index');
-        })->name('destinos');
-
-        Route::get('/aprobacion', fn () => view('admin.aprobacion'))->name('aprobacion');
-        Route::get('/reportes', fn () => view('admin.reportes'))->name('reportes');
-        Route::get('/respaldos', fn () => view('admin.respaldos'))->name('respaldos');
-
-        Route::resource('sitios', AdminSitioController::class);
+        Route::get('/aprobacion', fn() => view('admin.aprobacion'))->name('aprobacion');
+        Route::get('/reportes', fn() => view('admin.reportes'))->name('reportes');
+        Route::get('/respaldos', fn() => view('admin.respaldos'))->name('respaldos');
 
         Route::get('/solicitudes', [AdminSolicitudesController::class, 'index'])->name('solicitudes.index');
         Route::get('/solicitudes/crear', [AdminSolicitudesController::class, 'create'])->name('solicitudes.create');

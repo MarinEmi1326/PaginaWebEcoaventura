@@ -4,153 +4,92 @@
 
 @section('content')
 
+    @if (session('success'))
+        <div class="alert alert-success rounded-3 mb-4" id="alerta-exito">{{ session('success') }}</div>
+        <script>
+            setTimeout(() => {
+                const alerta = document.getElementById('alerta-exito');
+                if (alerta) alerta.remove();
+            }, 3000);
+        </script>
+    @endif
     {{-- Cards resumen --}}
     <div class="row g-3 mb-4">
-        <div class="col-12 col-md-6 col-xl-3">
+        <div class="col-12 col-md-6">
             <div class="ea-card ea-card-tight text-center">
-                <div class="ea-summary-number">4</div>
-                <div class="ea-summary-label">Total</div>
+                <div class="ea-summary-number">{{ $total }}</div>
+                <div class="ea-summary-label">Total de destinos</div>
             </div>
         </div>
-
-        <div class="col-12 col-md-6 col-xl-3">
+        <div class="col-12 col-md-6">
             <div class="ea-card ea-card-tight text-center">
-                <div class="ea-summary-number is-approved">1</div>
-                <div class="ea-summary-label">Aprobados</div>
-            </div>
-        </div>
-
-        <div class="col-12 col-md-6 col-xl-3">
-            <div class="ea-card ea-card-tight text-center">
-                <div class="ea-summary-number is-pending">1</div>
-                <div class="ea-summary-label">Pendientes</div>
-            </div>
-        </div>
-
-        <div class="col-12 col-md-6 col-xl-3">
-            <div class="ea-card ea-card-tight text-center">
-                <div class="ea-summary-number is-rejected">1</div>
-                <div class="ea-summary-label">Rechazados</div>
+                <div class="ea-summary-number is-approved">{{ $aprobados }}</div>
+                <div class="ea-summary-label">Publicados</div>
             </div>
         </div>
     </div>
 
-  
     {{-- Encabezado --}}
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
         <h2 class="ea-section-heading">Mis Destinos</h2>
-
-        <a href="#" class="btn ea-btn-green">
+        <a href="{{ route('destinos.create') }}" class="btn ea-btn-green">
             <i class="bi bi-plus-lg me-1"></i> Nuevo Destino
         </a>
     </div>
 
-    {{-- Lista de destinos --}}
+    {{-- Lista --}}
     <div class="d-grid gap-3">
 
-        <div class="ea-destination-card">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start gap-3">
-                <div>
-                    <div class="ea-destination-title">Zona Arqueológica de Toniná</div>
-                    <div class="ea-destination-meta">Categoría: arqueológicos · Actualizado: 2026-02-10</div>
-                </div>
+        @forelse ($destinos as $destino)
+            <div class="ea-destination-card">
+                <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start gap-3">
 
-                <div class="d-flex align-items-center gap-3 ms-lg-auto">
-                    <span class="ea-status approved">Aprobado</span>
-
-                    <div class="ea-actions">
-                        <a href="#" class="ea-action-btn edit" title="Editar">
-                            <i class="bi bi-pencil-square"></i>
-                        </a>
-                        <a href="#" class="ea-action-btn delete" title="Eliminar">
-                            <i class="bi bi-trash"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="ea-destination-card">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start gap-3">
-                <div>
-                    <div class="ea-destination-title">Cascadas de Agua Azul</div>
-                    <div class="ea-destination-meta">Categoría: cascadas · Actualizado: 2026-02-08</div>
-                </div>
-
-                <div class="d-flex align-items-center gap-3 ms-lg-auto">
-                    <span class="ea-status pending">Pendiente de aprobación</span>
-
-                    <div class="ea-actions">
-                        <a href="#" class="ea-action-btn edit" title="Editar">
-                            <i class="bi bi-pencil-square"></i>
-                        </a>
-                        <a href="#" class="ea-action-btn delete" title="Eliminar">
-                            <i class="bi bi-trash"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="ea-destination-card">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start gap-3">
-                <div class="flex-grow-1">
-                    <div class="ea-destination-title">Selva Lacandona</div>
-                    <div class="ea-destination-meta">Categoría: ecoturismo · Actualizado: 2026-02-06</div>
-
-                    <div class="ea-reject-box">
-                        <div class="ea-reject-label">
-                            <i class="bi bi-exclamation-circle"></i>
-                            Motivo de rechazo:
-                        </div>
-                        <div class="ea-reject-text">
-                            Falta incluir información de acceso y contacto de cooperativas locales.
+                    <div class="flex-grow-1">
+                        <div class="ea-destination-title">{{ $destino->nombre }}</div>
+                        <div class="ea-destination-meta">
+                            Creado: {{ \Carbon\Carbon::parse($destino->fecha_creacion)->format('d/m/Y') }}
                         </div>
                     </div>
-                </div>
 
-                <div class="d-flex align-items-center gap-3 ms-lg-auto">
-                    <span class="ea-status rejected">Rechazado</span>
+                    <div class="d-flex align-items-center gap-3 ms-lg-auto">
 
-                    <div class="ea-actions">
-                        <a href="#" class="ea-action-btn edit" title="Editar">
-                            <i class="bi bi-pencil-square"></i>
-                        </a>
-                        <a href="#" class="ea-action-btn send" title="Enviar de nuevo">
-                            <i class="bi bi-send"></i>
-                        </a>
-                        <a href="#" class="ea-action-btn delete" title="Eliminar">
-                            <i class="bi bi-trash"></i>
-                        </a>
+                        @if ($destino->activo === 'activo')
+                            <span class="ea-status approved">Publicado</span>
+                        @else
+                            <span class="ea-status pending">Inactivo</span>
+                        @endif
+
+                        <div class="ea-actions">
+                            <a href="{{ route('destinos.edit', $destino->id_destino) }}" class="ea-action-btn edit"
+                                title="Editar">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+
+                            <form action="{{ route('destinos.destroy', $destino->id_destino) }}" method="POST"
+                                class="d-inline" onsubmit="return confirm('¿Eliminar este destino?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="ea-action-btn delete border-0 bg-transparent p-0"
+                                    title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="ea-destination-card">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start gap-3">
-                <div>
-                    <div class="ea-destination-title">Laguna Miramar</div>
-                    <div class="ea-destination-meta">Categoría: ecoturismo · Actualizado: 2026-02-11</div>
-                </div>
+        @empty
 
-                <div class="d-flex align-items-center gap-3 ms-lg-auto">
-                    <span class="ea-status draft">Borrador</span>
-
-                    <div class="ea-actions">
-                        <a href="#" class="ea-action-btn edit" title="Editar">
-                            <i class="bi bi-pencil-square"></i>
-                        </a>
-                        <a href="#" class="ea-action-btn send" title="Enviar">
-                            <i class="bi bi-send"></i>
-                        </a>
-                        <a href="#" class="ea-action-btn delete" title="Eliminar">
-                            <i class="bi bi-trash"></i>
-                        </a>
-                    </div>
-                </div>
+            <div class="ea-card text-center py-5">
+                <i class="bi bi-map text-muted" style="font-size: 2.5rem;"></i>
+                <div class="mt-3 fw-semibold text-muted">Aún no tienes destinos registrados.</div>
+                <a href="{{ route('destinos.create') }}" class="btn ea-btn-green mt-3">
+                    <i class="bi bi-plus-lg me-1"></i> Crear mi primer destino
+                </a>
             </div>
-        </div>
+        @endforelse
 
     </div>
 
