@@ -16,9 +16,10 @@ class AdminSolicitudesController extends Controller
     public function index(Request $request)
     {
         $query = DB::table('usuario as u')
-            ->leftJoin('admin_destinos as ad', 'ad.id_usuario', '=', 'u.id_usuario')
-            ->leftJoin('gestor_rutas as gr', 'gr.id_usuario', '=', 'u.id_usuario')
-            ->whereIn('u.rol', ['admin_destinos', 'gestor_rutas']);
+        ->leftJoin('admin_destinos as ad', 'ad.id_usuario', '=', 'u.id_usuario')
+        ->leftJoin('gestor_rutas as gr', 'gr.id_usuario', '=', 'u.id_usuario')
+        ->whereIn('u.rol', ['admin_destinos', 'gestor_rutas'])
+        ->where('u.correo_verificado', 1);
 
         if ($request->filled('estado') && $request->estado !== 'todos') {
             $query->where('u.estado', $request->estado);
@@ -50,6 +51,7 @@ class AdminSolicitudesController extends Controller
             ->leftJoin('gestor_rutas as gr', 'gr.id_usuario', '=', 'u.id_usuario')
             ->where('u.id_usuario', $id)
             ->whereIn('u.rol', ['admin_destinos', 'gestor_rutas'])
+            ->where('u.correo_verificado', 1)
             ->select(
                 'u.id_usuario',
                 'u.correo',
@@ -253,6 +255,7 @@ class AdminSolicitudesController extends Controller
             ->leftJoin('gestor_rutas as gr', 'gr.id_usuario', '=', 'u.id_usuario')
             ->where('u.id_usuario', $id)
             ->whereIn('u.rol', ['admin_destinos', 'gestor_rutas'])
+            ->where('u.correo_verificado', 1)
             ->select(
                 'u.*',
                 DB::raw("COALESCE(ad.nombre, gr.nombre) as nombre_persona")
@@ -295,6 +298,7 @@ class AdminSolicitudesController extends Controller
             ->leftJoin('gestor_rutas as gr', 'gr.id_usuario', '=', 'u.id_usuario')
             ->where('u.id_usuario', $id)
             ->whereIn('u.rol', ['admin_destinos', 'gestor_rutas'])
+            ->where('u.correo_verificado', 1)
             ->select(
                 'u.*',
                 DB::raw("COALESCE(ad.nombre, gr.nombre) as nombre_persona")
