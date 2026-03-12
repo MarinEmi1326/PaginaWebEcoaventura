@@ -5,9 +5,7 @@
 @section('content')
 
     <div class="mb-4">
-        <a href="{{ route('misdestinos.index') }}" class="text-decoration-none fw-semibold" style="color: var(--ea-green);">
-            ← Regresar a mis destinos
-        </a>
+        <a href="{{ route('misdestinos.index') }}" class="text-decoration-none fw-semibold" style="color: var(--ea-green);">Regresar a mis destinos</a>
         <h1 class="ea-page-title mt-3 mb-1">Crear Nuevo Destino</h1>
         <p class="ea-subtitle mb-0">Completa la información para registrar un nuevo destino turístico.</p>
     </div>
@@ -29,7 +27,9 @@
         {{-- BLOQUE 1: Información básica --}}
         <div class="ea-card p-0 overflow-hidden mb-4">
             <div class="p-4 border-bottom" style="border-color: var(--ea-line) !important; background: rgba(255,255,255,.25);">
-                <div class="fw-semibold" style="color: var(--ea-text);">📍 Información del Destino</div>
+                <div class="fw-semibold" style="color: var(--ea-text);">
+                    <i class="bi bi-geo-fill me-2"></i>Información del Destino
+                </div>
             </div>
             <div class="p-4">
                 <div class="row g-3">
@@ -66,7 +66,9 @@
         {{-- BLOQUE 2: Ubicación --}}
         <div class="ea-card p-0 overflow-hidden mb-4">
             <div class="p-4 border-bottom" style="border-color: var(--ea-line) !important; background: rgba(255,255,255,.25);">
-                <div class="fw-semibold" style="color: var(--ea-text);">🗺️ Ubicación</div>
+                <div class="fw-semibold" style="color: var(--ea-text);">
+                    <i class="bi bi-map me-2"></i>Ubicación
+                </div>
             </div>
             <div class="p-4">
 
@@ -109,7 +111,9 @@
         {{-- BLOQUE 3: Categorías --}}
         <div class="ea-card p-0 overflow-hidden mb-4">
             <div class="p-4 border-bottom" style="border-color: var(--ea-line) !important; background: rgba(255,255,255,.25);">
-                <div class="fw-semibold" style="color: var(--ea-text);">🏷️ Categorías</div>
+                <div class="fw-semibold" style="color: var(--ea-text);">
+                    <i class="bi bi-tags me-2"></i>Categorías
+                </div>
             </div>
             <div class="p-4">
                 @if ($categorias->count() > 0)
@@ -139,7 +143,9 @@
         {{-- BLOQUE 4: Actividades --}}
         <div class="ea-card p-0 overflow-hidden mb-4">
             <div class="p-4 border-bottom" style="border-color: var(--ea-line) !important; background: rgba(255,255,255,.25);">
-                <div class="fw-semibold" style="color: var(--ea-text);">🏃 Actividades</div>
+                <div class="fw-semibold" style="color: var(--ea-text);">
+                    <i class="bi bi-run me-2"></i>Actividades
+                </div>
             </div>
             <div class="p-4">
 
@@ -197,7 +203,9 @@
         <div class="ea-card p-0 overflow-hidden mb-4">
             <div class="p-4 border-bottom" style="border-color: var(--ea-line) !important; background: rgba(255,255,255,.25);">
                 <div class="d-flex justify-content-between align-items-center">
-                    <div class="fw-semibold" style="color: var(--ea-text);">🎒 Paquetes / Talleres</div>
+                    <div class="fw-semibold" style="color: var(--ea-text);">
+                        <i class="bi bi-backpack me-2"></i>Paquetes / Talleres
+                    </div>
                     <button type="button" class="btn btn-sm ea-btn-green rounded-3" onclick="agregarPaquete()">
                         <i class="bi bi-plus-lg me-1"></i> Agregar paquete
                     </button>
@@ -215,7 +223,9 @@
         {{-- BLOQUE 6: Imágenes --}}
         <div class="ea-card p-0 overflow-hidden mb-4">
             <div class="p-4 border-bottom" style="border-color: var(--ea-line) !important; background: rgba(255,255,255,.25);">
-                <div class="fw-semibold" style="color: var(--ea-text);">🖼️ Imágenes del Destino</div>
+                <div class="fw-semibold" style="color: var(--ea-text);">
+                    <i class="bi bi-images me-2"></i>Imágenes del Destino                    
+                </div>
             </div>
             <div class="p-4">
                 <p class="text-muted small mb-3">Puedes subir varias imágenes (JPG/PNG, máx. 5MB c/u).</p>
