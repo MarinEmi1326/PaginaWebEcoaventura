@@ -10,6 +10,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\ComentarioController;
 use App\Http\Controllers\RutaController;
+use App\Http\Controllers\PagoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -74,7 +75,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/perfil', [PerfilController::class, 'update']);
 
     // Dashboard rutas
-    Route::get('/rutas/dashboard', fn () => view('rutas.dashboard'))->name('rutas.dashboard');
+    Route::get('/rutas/dashboard', fn() => view('rutas.dashboard'))->name('rutas.dashboard');
 
     // PANEL ADMIN DESTINOS
     Route::get('/mis-destinos', [AdminDestinoController::class, 'index'])->name('misdestinos.index');
@@ -88,6 +89,12 @@ Route::middleware('auth')->group(function () {
     // Comentarios
     Route::post('/centros/{id}/comentar', [ComentarioController::class, 'storeDestino'])->name('comentarios.destino.store');
     Route::delete('/comentarios/{id}', [ComentarioController::class, 'destroy'])->name('comentarios.destroy');
+
+
+    // pagos
+    Route::get('/paquetes/{id}/pagar',        [PagoController::class, 'show'])->name('pagos.show');
+    Route::post('/paquetes/{id}/pagar',       [PagoController::class, 'procesar'])->name('pagos.procesar');
+    Route::get('/paquetes/{id}/confirmacion', [PagoController::class, 'confirmacion'])->name('pagos.confirmacion');
 
     /*
     |--------------------------------------------------------------------------

@@ -17,11 +17,11 @@
                         Guía digital de Ocosingo, Chiapas
                     </span>
 
-                    <h1 class="display-1 fw-bold lh-1" style="font-family: Georgia, 'Times New Roman', serif;">
+                    <h1 class="display-1 fw-bold lh-1" style="font-family: Georgia, 'Times New Roman', serif; font-size:60px;">
                         Conoce y valora <br> Ocosingo antes de <br> visitarlo
                     </h1>
 
-                    <p class="lead mt-4 text-white" style="max-width: 850px; line-height: 1.7;">
+                    <p class="lead mt-4 text-white" style="max-width: 850px; line-height: 1.7; font-size:18px;">
                         Una plataforma de difusión cultural y turística que te permite descubrir la riqueza natural,
                         arqueológica y comunitaria del corazón de la Selva Lacandona. Tu guía digital para planificar
                         una visita responsable.

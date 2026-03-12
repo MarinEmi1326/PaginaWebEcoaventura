@@ -21,36 +21,40 @@
                 [
                     'icon' => 'bi bi-fire',
                     'title' => 'Tradiciones y Ceremonias',
-                    'text' => 'Ocosingo conserva rituales y costumbres ancestrales que las comunidades mayas practican como parte viva de su identidad. Las ceremonias de agradecimiento a la tierra, los rituales con copal y las ofrendas en cuevas sagradas son expresiones de una cosmovisión milenaria que sigue vigente.',
+                    'text' => 'Ocosingo, Chiapas, destaca por una rica mezcla de tradiciones mayas tzeltales y cultura mestiza, destacando las fiestas patronales de San Jacinto de Polonia (17 de agosto) y la Candelaria (2 de febrero). Se celebran con misas, música de marimba, ferias, y ceremonias ancestrales pidiendo por las cosechas y la lluvia.',
                     'items' => [
-                        'Ceremonias del fuego lacandón en Nahá y Metzabok',
-                        'Rituales de siembra y cosecha en comunidades tzeltales',
-                        'Procesiones religiosas sincréticas durante Semana Santa',
-                        'Danzas tradicionales del Carnaval zoque-tzeltal',
+                        'Fiesta de San Jacinto de Polonia (17 de agosto)',
+                        'Fiesta de la Candelaria (2 de febrero)',
+                        'Ceremonias de la Santa Cruz (3 de mayo)',
+                        'Tradiciones Tzeltales',
+                        'Día de Muertos',
+                        'Fiestas Patrias'
                     ]
                 ],
                 [
                     'icon' => 'bi bi-fork-knife',
-                    'title' => 'Gastronomía Regional',
-                    'text' => 'La cocina de Ocosingo es un patrimonio vivo que fusiona sabores prehispánicos con influencias coloniales. Los ingredientes locales como el cacao, el chipilín, el maíz criollo y las hierbas de la selva crean una experiencia gastronómica única e irrepetible.',
+                    'title' => 'Gastronomía',
+                    'text' => 'La comida típica de Ocosingo, Chiapas, destaca por su tradición láctea y sabores de la Selva Lacandona, siendo el famoso queso de bola de Ocosingo (artesanal y relleno de carne) su mayor exponente. Otros platillos emblemáticos incluyen el cochito horneado, tamales de chipilín, sopa de pan, tasajo con pepita y los tradicionales dulces chimbos.',
                     'items' => [
-                        'Queso bola de Ocosingo – denominación de origen',
-                        'Tamales de chipilín y de bola',
-                        'Pozol – bebida ceremonial de maíz y cacao',
+                        'Queso de Bola de Ocosingo',
+                        'Cochito Horneado',
+                        'Tamales Chiapanecos',
                         'Cochito horneado y tasajo chiapaneco',
-                        'Cacao ceremonial y chocolate artesanal',
+                        'Sopa de Pan',
+                        'Chimbos',
+                        'Tasajo con Pepita'
                     ]
                 ],
                 [
                     'icon' => 'bi bi-palette',
                     'title' => 'Artesanías',
-                    'text' => 'Las manos de artesanos tzeltales, tzotziles y lacandones transforman materias primas naturales en obras de arte funcional. Cada pieza lleva consigo siglos de técnica heredada y simbolismo cultural profundo.',
+                    'text' => 'Las artesanías de Ocosingo, Chiapas, destacan por su rica tradición textil elaborada en telar de cintura, incluyendo huipiles, blusas bordadas y bolsas de estambre con pompones. También sobresalen los trabajos en madera, la joyería de ámbar, el crochet, y la famosa producción local de quesos artesanales, como el queso de bola.',
                     'items' => [
-                        'Textiles bordados con diseños cosmogónicos mayas',
-                        'Joyería de ámbar chiapaneco – resina fósil milenaria',
-                        'Cerámica lacandona con formas de deidades',
-                        'Tallas en madera y máscaras ceremoniales',
-                        'Hamacas y bolsas de fibra natural',
+                        'Textiles y Bordados',
+                        'Artesanías en Madera y Materiales Naturales',
+                        'Joyería y Accesorios',
+                        'Quesos Artesanales',
+                        'Puntos de Venta',
                     ]
                 ],
                 [

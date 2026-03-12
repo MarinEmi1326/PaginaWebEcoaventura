@@ -6,8 +6,10 @@
     <nav aria-label="breadcrumb" class="py-3">
         <div class="container">
             <ol class="breadcrumb mb-0 small">
-                <li class="breadcrumb-item"><a href="{{ url('/') }}" class="text-success text-decoration-none">Inicio</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('destinos.index') }}" class="text-success text-decoration-none">Centros Turísticos</a></li>
+                <li class="breadcrumb-item"><a href="{{ url('/') }}" class="text-success text-decoration-none">Inicio</a>
+                </li>
+                <li class="breadcrumb-item"><a href="{{ route('destinos.index') }}"
+                        class="text-success text-decoration-none">Centros Turísticos</a></li>
                 <li class="breadcrumb-item active">{{ $destino->nombre }}</li>
             </ol>
         </div>
@@ -20,8 +22,7 @@
                 <div id="carruselDestino" class="carousel slide rounded-4 overflow-hidden" data-bs-ride="carousel">
                     <div class="carousel-indicators">
                         @foreach ($imagenes as $i => $img)
-                            <button type="button" data-bs-target="#carruselDestino"
-                                data-bs-slide-to="{{ $i }}"
+                            <button type="button" data-bs-target="#carruselDestino" data-bs-slide-to="{{ $i }}"
                                 class="{{ $i === 0 ? 'active' : '' }}"></button>
                         @endforeach
                     </div>
@@ -29,23 +30,24 @@
                         @foreach ($imagenes as $i => $img)
                             <div class="carousel-item {{ $i === 0 ? 'active' : '' }} h-100">
                                 <img src="{{ Storage::url($img->ruta_archivo) }}"
-                                     class="d-block w-100 h-100 object-fit-cover"
-                                     alt="{{ $destino->nombre }}">
+                                    class="d-block w-100 h-100 object-fit-cover" alt="{{ $destino->nombre }}">
                             </div>
                         @endforeach
                     </div>
                     @if ($imagenes->count() > 1)
-                        <button class="carousel-control-prev" type="button" data-bs-target="#carruselDestino" data-bs-slide="prev">
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carruselDestino"
+                            data-bs-slide="prev">
                             <span class="carousel-control-prev-icon"></span>
                         </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#carruselDestino" data-bs-slide="next">
+                        <button class="carousel-control-next" type="button" data-bs-target="#carruselDestino"
+                            data-bs-slide="next">
                             <span class="carousel-control-next-icon"></span>
                         </button>
                     @endif
                 </div>
             @else
                 <div class="rounded-4 d-flex align-items-center justify-content-center"
-                     style="height:300px; background:#e2ece9;">
+                    style="height:300px; background:#e2ece9;">
                     <i class="bi bi-image text-muted fs-1"></i>
                 </div>
             @endif
@@ -61,7 +63,7 @@
                 <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
                     @foreach ($categorias as $cat)
                         <span class="badge rounded-pill px-3 py-2"
-                              style="background:#e2ece9; color:#1F6B4B; font-weight:500;">
+                            style="background:#e2ece9; color:#1F6B4B; font-weight:500;">
                             <i class="bi bi-tag me-1"></i>{{ $cat }}
                         </span>
                     @endforeach
@@ -79,40 +81,42 @@
             <div class="rounded-3 p-1 mb-4" style="background:#e8ede9;">
                 <ul class="nav" id="detalleTabs" role="tablist">
                     <li class="nav-item">
-                        <button class="nav-link active px-4 py-2" data-bs-toggle="tab"
-                            data-bs-target="#tab-descripcion" type="button">Descripción</button>
+                        <button class="nav-link active px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-descripcion"
+                            type="button">Descripción</button>
                     </li>
                     @if ($actividades->count() > 0)
-                    <li class="nav-item">
-                        <button class="nav-link px-4 py-2" data-bs-toggle="tab"
-                            data-bs-target="#tab-actividades" type="button">
-                            Actividades
-                            <span class="badge rounded-pill ms-1" style="background:#1F6B4B; font-size:.7rem;">{{ $actividades->count() }}</span>
-                        </button>
-                    </li>
+                        <li class="nav-item">
+                            <button class="nav-link px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-actividades"
+                                type="button">
+                                Actividades
+                                <span class="badge rounded-pill ms-1"
+                                    style="background:#1F6B4B; font-size:.7rem;">{{ $actividades->count() }}</span>
+                            </button>
+                        </li>
                     @endif
                     @if ($paquetes->count() > 0)
-                    <li class="nav-item">
-                        <button class="nav-link px-4 py-2" data-bs-toggle="tab"
-                            data-bs-target="#tab-paquetes" type="button">
-                            Paquetes
-                            <span class="badge rounded-pill ms-1" style="background:#1F6B4B; font-size:.7rem;">{{ $paquetes->count() }}</span>
-                        </button>
-                    </li>
+                        <li class="nav-item">
+                            <button class="nav-link px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-paquetes"
+                                type="button">
+                                Paquetes
+                                <span class="badge rounded-pill ms-1"
+                                    style="background:#1F6B4B; font-size:.7rem;">{{ $paquetes->count() }}</span>
+                            </button>
+                        </li>
                     @endif
                     @if ($destino->recomendaciones)
-                    <li class="nav-item">
-                        <button class="nav-link px-4 py-2" data-bs-toggle="tab"
-                            data-bs-target="#tab-recomendaciones" type="button">Recomendaciones</button>
-                    </li>
+                        <li class="nav-item">
+                            <button class="nav-link px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-recomendaciones"
+                                type="button">Recomendaciones</button>
+                        </li>
                     @endif
                     @if ($destino->lat && $destino->lng)
-                    <li class="nav-item">
-                        <button class="nav-link px-4 py-2" data-bs-toggle="tab"
-                            data-bs-target="#tab-mapa" type="button">
-                            <i class="bi bi-map me-1"></i>Ubicación
-                        </button>
-                    </li>
+                        <li class="nav-item">
+                            <button class="nav-link px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-mapa"
+                                type="button">
+                                <i class="bi bi-map me-1"></i>Ubicación
+                            </button>
+                        </li>
                     @endif
                 </ul>
             </div>
@@ -126,88 +130,107 @@
 
                 {{-- ACTIVIDADES --}}
                 @if ($actividades->count() > 0)
-                <div class="tab-pane fade" id="tab-actividades" role="tabpanel">
-                    <div class="d-flex flex-column gap-3">
-                        @foreach ($actividades as $act)
-                            <div class="rounded-3 p-4" style="background:#f1f5f2;">
-                                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
-                                    <h6 class="fw-bold mb-0">{{ $act->nombre }}</h6>
-                                    <span class="badge rounded-pill
+                    <div class="tab-pane fade" id="tab-actividades" role="tabpanel">
+                        <div class="d-flex flex-column gap-3">
+                            @foreach ($actividades as $act)
+                                <div class="rounded-3 p-4" style="background:#f1f5f2;">
+                                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+                                        <h6 class="fw-bold mb-0">{{ $act->nombre }}</h6>
+                                        <span
+                                            class="badge rounded-pill
                                         {{ $act->dificultad === 'alta' ? 'bg-danger' : ($act->dificultad === 'media' ? 'bg-warning text-dark' : 'bg-success') }}">
-                                        {{ ucfirst($act->dificultad) }}
-                                    </span>
-                                </div>
-                                <div class="d-flex flex-wrap gap-3 text-muted small mb-2">
-                                    @if ($act->duracion_estimada)
-                                        <span><i class="bi bi-clock me-1"></i>{{ $act->duracion_estimada }}</span>
+                                            {{ ucfirst($act->dificultad) }}
+                                        </span>
+                                    </div>
+                                    <div class="d-flex flex-wrap gap-3 text-muted small mb-2">
+                                        @if ($act->duracion_estimada)
+                                            <span><i class="bi bi-clock me-1"></i>{{ $act->duracion_estimada }}</span>
+                                        @endif
+                                        @if ($act->minimo_personas)
+                                            <span><i class="bi bi-people me-1"></i>Mín. {{ $act->minimo_personas }}
+                                                personas</span>
+                                        @endif
+                                    </div>
+                                    @if ($act->recomendacion)
+                                        <p class="text-muted small mb-0">
+                                            <i class="bi bi-lightbulb me-1 text-success"></i>{{ $act->recomendacion }}
+                                        </p>
                                     @endif
-                                    @if ($act->minimo_personas)
-                                        <span><i class="bi bi-people me-1"></i>Mín. {{ $act->minimo_personas }} personas</span>
-                                    @endif
                                 </div>
-                                @if ($act->recomendacion)
-                                    <p class="text-muted small mb-0">
-                                        <i class="bi bi-lightbulb me-1 text-success"></i>{{ $act->recomendacion }}
-                                    </p>
-                                @endif
-                            </div>
-                        @endforeach
+                            @endforeach
+                        </div>
                     </div>
-                </div>
                 @endif
 
                 {{-- PAQUETES --}}
                 @if ($paquetes->count() > 0)
-                <div class="tab-pane fade" id="tab-paquetes" role="tabpanel">
-                    <div class="row g-3">
-                        @foreach ($paquetes as $paq)
-                            <div class="col-md-6">
-                                <div class="rounded-3 p-4 h-100" style="background:#f1f5f2;">
-                                    <h6 class="fw-bold mb-2">🎒 {{ $paq->nombre }}</h6>
-                                    @if ($paq->descripcion)
-                                        <p class="text-muted small mb-3">{{ $paq->descripcion }}</p>
-                                    @endif
-                                    <div class="d-flex flex-wrap gap-3 text-muted small">
-                                        @if ($paq->precio)
-                                            <span class="fw-semibold text-success">
-                                                <i class="bi bi-tag me-1"></i>${{ number_format($paq->precio, 2) }} MXN
-                                            </span>
+                    <div class="tab-pane fade" id="tab-paquetes" role="tabpanel">
+                        <div class="row g-3">
+                            @foreach ($paquetes as $paq)
+                                <div class="col-md-6">
+                                    <div class="rounded-3 p-4 h-100" style="background:#f1f5f2;">
+                                        <h6 class="fw-bold mb-2">🎒 {{ $paq->nombre }}</h6>
+                                        @if ($paq->descripcion)
+                                            <p class="text-muted small mb-3">{{ $paq->descripcion }}</p>
                                         @endif
-                                        @if ($paq->minimo_personas)
-                                            <span><i class="bi bi-people me-1"></i>Mín. {{ $paq->minimo_personas }} personas</span>
-                                        @endif
+                                        <div class="d-flex flex-wrap gap-3 text-muted small mb-3">
+                                            @if ($paq->precio)
+                                                <span class="fw-semibold text-success">
+                                                    <i class="bi bi-tag me-1"></i>${{ number_format($paq->precio, 2) }}
+                                                    MXN
+                                                </span>
+                                            @endif
+                                            @if ($paq->minimo_personas)
+                                                <span><i class="bi bi-people me-1"></i>Mín. {{ $paq->minimo_personas }}
+                                                    personas</span>
+                                            @endif
+                                        </div>
+                                        @auth
+                                            @if (auth()->user()->rol === 'turista' && $paq->precio)
+                                                <a href="{{ route('pagos.show', $paq->id_paquete) }}"
+                                                    class="btn btn-success btn-sm rounded-3 px-3">
+                                                    <i class="bi bi-credit-card me-1"></i>Adquirir paquete
+                                                </a>
+                                            @endif
+                                        @else
+                                            @if ($paq->precio)
+                                                <a href="{{ route('login') }}"
+                                                    class="btn btn-outline-success btn-sm rounded-3 px-3">
+                                                    <i class="bi bi-person me-1"></i>Inicia sesión para adquirir
+                                                </a>
+                                            @endif
+                                        @endauth
                                     </div>
                                 </div>
-                            </div>
-                        @endforeach
+                            @endforeach
+                        </div>
                     </div>
-                </div>
                 @endif
 
                 {{-- RECOMENDACIONES --}}
                 @if ($destino->recomendaciones)
-                <div class="tab-pane fade" id="tab-recomendaciones" role="tabpanel">
-                    <div class="rounded-3 p-4" style="background:#f1f5f2;">
-                        <i class="bi bi-exclamation-triangle text-success me-2"></i>
-                        {{ $destino->recomendaciones }}
+                    <div class="tab-pane fade" id="tab-recomendaciones" role="tabpanel">
+                        <div class="rounded-3 p-4" style="background:#f1f5f2;">
+                            <i class="bi bi-exclamation-triangle text-success me-2"></i>
+                            {{ $destino->recomendaciones }}
+                        </div>
                     </div>
-                </div>
                 @endif
 
                 {{-- MAPA --}}
                 @if ($destino->lat && $destino->lng)
-                <div class="tab-pane fade" id="tab-mapa" role="tabpanel">
-                    <div class="rounded-4 overflow-hidden" style="height: 380px;">
-                        <iframe width="100%" height="100%" style="border:0;" loading="lazy" allowfullscreen
-                            referrerpolicy="no-referrer-when-downgrade"
-                            src="https://www.google.com/maps/embed/v1/view?key={{ config('services.google_maps.key') }}&center={{ $destino->lat }},{{ $destino->lng }}&zoom=14&maptype=roadmap">
-                        </iframe>
+                    <div class="tab-pane fade" id="tab-mapa" role="tabpanel">
+                        <div class="rounded-4 overflow-hidden" style="height: 380px;">
+                            <iframe width="100%" height="100%" style="border:0;" loading="lazy" allowfullscreen
+                                referrerpolicy="no-referrer-when-downgrade"
+                                src="https://www.google.com/maps/embed/v1/place?q={{ $destino->nombre }}&key={{ config('services.google_maps.key') }}&center={{ $destino->lat }},{{ $destino->lng }}&zoom=12&maptype=roadmap">
+                            </iframe>
+                        </div>
+                        <p class="small text-muted mt-2">
+                            <i class="bi bi-geo-alt me-1 text-success"></i>
+                            {{ $destino->lat }}, {{ $destino->lng }}
+                        </p>
                     </div>
-                    <p class="small text-muted mt-2">
-                        <i class="bi bi-geo-alt me-1 text-success"></i>
-                        {{ $destino->lat }}, {{ $destino->lng }}
-                    </p>
-                </div>
                 @endif
 
             </div>
@@ -215,7 +238,7 @@
             {{-- BOTONES --}}
             <div class="d-flex flex-wrap gap-3 mb-5 pt-3 border-top">
                 @auth
-                    @if(auth()->user()->rol === 'turista')
+                    @if (auth()->user()->rol === 'turista')
                         <a href="#comentarios" class="btn btn-success rounded-3 px-4 py-2">
                             <i class="bi bi-chat me-2"></i>Dejar un comentario
                         </a>
@@ -232,7 +255,8 @@
                 <h5 class="fw-bold mb-4">
                     <i class="bi bi-chat-square-text me-2 text-success"></i>
                     Comentarios
-                    <span class="badge rounded-pill ms-1" style="background:#e2ece9; color:#1F6B4B; font-size:.8rem;">{{ $comentarios->count() }}</span>
+                    <span class="badge rounded-pill ms-1"
+                        style="background:#e2ece9; color:#1F6B4B; font-size:.8rem;">{{ $comentarios->count() }}</span>
                 </h5>
 
                 {{-- Mensajes --}}
@@ -241,7 +265,11 @@
                     <script>
                         setTimeout(() => {
                             const a = document.getElementById('alerta-com');
-                            if (a) { a.style.transition='opacity .5s'; a.style.opacity='0'; setTimeout(()=>a.remove(),500); }
+                            if (a) {
+                                a.style.transition = 'opacity .5s';
+                                a.style.opacity = '0';
+                                setTimeout(() => a.remove(), 500);
+                            }
                         }, 3000);
                     </script>
                 @endif
@@ -251,7 +279,7 @@
 
                 {{-- Formulario solo para turistas --}}
                 @auth
-                    @if(auth()->user()->rol === 'turista')
+                    @if (auth()->user()->rol === 'turista')
                         <div class="rounded-3 p-4 mb-4" style="background:#f1f5f2;">
                             <form action="{{ route('comentarios.destino.store', $destino->id_destino) }}" method="POST">
                                 @csrf
@@ -295,9 +323,9 @@
                             </div>
                             {{-- Botón eliminar solo para admin_general --}}
                             @auth
-                                @if(auth()->user()->rol === 'admin_general')
+                                @if (auth()->user()->rol === 'admin_general')
                                     <form action="{{ route('comentarios.destroy', $com->id_comentario) }}" method="POST"
-                                          onsubmit="return confirm('¿Eliminar este comentario?')">
+                                        onsubmit="return confirm('¿Eliminar este comentario?')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-outline-danger rounded-3">
@@ -319,16 +347,16 @@
 
             {{-- OTROS DESTINOS --}}
             @if ($otrosDestinos->count() > 0)
-            <div class="mb-5">
-                <h5 class="fw-bold mb-4">Otros destinos que podrían interesarte</h5>
-                <div class="row g-4">
-                    @foreach ($otrosDestinos as $od)
-                        <div class="col-md-6 col-lg-4">
-                            @include('centros._card', ['d' => $od])
-                        </div>
-                    @endforeach
+                <div class="mb-5">
+                    <h5 class="fw-bold mb-4">Otros destinos que podrían interesarte</h5>
+                    <div class="row g-4">
+                        @foreach ($otrosDestinos as $od)
+                            <div class="col-md-6 col-lg-4">
+                                @include('centros._card', ['d' => $od])
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
-            </div>
             @endif
 
         </div>
@@ -337,5 +365,5 @@
 @endsection
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/destinos.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/destinos.css') }}">
 @endpush

@@ -8,9 +8,12 @@ use App\Models\AdminGeneral;
 use App\Models\Turista;
 use App\Models\AdminDestinos;
 use App\Models\GestorRutas;
+use Laravel\Sanctum\HasApiTokens;
 
 class Usuario extends Authenticatable
 {
+
+    use HasApiTokens;
     use Notifiable;
 
     protected $table = 'usuario';
