@@ -247,7 +247,7 @@
     {{-- TURISMO RESPONSABLE --}}
     <section class="home-responsable">
         <div class="home-container">
-            <div class="home-kicker">Turismo responsable</div>
+            <div class="home-kicker text-white">Turismo responsable</div>
             <h2 class="home-title">Viaja con propósito</h2>
             <p class="home-lead">
                 Conocer Ocosingo es también comprender la importancia de preservar su biodiversidad
