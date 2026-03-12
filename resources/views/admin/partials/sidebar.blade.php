@@ -23,10 +23,10 @@
       <span>Dashboard</span>
     </a>
 
-    <a href="{{ route('admin.aprobacion') }}"
+    <a href="{{ route('admin.destino') }}"
         class="ea-nav-pill {{ request()->routeIs('admin.aprobacion') ? 'active' : '' }}">
-        <i class="bi bi-check2-square"></i>
-        <span>Aprobación</span>
+       <i class="bi bi-geo-alt"></i>
+       <span>Destinos</span>
     </a>
 
     <a href="{{ route('admin.solicitudes.index') }}"

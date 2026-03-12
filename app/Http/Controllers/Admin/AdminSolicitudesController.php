@@ -97,6 +97,8 @@ class AdminSolicitudesController extends Controller
                 'rol'             => $request->rol,
                 'estado'          => 'aprobado',
                 'activo'          => 1,
+                'correo_verificado'   => 1,
+                'token_verificacion'  => null,
                 'fecha_solicitud' => now(),
                 'fecha_respuesta' => now(),
             ]);

@@ -15,17 +15,21 @@
   <div class="d-flex ea-shell">
 
     @if(auth()->check() && auth()->user()->rol === 'admin_destinos')
-        @include('admin.partials.sidebar-destinos')
-    @else
-        @include('admin.partials.sidebar')
-    @endif
+    @include('admin.partials.sidebar-destinos')
+  @elseif(auth()->check() && auth()->user()->rol === 'gestor_rutas')
+      @include('admin.partials.sidebar-rutas')
+  @else
+      @include('admin.partials.sidebar')
+  @endif
 
-    <div class="flex-grow-1 d-flex flex-column">
-      @if(auth()->check() && auth()->user()->rol === 'admin_destinos')
-          @include('admin.partials.topbar-destinos')
-      @else
-          @include('admin.partials.topbar')
-      @endif
+  <div class="flex-grow-1 d-flex flex-column">
+    @if(auth()->check() && auth()->user()->rol === 'admin_destinos')
+        @include('admin.partials.topbar-destinos')
+    @elseif(auth()->check() && auth()->user()->rol === 'gestor_rutas')
+        @include('admin.partials.topbar-rutas')
+    @else
+        @include('admin.partials.topbar')
+    @endif
 
       <main class="container-fluid py-4 px-4 px-lg-5">
         @yield('content')

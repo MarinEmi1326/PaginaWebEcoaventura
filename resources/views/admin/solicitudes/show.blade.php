@@ -6,18 +6,18 @@
 
 <div class="container-fluid">
   <div class="row justify-content-center">
-    <div class="col-12 col-lg-10 col-xl-9">
+    <div class="col-12 col-xl-12">
 
       {{-- Header --}}
       <div class="mb-4">
         <a href="{{ route('admin.solicitudes.index') }}"
            class="text-decoration-none fw-semibold"
            style="color: var(--ea-green);">
-          ← Regresar a solicitudes
+          ← Volver al listado
         </a>
 
         <h1 class="ea-page-title mt-3 mb-1">Detalle de Solicitud</h1>
-        <p class="ea-subtitle mb-0">Revisa la información y aprueba o rechaza la solicitud.</p>
+        <p class="ea-subtitle mb-0">Revisa la información del usuario y administra su estado.</p>
       </div>
 
       {{-- Mensajes --}}
@@ -47,52 +47,115 @@
         </div>
       @endif
 
+      @php
+        $nombreCompleto = trim(($solicitud->nombre ?? '') . ' ' . ($solicitud->apaterno ?? '') . ' ' . ($solicitud->amaterno ?? ''));
+        $estado = strtolower($solicitud->estado ?? 'pendiente');
+
+        $chipEstado = match($estado) {
+          'aprobado' => 'green',
+          'rechazado' => 'red',
+          'pendiente' => 'blue',
+          default => 'gray'
+        };
+      @endphp
+
       {{-- Card principal --}}
       <div class="ea-card p-0 overflow-hidden">
 
+        {{-- Encabezado principal --}}
         <div class="p-4 border-bottom d-flex justify-content-between align-items-start gap-3 flex-wrap"
              style="border-color: var(--ea-line) !important; background: rgba(255,255,255,.25);">
 
-          <div>
-            <div class="small" style="color: var(--ea-muted);">Solicitante</div>
-            <div class="fw-semibold" style="font-family: Georgia, 'Times New Roman', serif; font-size: 1.6rem;">
-              {{ trim(($solicitud->nombre ?? '') . ' ' . ($solicitud->apaterno ?? '') . ' ' . ($solicitud->amaterno ?? '')) }}
+          <div class="d-flex align-items-center gap-3">
+            <div class="ea-avatar" style="width: 64px; height: 64px; font-size: 1.3rem;">
+              {{ strtoupper(substr($solicitud->nombre ?? 'U', 0, 1)) }}
             </div>
-            <div class="small" style="color: var(--ea-muted);">{{ $solicitud->correo }}</div>
+
+            <div>
+              <div class="fw-semibold" style="font-family: Georgia, 'Times New Roman', serif; font-size: 1.6rem;">
+                {{ $nombreCompleto ?: 'Sin nombre' }}
+              </div>
+              <div class="small" style="color: var(--ea-muted);">{{ $solicitud->correo }}</div>
+              <div class="small" style="color: var(--ea-muted);">
+                Registrado: {{ $solicitud->fecha_solicitud ? \Carbon\Carbon::parse($solicitud->fecha_solicitud)->format('Y-m-d') : '—' }}
+              </div>
+            </div>
           </div>
 
           <div class="text-end">
-            <div class="small" style="color: var(--ea-muted);">Tipo</div>
-            <span class="ea-chip gray">
-              {{ $solicitud->rol === 'admin_destinos' ? 'Administrador de destinos' : 'Gestor de rutas' }}
-            </span>
+            <div class="d-flex flex-column align-items-end gap-2">
+              @if(($solicitud->activo ?? 0))
+                <span class="ea-chip green">Activo</span>
+              @else
+                <span class="ea-chip red">Inhabilitado</span>
+              @endif
 
-            <div class="small mt-3" style="color: var(--ea-muted);">Estado</div>
-            @php $estado = strtolower($solicitud->estado ?? 'pendiente'); @endphp
-            <span class="ea-chip
-              {{ $estado === 'aprobado' ? 'green' : '' }}
-              {{ $estado === 'rechazado' ? 'red' : '' }}
-              {{ $estado === 'pendiente' ? 'blue' : '' }}
-              {{ !in_array($estado, ['aprobado', 'rechazado', 'pendiente']) ? 'gray' : '' }}">
-              {{ ucfirst($estado) }}
-            </span>
+              <span class="ea-chip gray">
+                {{ $solicitud->rol === 'admin_destinos' ? 'Admin. de Destinos' : 'Gestor de Rutas' }}
+              </span>
+
+              <form action="{{ route('admin.solicitudes.toggle', $solicitud->id_usuario) }}" method="POST" class="mt-2">
+                @csrf
+                <button type="submit"
+                        class="btn rounded-3 px-3 py-2 fw-semibold"
+                        style="
+                          font-size:.85rem;
+                          {{ ($solicitud->activo ?? 0)
+                            ? 'background:#e4572e; border-color:#e4572e; color:#fff;'
+                            : 'background: rgba(63,125,59,.10); border:1px solid rgba(63,125,59,.30); color:#2f6b2c;'
+                          }}
+                        ">
+                  @if(($solicitud->activo ?? 0))
+                    <i class="bi bi-slash-circle me-1"></i> Suspender
+                  @else
+                    <i class="bi bi-check2-circle me-1"></i> Habilitar
+                  @endif
+                </button>
+              </form>
+            </div>
           </div>
 
         </div>
 
+        {{-- Resumen --}}
         <div class="p-4">
-          <div class="row g-3">
+          <div class="row g-4">
+
+            <div class="col-12 col-md-6">
+              <div class="ea-soft-row h-100 p-4">
+                <div class="small mb-1" style="color: var(--ea-muted);">Rol</div>
+                <div class="fw-semibold">
+                  {{ $solicitud->rol === 'admin_destinos' ? 'Admin. de Destinos' : 'Gestor de Rutas' }}
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <div class="ea-soft-row h-100 p-4">
+                <div class="small mb-1" style="color: var(--ea-muted);">Estado actual</div>
+                <div>
+                  <span class="ea-chip {{ $chipEstado }}">
+                    {{ ucfirst($estado) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {{-- Bloques de información --}}
+        <div class="px-4 pb-4">
+          <div class="row g-4">
 
             {{-- Datos personales --}}
             <div class="col-12 col-md-6">
-              <div class="ea-card p-4">
+              <div class="ea-card p-5 h-100">
                 <div class="fw-semibold mb-3">Datos personales</div>
 
                 <div class="d-flex justify-content-between mb-2">
                   <span style="color: var(--ea-muted);">Nombre completo</span>
-                  <span class="fw-semibold">
-                    {{ trim(($solicitud->nombre ?? '') . ' ' . ($solicitud->apaterno ?? '') . ' ' . ($solicitud->amaterno ?? '')) ?: '—' }}
-                  </span>
+                  <span class="fw-semibold">{{ $nombreCompleto ?: '—' }}</span>
                 </div>
 
                 <div class="d-flex justify-content-between mb-2">
@@ -100,23 +163,16 @@
                   <span class="fw-semibold">{{ $solicitud->correo ?? '—' }}</span>
                 </div>
 
-                <div class="d-flex justify-content-between mb-2">
+                <div class="d-flex justify-content-between">
                   <span style="color: var(--ea-muted);">Teléfono</span>
                   <span class="fw-semibold">{{ $solicitud->telefono ?? '—' }}</span>
-                </div>
-
-                <div class="d-flex justify-content-between">
-                  <span style="color: var(--ea-muted);">Rol solicitado</span>
-                  <span class="fw-semibold">
-                    {{ $solicitud->rol === 'admin_destinos' ? 'Administrador de destinos' : 'Gestor de rutas' }}
-                  </span>
                 </div>
               </div>
             </div>
 
             {{-- Datos de la solicitud --}}
             <div class="col-12 col-md-6">
-              <div class="ea-card p-4">
+              <div class="ea-card p-5 h-100">
                 <div class="fw-semibold mb-3">Datos de la solicitud</div>
 
                 <div class="d-flex justify-content-between mb-2">
@@ -155,29 +211,29 @@
           </div>
         </div>
 
-        {{-- Acciones --}}
+        {{-- Acciones de aprobación / rechazo --}}
         <div class="p-4 border-top" style="border-color: var(--ea-line) !important;">
-          @if(($solicitud->estado ?? 'pendiente') === 'pendiente')
+          @if($estado === 'pendiente')
 
-            <div class="d-flex flex-column flex-md-row justify-content-between gap-2">
+            <div class="d-flex flex-column flex-md-row gap-2">
               {{-- Aprobar --}}
               <form method="POST" action="{{ route('admin.solicitudes.aprobar', $solicitud->id_usuario) }}">
                 @csrf
                 <button type="submit" class="btn ea-btn-approve rounded-3 px-4 py-2 fw-semibold">
-                  Aprobar
+                  <i class="bi bi-check2-circle me-2"></i>Aprobar
                 </button>
               </form>
 
-              {{-- Rechazar --}}
+              {{-- Mostrar formulario de rechazo --}}
               <button type="button"
                       class="btn rounded-3 px-4 py-2 fw-semibold"
                       style="border:1px solid rgba(209,75,58,.35); background: rgba(209,75,58,.08); color:#d14b3a;"
                       onclick="document.getElementById('rechazar-form').classList.remove('d-none'); document.getElementById('rechazar-form').scrollIntoView({behavior:'smooth'});">
-                Rechazar
+                <i class="bi bi-x-circle me-2"></i>Rechazar
               </button>
             </div>
 
-            {{-- Form rechazo --}}
+            {{-- Formulario rechazo --}}
             <div id="rechazar-form" class="d-none mt-3 ea-card p-4">
               <form method="POST" action="{{ route('admin.solicitudes.rechazar', $solicitud->id_usuario) }}">
                 @csrf
@@ -204,6 +260,47 @@
               Esta solicitud ya fue atendida ({{ $solicitud->estado }}).
             </div>
           @endif
+        </div>
+
+        {{-- Comentarios del usuario --}}
+        <div class="p-4 border-top" style="border-color: var(--ea-line) !important;">
+
+          <div class="fw-semibold mb-3" style="font-size: 1.1rem;">
+            Comentarios del usuario
+          </div>
+
+          <div class="table-responsive">
+            <table class="table align-middle mb-0">
+              <thead style="background: rgba(255,255,255,.25);">
+                <tr>
+                  <th>Motivo</th>
+                  <th>Contra</th>
+                  <th class="text-end">Fecha</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td>Comentario ofensivo</td>
+                  <td style="color: var(--ea-muted);">Destino: Toniná</td>
+                  <td class="text-end">2026-02-10</td>
+                </tr>
+
+                <tr>
+                  <td>Información incorrecta</td>
+                  <td style="color: var(--ea-muted);">Destino: Cascadas de Misol-Ha</td>
+                  <td class="text-end">2026-02-15</td>
+                </tr>
+
+                <tr>
+                  <td>Spam o publicidad</td>
+                  <td style="color: var(--ea-muted);">Destino: Agua Azul</td>
+                  <td class="text-end">2026-03-01</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
         </div>
 
       </div>

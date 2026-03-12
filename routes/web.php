@@ -73,9 +73,8 @@ Route::middleware('auth')->group(function () {
     // Perfil
     Route::get('/perfil', [PerfilController::class, 'show'])->name('perfil');
     Route::post('/perfil', [PerfilController::class, 'update']);
-
-    // Dashboard rutas
-    Route::get('/rutas/dashboard', fn() => view('rutas.dashboard'))->name('rutas.dashboard');
+    
+    Route::get('/rutas/dashboard', fn() => view('admin.gestor_rutas.index'))->name('rutas.dashboard');
 
     // PANEL ADMIN DESTINOS
     Route::get('/mis-destinos', [AdminDestinoController::class, 'index'])->name('misdestinos.index');
@@ -104,9 +103,10 @@ Route::middleware('auth')->group(function () {
     Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
 
         Route::get('/index', [AdminDashboardController::class, 'index'])->name('index');
-
-        Route::get('/aprobacion', fn() => view('admin.aprobacion'))->name('aprobacion');
-        Route::get('/reportes', fn() => view('admin.reportes'))->name('reportes');
+        
+        Route::get('/destino', fn() => view('admin.centro.index'))->name('destino');
+        Route::get('/destino/show', fn() => view('admin.centro.show'))->name('destino.show');
+        Route::get('/reportes', fn() => view('admin.reportes.index'))->name('reportes');
         Route::get('/respaldos', fn() => view('admin.respaldos'))->name('respaldos');
 
         Route::get('/solicitudes', [AdminSolicitudesController::class, 'index'])->name('solicitudes.index');
