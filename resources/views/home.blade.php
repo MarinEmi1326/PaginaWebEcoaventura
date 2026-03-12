@@ -247,7 +247,7 @@
     {{-- TURISMO RESPONSABLE --}}
     <section class="home-responsable">
         <div class="home-container">
-            <div class="home-kicker">Turismo responsable</div>
+            <div class="home-kicker text-white">Turismo responsable</div>
             <h2 class="home-title">Viaja con propósito</h2>
             <p class="home-lead">
                 Conocer Ocosingo es también comprender la importancia de preservar su biodiversidad
@@ -257,7 +257,7 @@
             <div class="home-responsable-grid">
                 <div class="home-value-card">
                     <div class="home-value-icon">
-                        <i class="bi bi-leaf"></i>
+                        <i class="bi bi-leaf text-white"></i>
                     </div>
                     <h3 class="home-value-title">Conservación Ambiental</h3>
                     <p class="home-value-text">
@@ -267,7 +267,7 @@
 
                 <div class="home-value-card">
                     <div class="home-value-icon">
-                        <i class="bi bi-heart"></i>
+                        <i class="bi bi-heart text-white"></i>
                     </div>
                     <h3 class="home-value-title">Respeto Cultural</h3>
                     <p class="home-value-text">
@@ -277,7 +277,7 @@
 
                 <div class="home-value-card">
                     <div class="home-value-icon">
-                        <i class="bi bi-flower1"></i>
+                        <i class="bi bi-flower1 text-white"></i>
                     </div>
                     <h3 class="home-value-title">Turismo Comunitario</h3>
                     <p class="home-value-text">
@@ -287,7 +287,7 @@
 
                 <div class="home-value-card">
                     <div class="home-value-icon">
-                        <i class="bi bi-shield-check"></i>
+                        <i class="bi bi-shield-check text-white"></i>
                     </div>
                     <h3 class="home-value-title">Viajero Consciente</h3>
                     <p class="home-value-text">

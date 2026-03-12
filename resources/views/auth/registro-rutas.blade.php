@@ -52,7 +52,10 @@
                             value="{{ old('nombre') }}"
                             class="form-control"
                             placeholder="Tu nombre"
-                            required>
+                            pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
+                            required
+                            oninvalid="this.setCustomValidity('El nombre solo debe contener letras')"
+                            onchange="this.setCustomValidity('')">
                     </div>
 
                     <div class="mb-3">
@@ -64,7 +67,10 @@
                             value="{{ old('apaterno') }}"
                             class="form-control"
                             placeholder="Apellido paterno"
-                            required>
+                            pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
+                            required
+                            oninvalid="this.setCustomValidity('El apellido paterno solo debe contener letras')"
+                            onchange="this.setCustomValidity('')">
                     </div>
 
                     <div class="mb-3">
@@ -75,7 +81,10 @@
                             name="amaterno"
                             value="{{ old('amaterno') }}"
                             class="form-control"
-                            placeholder="Apellido materno (opcional)">
+                            placeholder="Apellido materno (opcional)"
+                            pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
+                            oninvalid="this.setCustomValidity('El apellido materno solo debe contener letras')"
+                            onchange="this.setCustomValidity('')">
                     </div>
 
                     <div class="mb-3">
@@ -87,8 +96,12 @@
                             value="{{ old('telefono') }}"
                             class="form-control"
                             maxlength="10"
+                            pattern="[0-9]{10}"
+                            inputmode="numeric"
                             placeholder="9611234567"
-                            required>
+                            required
+                            oninvalid="this.setCustomValidity('Debes ingresar un número de teléfono de 10 dígitos')"
+                            onchange="this.setCustomValidity('')">
                     </div>
 
                     <div class="mb-3">
@@ -100,7 +113,9 @@
                             value="{{ old('correo') }}"
                             class="form-control"
                             placeholder="tu@email.com"
-                            required>
+                            required
+                            oninvalid="this.setCustomValidity('Debes ingresar un correo electrónico válido')"
+                            onchange="this.setCustomValidity('')">
                     </div>
 
                     <div class="mb-3">
@@ -111,7 +126,10 @@
                             name="password"
                             class="form-control"
                             placeholder="••••••••"
-                            required>
+                            minlength="8"
+                            required
+                            oninvalid="this.setCustomValidity('Debes ingresar una contraseña')"
+                            onchange="this.setCustomValidity('')">
                     </div>
 
                     <div class="mb-4">
@@ -122,7 +140,9 @@
                             name="password_confirmation"
                             class="form-control"
                             placeholder="••••••••"
-                            required>
+                            required
+                            oninvalid="this.setCustomValidity('Debes confirmar tu contraseña')"
+                            onchange="this.setCustomValidity('')">
                     </div>
 
                     <button type="submit" class="btn btn-success w-100 py-2 fw-semibold">

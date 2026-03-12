@@ -11,6 +11,9 @@ use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\ComentarioController;
 use App\Http\Controllers\RutaController;
 use App\Http\Controllers\PagoController;
+use App\Http\Controllers\ReporteController;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -75,6 +78,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/perfil', [PerfilController::class, 'update']);
     
     Route::get('/rutas/dashboard', fn() => view('admin.gestor_rutas.index'))->name('rutas.dashboard');
+
+
+    // reporte
+    Route::post('/destinos/{id}/reportar',    [ReporteController::class, 'reportarDestino'])->name('reportes.destino');
+    Route::post('/comentarios/{id}/reportar', [ReporteController::class, 'reportarComentario'])->name('reportes.comentario');
+
 
     // PANEL ADMIN DESTINOS
     Route::get('/mis-destinos', [AdminDestinoController::class, 'index'])->name('misdestinos.index');

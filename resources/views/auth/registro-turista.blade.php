@@ -15,7 +15,9 @@
                 <div class="d-flex align-items-center gap-3">
                     <div class="bg-white bg-opacity-25 rounded-circle d-flex align-items-center justify-content-center"
                         style="width:45px;height:45px;">
-                        <span>🌿</span>
+
+                        <img src="{{ asset('img/ecoaventura-logo.png') }}" alt="Ecoaventura" style="width:26px; height:26px;">
+                        
                     </div>
 
                     <span class="fs-4 fw-semibold">Ecoaventura</span>
