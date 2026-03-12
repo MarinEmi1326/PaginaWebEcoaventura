@@ -12,7 +12,9 @@
                     <div class="text-center mb-4">
                         <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
                             style="width:64px; height:64px; background:#e2ece9;">
-                            <i class="bi bi-leaf text-success fs-4"></i>
+
+                            <img src="{{ asset('img/ecoaventura-logo.png') }}" alt="Logo" style="width:32px; height:32px;">
+
                         </div>
                         <h2 class="fw-bold" style="font-family: Georgia, 'Times New Roman', serif;">Iniciar Sesión</h2>
                         <p class="text-muted small">Ingresa tus credenciales para acceder</p>
