@@ -1,0 +1,706 @@
+/* =========================================================
+   HOME ECOAVENTURA - SECCIONES INFERIORES
+   ========================================================= */
+
+:root{
+    --home-bg: #f7f8f5;
+    --home-card: #f3f5f1;
+    --home-soft: #eef2ed;
+    --home-border: rgba(20, 40, 30, 0.08);
+    --home-text: #1f2f25;
+    --home-muted: #607166;
+    --home-green: #1f6b4b;
+    --home-green-dark: #174d37;
+    --home-teal: #2aa39a;
+    --home-white: #ffffff;
+}
+
+/* =========================================================
+   BASE
+   ========================================================= */
+
+.home-section{
+    padding: 72px 0;
+    background: var(--home-bg);
+}
+
+.home-container{
+    width: min(1280px, calc(100% - 48px));
+    margin: 0 auto;
+}
+
+.home-kicker{
+    color: var(--home-teal);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-weight: 800;
+    font-size: .86rem;
+    margin-bottom: 14px;
+}
+
+.home-title{
+    font-family: Georgia, "Times New Roman", serif;
+    color: var(--home-text);
+    font-weight: 800;
+    font-size: clamp(2rem, 4vw, 3.6rem);
+    line-height: 1.08;
+    margin-bottom: 18px;
+}
+
+.home-lead{
+    color: var(--home-muted);
+    font-size: 1.02rem;
+    line-height: 1.75;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.home-btn{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 28px;
+    border-radius: 16px;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: .25s ease;
+}
+
+.home-btn-solid{
+    background: var(--home-green);
+    color: #fff;
+    border: 2px solid var(--home-green);
+}
+
+.home-btn-solid:hover{
+    background: var(--home-green-dark);
+    border-color: var(--home-green-dark);
+    color: #fff;
+}
+
+.home-btn-outline{
+    background: transparent;
+    color: var(--home-green);
+    border: 2px solid var(--home-green);
+}
+
+.home-btn-outline:hover{
+    background: rgba(31, 107, 75, 0.06);
+    color: var(--home-green);
+}
+
+/* cuando lo presionas */
+.home-btn-outline:active{
+    background: var(--home-green);
+    color: #fff;
+    border-color: var(--home-green);
+}
+
+/* cuando queda seleccionado por el click */
+.home-btn-outline:focus,
+.home-btn-outline:focus-visible{
+    background: var(--home-green);
+    color: #fff;
+    border-color: var(--home-green);
+    box-shadow: none;
+    outline: none;
+}
+
+.home-btn-center{
+    display: flex;
+    justify-content: center;
+    margin-top: 34px;
+}
+
+/* =========================================================
+   CENTROS TURÍSTICOS
+   ========================================================= */
+
+.home-featured-header{
+    text-align: center;
+    margin-bottom: 42px;
+}
+
+.home-featured-header .home-lead{
+    max-width: 760px;
+}
+
+.home-card-destino{
+    position: relative;
+    height: 520px;
+    border-radius: 26px;
+    overflow: hidden;
+    background: #ddd;
+    box-shadow: 0 10px 28px rgba(0,0,0,.08);
+}
+
+.home-card-destino img{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .6s ease;
+    z-index: 0;
+}
+
+.home-card-destino:hover img{
+    transform: scale(1.05);
+}
+
+.home-card-overlay{
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to top,
+        rgba(10, 45, 30, 0.92) 0%,
+        rgba(10, 45, 30, 0.72) 22%,
+        rgba(10, 45, 30, 0.38) 48%,
+        rgba(10, 45, 30, 0.12) 72%,
+        rgba(10, 45, 30, 0.03) 100%
+    );
+    z-index: 1;
+}
+
+.home-card-content{
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 22px 22px 24px;
+    color: #fff;
+    z-index: 2;
+}
+
+.home-badge-type{
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #2aa39a;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: .95rem;
+    line-height: 1;
+}
+
+.home-badge-type i{
+    font-size: .95rem;
+}
+
+.home-location{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255,255,255,.88);
+    font-size: .95rem;
+    margin-bottom: 10px;
+}
+
+.home-location i{
+    color: #2aa39a;
+}
+
+.home-card-title{
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 2rem;
+    line-height: 1.12;
+    font-weight: 800;
+    margin-bottom: 10px;
+    color: #fff;
+}
+
+.home-card-text{
+    font-size: 1rem;
+    line-height: 1.55;
+    color: rgba(255,255,255,.85);
+    margin-bottom: 14px;
+    max-width: 95%;
+}
+
+.home-link-light{
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.home-link-light:hover{
+    color: #fff;
+    opacity: .9;
+}
+
+
+/* al pasar el mouse */
+.home-link-light:hover{
+    color: #2aa39a;
+    opacity: 1;
+}
+
+.home-link-light:hover i{
+    color: #2aa39a;
+    transform: translateX(3px);
+}
+
+/* al dar click */
+.home-link-light:active{
+    color: #2aa39a;
+}
+
+.home-link-light:active i{
+    color: #2aa39a;
+}
+
+/* cuando queda enfocado */
+.home-link-light:focus,
+.home-link-light:focus-visible{
+    color: #2aa39a;
+    outline: none;
+    box-shadow: none;
+}
+
+.home-link-light:focus i,
+.home-link-light:focus-visible i{
+    color: #2aa39a;
+}
+
+/* =========================================================
+   CULTURA Y PATRIMONIO
+   ========================================================= */
+
+.home-cultura-grid{
+    display: grid;
+    grid-template-columns: 1.02fr .98fr;
+    gap: 36px;
+    align-items: center;
+}
+
+.home-cultura-text .home-title{
+    margin-bottom: 18px;
+}
+
+.home-cultura-text .home-lead{
+    max-width: 100%;
+    margin-bottom: 24px;
+}
+
+.home-info-list{
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.home-info-card{
+    background: #f8f8f5;
+    border: 1px solid var(--home-border);
+    border-radius: 22px;
+    padding: 20px 20px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    box-shadow: 0 6px 18px rgba(0,0,0,.03);
+}
+
+.home-info-icon{
+    width: 58px;
+    height: 58px;
+    min-width: 58px;
+    border-radius: 18px;
+    background: #e6ece5;
+    color: var(--home-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.45rem;
+}
+
+.home-info-title{
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.55rem;
+    line-height: 1.1;
+    font-weight: 800;
+    color: var(--home-text);
+    margin-bottom: 6px;
+}
+
+.home-info-text{
+    color: var(--home-muted);
+    font-size: 1rem;
+    line-height: 1.55;
+    margin: 0;
+}
+
+/* =========================================================
+   TURISMO RESPONSABLE
+   ========================================================= */
+
+.home-responsable{
+    position: relative;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at left top, rgba(255,255,255,.10), transparent 30%),
+        radial-gradient(circle at right bottom, rgba(255,255,255,.10), transparent 30%),
+        linear-gradient(135deg, #4b8a73 0%, #5ba596 52%, #68c4bf 100%);
+    padding: 78px 0 84px;
+}
+
+.home-responsable .home-kicker{
+    text-align: center;
+    color: #28b7b0;
+}
+
+.home-responsable .home-title,
+.home-responsable .home-lead{
+    text-align: center;
+    color: #fff;
+}
+
+.home-responsable .home-lead{
+    max-width: 820px;
+    margin: 0 auto;
+    color: rgba(255,255,255,.90);
+}
+
+.home-responsable-grid{
+    margin-top: 42px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.home-value-card{
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 24px;
+    padding: 26px 20px;
+    text-align: center;
+    min-height: 230px;
+    backdrop-filter: blur(2px);
+}
+
+.home-value-icon{
+    width: 68px;
+    height: 68px;
+    margin: 0 auto 20px;
+    border-radius: 20px;
+    background: rgba(255,255,255,.08);
+    color: #27b7b1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.7rem;
+}
+
+.home-value-title{
+    font-family: Georgia, "Times New Roman", serif;
+    color: #fff;
+    font-weight: 800;
+    font-size: 1.5rem;
+    line-height: 1.15;
+    margin-bottom: 12px;
+}
+
+.home-value-text{
+    color: rgba(255,255,255,.88);
+    font-size: .98rem;
+    line-height: 1.55;
+    margin: 0;
+}
+
+.home-responsable .home-btn-solid{
+    background: #f2e6d4;
+    border-color: #f2e6d4;
+    color: #17392b;
+}
+
+.home-responsable .home-btn-solid:hover{
+    background: #ead9c0;
+    border-color: #ead9c0;
+    color: #17392b;
+}
+
+/* =========================================================
+   RUTAS Y ORIENTACIÓN
+   ========================================================= */
+
+.home-rutas-header{
+    text-align: center;
+    margin-bottom: 42px;
+}
+
+.home-rutas-header .home-lead{
+    max-width: 760px;
+}
+
+.home-rutas-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+    margin-bottom: 26px;
+}
+
+.home-ruta-card{
+    background: #f8f8f5;
+    border: 1px solid var(--home-border);
+    border-radius: 24px;
+    padding: 24px;
+    min-height: 200px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.03);
+}
+
+.home-ruta-top{
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    margin-bottom: 14px;
+}
+
+.home-ruta-icon{
+    width: 54px;
+    height: 54px;
+    min-width: 54px;
+    border-radius: 16px;
+    background: #e6ece5;
+    color: var(--home-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+}
+
+.home-ruta-title{
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--home-text);
+    margin-bottom: 5px;
+    line-height: 1.12;
+}
+
+.home-ruta-meta{
+    font-size: .96rem;
+    color: var(--home-muted);
+}
+
+.home-ruta-text{
+    color: var(--home-muted);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.home-season-grid{
+    display: flex;
+    justify-content: center;
+    gap: 22px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.home-season-card{
+    background: #eff3ef;
+    border: 1px solid rgba(20, 40, 30, 0.08);
+    border-radius: 22px;
+    padding: 22px 24px;
+    min-width: 320px;
+    max-width: 380px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.home-season-icon{
+    width: 58px;
+    height: 58px;
+    min-width: 58px;
+    border-radius: 16px;
+    background: #e2e8e1;
+    color: var(--home-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.45rem;
+}
+
+.home-season-title{
+    font-weight: 800;
+    font-size: 1.25rem;
+    color: var(--home-text);
+    margin-bottom: 4px;
+    line-height: 1.15;
+}
+
+.home-season-text{
+    color: var(--home-muted);
+    font-size: .98rem;
+    margin: 0;
+    line-height: 1.45;
+}
+
+.home-season-badge{
+    display: inline-block;
+    margin-left: 8px;
+    padding: 4px 10px;
+    font-size: .8rem;
+    border-radius: 999px;
+    background: #dfe8d8;
+    color: var(--home-green);
+    font-weight: 700;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1199px){
+    .home-card-destino{
+        height: 470px;
+    }
+
+    .home-responsable-grid{
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .home-card-title{
+        font-size: 1.75rem;
+    }
+}
+
+@media (max-width: 991px){
+    .home-cultura-grid{
+        grid-template-columns: 1fr;
+    }
+
+    .home-rutas-grid{
+        grid-template-columns: 1fr;
+    }
+
+    .home-card-destino{
+        height: 460px;
+    }
+
+    .home-season-card{
+        min-width: 100%;
+        max-width: 100%;
+    }
+
+    .home-title{
+        font-size: clamp(1.9rem, 5vw, 3rem);
+    }
+
+    .home-responsable-grid{
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 767px){
+    .home-section,
+    .home-responsable{
+        padding: 60px 0;
+    }
+
+    .home-container{
+        width: min(100%, calc(100% - 24px));
+    }
+
+    .home-featured-header,
+    .home-rutas-header{
+        margin-bottom: 30px;
+    }
+
+    .home-card-destino{
+        height: 430px;
+    }
+
+    .home-card-content{
+        padding: 18px 18px 20px;
+    }
+
+    .home-badge-type{
+        top: 16px;
+        left: 16px;
+        font-size: .85rem;
+        padding: 8px 14px;
+    }
+
+    .home-card-title{
+        font-size: 1.55rem;
+    }
+
+    .home-card-text,
+    .home-lead,
+    .home-ruta-text,
+    .home-info-text,
+    .home-value-text{
+        font-size: .96rem;
+    }
+
+    .home-info-title,
+    .home-ruta-title,
+    .home-season-title{
+        font-size: 1.28rem;
+    }
+
+    .home-responsable-grid{
+        grid-template-columns: 1fr;
+    }
+
+    .home-value-card{
+        min-height: auto;
+    }
+
+    .home-btn{
+        width: 100%;
+        padding: 14px 18px;
+        font-size: .96rem;
+    }
+}
+
+@media (max-width: 575px){
+    .home-card-destino{
+        height: 400px;
+        border-radius: 22px;
+    }
+
+    .home-title{
+        font-size: 1.9rem;
+    }
+
+    .home-lead{
+        font-size: .95rem;
+    }
+
+    .home-location{
+        font-size: .88rem;
+    }
+
+    .home-card-title{
+        font-size: 1.42rem;
+    }
+
+    .home-card-text{
+        font-size: .92rem;
+        line-height: 1.45;
+    }
+
+    .home-link-light{
+        font-size: .95rem;
+    }
+
+    .home-info-card,
+    .home-ruta-card,
+    .home-season-card{
+        padding: 18px;
+    }
+}

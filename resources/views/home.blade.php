@@ -1,132 +1,405 @@
 @extends('layouts.app')
 
 @section('content')
+
     {{-- HERO --}}
     <section class="position-relative d-flex align-items-center text-white p-0"
         style="background: url('{{ asset('img/tonina.jpeg') }}') center center / cover no-repeat; min-height: 100vh;">
 
-        {{-- Overlay --}}
         <div class="position-absolute top-0 start-0 w-100 h-100"
-            style="background: linear-gradient(90deg, rgba(6,78,59,0.75) 0%, rgba(6,95,70,0.55) 50%, rgba(6,95,70,0.35) 100%);">
+            style="background: linear-gradient(90deg, rgba(6,78,59,0.78) 0%, rgba(6,95,70,0.60) 45%, rgba(6,95,70,0.20) 100%);">
         </div>
 
-        <div class="container-fluid position-relative px-5">
-            <div class="col-lg-7">
+        <div class="container-fluid position-relative px-lg-5 px-4">
+            <div class="row">
+                <div class="col-xl-7 col-lg-8">
+                    <span class="badge rounded-pill bg-light bg-opacity-25 text-white px-4 py-2 mb-4 fs-6">
+                        Guía digital de Ocosingo, Chiapas
+                    </span>
 
-                <span class="badge rounded-pill bg-light bg-opacity-25 text-white px-4 py-2 mb-4">
-                    Turismo sostenible y responsable
-                </span>
+                    <h1 class="display-1 fw-bold lh-1" style="font-family: Georgia, 'Times New Roman', serif;">
+                        Conoce y valora <br> Ocosingo antes de <br> visitarlo
+                    </h1>
 
-                <h1 class="display-3 fw-bold lh-1">
-                    Descubre la magia de la naturaleza
-                </h1>
+                    <p class="lead mt-4 text-white" style="max-width: 850px; line-height: 1.7;">
+                        Una plataforma de difusión cultural y turística que te permite descubrir la riqueza natural,
+                        arqueológica y comunitaria del corazón de la Selva Lacandona. Tu guía digital para planificar
+                        una visita responsable.
+                    </p>
 
-                <p class="lead mt-4 text-white-50">
-                    Vive experiencias únicas de ecoturismo. Explora destinos extraordinarios,
-                    conecta con la naturaleza y crea recuerdos inolvidables.
+                    <div class="d-flex flex-wrap gap-3 mt-4">
+                        <a href="{{ route('destinos.index') }}" class="btn btn-light px-4 py-3 rounded-4 fw-semibold border-0">
+                            Explorar Centros Turísticos <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+
+                        <a href="{{ route('cultura') }}" class="btn btn-outline-light px-4 py-3 rounded-4 fw-semibold">
+                            Cultura y Patrimonio
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{-- CENTROS TURÍSTICOS DESTACADOS --}}
+    <section id="centros" class="home-section">
+        <div class="home-container">
+
+            <div class="home-featured-header">
+                <div class="home-kicker">Centros turísticos destacados</div>
+                <h2 class="home-title">Tesoros naturales y culturales</h2>
+                <p class="home-lead">
+                    Ocosingo resguarda sitios de incomparable valor arqueológico, natural y comunitario.
+                    Descubre cada uno con información detallada para planificar tu visita.
                 </p>
-
             </div>
+
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <article class="home-card-destino">
+                        <span class="home-badge-type">
+                            <i class="bi bi-bank"></i> Turisticos
+                        </span>
+
+                        <img src="{{ asset('img/tonina.jpeg') }}" alt="Zona Arqueológica de Toniná">
+                        <div class="home-card-overlay"></div>
+
+                        <div class="home-card-content">
+                            <div class="home-location">
+                                <i class="bi bi-geo-alt"></i>
+                                Ocosingo, Chiapas
+                            </div>
+
+                            <h3 class="home-card-title">Zona Arqueológica de Toniná</h3>
+
+                            <p class="home-card-text">
+                                Antigua ciudad maya con una de las pirámides más altas de Mesoamérica.
+                                Centro ceremonial de gran importancia histórica y cultural.
+                            </p>
+
+                            <a href="{{ route('destinos.show', 1) }}" class="home-link-light">
+                                Conocer más <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="col-lg-4">
+                    <article class="home-card-destino">
+                        <span class="home-badge-type">
+                            <i class="bi bi-droplet-half"></i> Ecoturísticos
+                        </span>
+
+                        <img src="{{ asset('img/ecoturisticos/miramar-1.png') }}" alt="Cascadas">
+                        <div class="home-card-overlay"></div>
+
+                        <div class="home-card-content">
+                            <div class="home-location">
+                                <i class="bi bi-geo-alt"></i>
+                                Tumbalá, Chiapas
+                            </div>
+
+                            <h3 class="home-card-title">Laguna Miramar</h3>
+
+                            <p class="home-card-text">
+                                Uno de los atractivos naturales más representativos de Chiapas,
+                                reconocido por sus aguas turquesa y su entorno selvático.
+                            </p>
+
+                            <a href="{{ route('destinos.show', 2) }}" class="home-link-light">
+                                Conocer más <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="col-lg-4">
+                    <article class="home-card-destino">
+                        <span class="home-badge-type">
+                            <i class="bi bi-tree"></i> Balnearios
+                        </span>
+
+                        <img src="{{ asset('img/balnearios/reyes-1.png') }}" alt="Selva Lacandona">
+                        <div class="home-card-overlay"></div>
+
+                        <div class="home-card-content">
+                            <div class="home-location">
+                                <i class="bi bi-geo-alt"></i>
+                                Ocosingo, Chiapas
+                            </div>
+
+                            <h3 class="home-card-title">Balneario Reyes</h3>
+
+                            <p class="home-card-text">
+                                Espacio recreativo ideal para disfrutar en familia, con albercas,
+                                áreas de descanso y un entorno natural agradable en Ocosingo.
+                            </p>
+
+                            <a href="{{ route('destinos.show', 3) }}" class="home-link-light">
+                                Conocer más <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+            <div class="home-btn-center">
+                <a href="{{ route('destinos.index') }}" class="home-btn home-btn-outline">
+                    Ver todos los centros turísticos <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+
         </div>
     </section>
 
-    {{-- DESTINOS DESTACADOS --}}
-    <section class="py-5" style="background:#F7F6EF;">
-        <div class="container text-center">
+    {{-- CULTURA Y PATRIMONIO --}}
+    <section id="cultura" class="home-section">
+        <div class="home-container">
+            <div class="home-cultura-grid">
 
-            <p class="text-uppercase text-success small fw-semibold">Destinos destacados</p>
-            <h2 class="fw-bold mb-5">Explora lugares extraordinarios</h2>
+                <div class="home-cultura-text">
+                    <div class="home-kicker text-start">Cultura y patrimonio</div>
+                    <h2 class="home-title text-start">Identidad viva de Ocosingo</h2>
 
-            <div class="row g-4">
+                    <p class="home-lead text-start">
+                        Ocosingo es mucho más que un destino natural. Es un territorio donde conviven
+                        tradiciones milenarias, gastronomía auténtica, arte popular y comunidades indígenas
+                        que son guardianas de un patrimonio cultural invaluable.
+                    </p>
 
-                @foreach ([['img' => 'ecoturisticos/miramar-1.png', 'tipo' => 'Ecoturístico', 'titulo' => 'Miramar', 'ubicacion' => 'Sierra Azul'], ['img' => 'balnearios/encanto-1.png', 'tipo' => 'Balneario', 'titulo' => 'Playa Cristalina', 'ubicacion' => 'Costa Azul'], ['img' => 'turisticos/mirador-1.png', 'tipo' => 'Turístico', 'titulo' => 'Ruinas Ancestrales', 'ubicacion' => 'Valle Sagrado']] as $destino)
-                    <div class="col-md-4">
-                        <div class="card border-0 shadow-sm overflow-hidden h-100 rounded-4">
+                    
+                    <a href="{{ route('cultura') }}" class="home-btn home-btn-solid mt-3">
+                        Explorar cultura y patrimonio <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
 
-                            <div class="overflow-hidden">
-                                <img src="{{ asset('img/' . $destino['img']) }}" class="w-100"
-                                    style="height:420px; object-fit:cover; transition:transform .6s;">
-                            </div>
-
-                            <div class="card-body text-start">
-                                <span class="badge bg-success mb-2">{{ $destino['tipo'] }}</span>
-                                <h5 class="fw-bold">{{ $destino['titulo'] }}</h5>
-                                <p class="text-muted small">{{ $destino['ubicacion'] }}</p>
-                                <a href="#" class="btn btn-outline-success btn-sm rounded-pill">
-                                    Ver más
-                                </a>
-                            </div>
-
+                <div class="home-info-list">
+                    <div class="home-info-card">
+                        <div class="home-info-icon">
+                            <i class="bi bi-fire"></i>
+                        </div>
+                        <div>
+                            <h3 class="home-info-title">Tradiciones Vivas</h3>
+                            <p class="home-info-text">
+                                Rituales y ceremonias ancestrales que las comunidades mayas y lacandonas
+                                mantienen hasta hoy.
+                            </p>
                         </div>
                     </div>
-                @endforeach
 
-            </div>
-
-        </div>
-    </section>
-
-    {{-- SERVICIOS --}}
-    <section class="py-5">
-        <div class="container text-center">
-
-            <p class="text-uppercase text-success small fw-semibold">Nuestros servicios</p>
-            <h2 class="fw-bold mb-5">Todo para tu aventura</h2>
-
-            <div class="row g-4">
-
-                <div class="col-md-6">
-                    <div class="card border-0 shadow-sm h-100 rounded-4 overflow-hidden">
-                        <img src="{{ asset('img/Hoteles/ex-hacienda-1.png') }}" class="w-100"
-                            style="height:350px; object-fit:cover;">
-                        <div class="card-body text-start">
-                            <h5 class="fw-bold">Hospedaje Ecológico</h5>
-                            <p class="text-muted">
-                                Eco-lodges y hoteles boutique en armonía con la naturaleza.
+                    <div class="home-info-card">
+                        <div class="home-info-icon">
+                            <i class="bi bi-fork-knife"></i>
+                        </div>
+                        <div>
+                            <h3 class="home-info-title">Gastronomía Regional</h3>
+                            <p class="home-info-text">
+                                Sabores únicos de Chiapas: tamales de chipilín, pozol, cochito horneado
+                                y cacao ceremonial.
                             </p>
-                            <a href="#" class="btn btn-success btn-sm rounded-pill">
-                                Explorar 
-                            </a>
+                        </div>
+                    </div>
+
+                    <div class="home-info-card">
+                        <div class="home-info-icon">
+                            <i class="bi bi-palette"></i>
+                        </div>
+                        <div>
+                            <h3 class="home-info-title">Artesanías</h3>
+                            <p class="home-info-text">
+                                Textiles bordados, joyería, cerámica lacandona y tallas en madera
+                                con diseños inspirados en la herencia prehispánica.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="home-info-card">
+                        <div class="home-info-icon">
+                            <i class="bi bi-music-note-beamed"></i>
+                        </div>
+                        <div>
+                            <h3 class="home-info-title">Festividades</h3>
+                            <p class="home-info-text">
+                                Celebraciones que fusionan tradiciones prehispánicas y coloniales
+                                a lo largo del año.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="home-info-card">
+                        <div class="home-info-icon">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <div>
+                            <h3 class="home-info-title">Comunidades Indígenas</h3>
+                            <p class="home-info-text">
+                                Pueblos tzeltales, tzotziles y lacandones que preservan lenguas,
+                                saberes y modos de vida ancestrales.
+                            </p>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-md-6">
-                    <div class="card border-0 shadow-sm h-100 rounded-4 overflow-hidden">
-                        <img src="{{ asset('img/Restaurantes/espresso-1.png') }}" class="w-100"
-                            style="height:350px; object-fit:cover;">
-                        <div class="card-body text-start">
-                            <h5 class="fw-bold">Gastronomía Local</h5>
-                            <p class="text-muted">
-                                Restaurantes con cocina tradicional y gourmet.
-                            </p>
-                            <a href="#" class="btn btn-success btn-sm rounded-pill">
-                                Explorar 
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
             </div>
-
         </div>
     </section>
 
-    {{-- CTA --}}
-    <section class="py-5 text-white text-center" style="background: linear-gradient(to right, #064e3b, #065f46);">
-
-        <div class="container">
-            <h2 class="fw-bold display-6">
-                Comienza tu próxima ecoaventura hoy
-            </h2>
-
-            <p class="mt-3">
-                Regístrate gratis y accede a ofertas exclusivas.
+    {{-- TURISMO RESPONSABLE --}}
+    <section class="home-responsable">
+        <div class="home-container">
+            <div class="home-kicker">Turismo responsable</div>
+            <h2 class="home-title">Viaja con propósito</h2>
+            <p class="home-lead">
+                Conocer Ocosingo es también comprender la importancia de preservar su biodiversidad
+                y respetar a las comunidades que lo habitan.
             </p>
 
-            <a href="{{ route('registro.turista') }}" class="btn btn-light text-success fw-semibold mt-3 px-4 py-2 rounded-pill">
-                Crear cuenta gratis →
-            </a>
+            <div class="home-responsable-grid">
+                <div class="home-value-card">
+                    <div class="home-value-icon">
+                        <i class="bi bi-leaf"></i>
+                    </div>
+                    <h3 class="home-value-title">Conservación Ambiental</h3>
+                    <p class="home-value-text">
+                        Proteger los ecosistemas de la Selva Lacandona y promover prácticas de bajo impacto.
+                    </p>
+                </div>
+
+                <div class="home-value-card">
+                    <div class="home-value-icon">
+                        <i class="bi bi-heart"></i>
+                    </div>
+                    <h3 class="home-value-title">Respeto Cultural</h3>
+                    <p class="home-value-text">
+                        Valorar y respetar las tradiciones, lenguas y modos de vida de las comunidades locales.
+                    </p>
+                </div>
+
+                <div class="home-value-card">
+                    <div class="home-value-icon">
+                        <i class="bi bi-flower1"></i>
+                    </div>
+                    <h3 class="home-value-title">Turismo Comunitario</h3>
+                    <p class="home-value-text">
+                        Apoyar cooperativas locales y proyectos de ecoturismo gestionados por comunidades indígenas.
+                    </p>
+                </div>
+
+                <div class="home-value-card">
+                    <div class="home-value-icon">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <h3 class="home-value-title">Viajero Consciente</h3>
+                    <p class="home-value-text">
+                        Guías prácticas para que cada visitante contribuya positivamente al territorio.
+                    </p>
+                </div>
+            </div>
+
+            <div class="home-btn-center">
+                <a href="{{ route('turismo-responsable') }}" class="home-btn home-btn-solid">
+                    Aprende sobre turismo responsable <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
         </div>
     </section>
+
+    {{-- RUTAS SUGERIDAS --}}
+    <section class="home-section">
+        <div class="home-container">
+
+            <div class="home-rutas-header">
+                <div class="home-kicker">Planifica tu visita</div>
+                <h2 class="home-title">Rutas sugeridas y orientación</h2>
+                <p class="home-lead">
+                    Organiza tu recorrido por Ocosingo con nuestras rutas recomendadas y consejos
+                    según la temporada del año.
+                </p>
+            </div>
+
+            <div class="home-rutas-grid">
+                <div class="home-ruta-card">
+                    <div class="home-ruta-top">
+                        <div class="home-ruta-icon">
+                            <i class="bi bi-map"></i>
+                        </div>
+                        <div>
+                            <h3 class="home-ruta-title">Ruta Arqueológica</h3>
+                            <div class="home-ruta-meta">2 días · Moderada</div>
+                        </div>
+                    </div>
+                    <p class="home-ruta-text">
+                        Toniná → Bonampak → Yaxchilán. Un recorrido por las grandes ciudades mayas.
+                    </p>
+                </div>
+
+                <div class="home-ruta-card">
+                    <div class="home-ruta-top">
+                        <div class="home-ruta-icon">
+                            <i class="bi bi-map"></i>
+                        </div>
+                        <div>
+                            <h3 class="home-ruta-title">Ruta de Cascadas</h3>
+                            <div class="home-ruta-meta">1 día · Fácil</div>
+                        </div>
+                    </div>
+                    <p class="home-ruta-text">
+                        Agua Azul → Misol-Ha. Cascadas espectaculares en un solo día.
+                    </p>
+                </div>
+
+                <div class="home-ruta-card">
+                    <div class="home-ruta-top">
+                        <div class="home-ruta-icon">
+                            <i class="bi bi-map"></i>
+                        </div>
+                        <div>
+                            <h3 class="home-ruta-title">Ruta Comunitaria</h3>
+                            <div class="home-ruta-meta">3 días · Alta</div>
+                        </div>
+                    </div>
+                    <p class="home-ruta-text">
+                        Comunidades lacandonas → Selva → Laguna Miramar. Inmersión cultural total.
+                    </p>
+                </div>
+            </div>
+
+            <div class="home-season-grid">
+                <div class="home-season-card">
+                    <div class="home-season-icon">
+                        <i class="bi bi-sun"></i>
+                    </div>
+                    <div>
+                        <div class="home-season-title">
+                            Seca (Nov-Abr)
+                            <span class="home-season-badge">Recomendada</span>
+                        </div>
+                        <p class="home-season-text">
+                            Ideal para senderismo y cascadas.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="home-season-card">
+                    <div class="home-season-icon">
+                        <i class="bi bi-cloud-rain"></i>
+                    </div>
+                    <div>
+                        <div class="home-season-title">Lluvias (May-Oct)</div>
+                        <p class="home-season-text">
+                            Selva exuberante, menos visitantes.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="home-btn-center">
+                <a href="{{ route('ruta') }}" class="home-btn home-btn-outline">
+                    Ver todas las rutas <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+
+        </div>
+    </section>
+
 @endsection
