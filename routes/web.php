@@ -13,7 +13,7 @@ use App\Http\Controllers\RutaController;
 use App\Http\Controllers\PagoController;
 use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\Admin\AdminReportesController;
-
+use App\Http\Controllers\Admin\AdminCentroController;
 
 
 
@@ -118,8 +118,10 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/index', [AdminDashboardController::class, 'index'])->name('index');
 
-        Route::get('/destino', fn() => view('admin.centro.index'))->name('destino');
-        Route::get('/destino/show', fn() => view('admin.centro.show'))->name('destino.show');
+
+        // panel admin general , para que le aparesca los destinos reportados
+        Route::get('/destino', [AdminCentroController::class, 'index'])->name('destino');
+        Route::post('/destino/{id}/toggle', [AdminCentroController::class, 'toggleActivo'])->name('destino.toggle');
         Route::get('/respaldos', fn() => view('admin.respaldos'))->name('respaldos');
 
         // Reportes
