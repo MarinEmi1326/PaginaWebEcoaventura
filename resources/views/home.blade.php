@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-
     {{-- HERO --}}
     <section class="position-relative d-flex align-items-center text-white p-0"
         style="background: url('{{ asset('img/tonina.jpeg') }}') center center / cover no-repeat; min-height: 100vh;">
@@ -17,7 +16,8 @@
                         Guía digital de Ocosingo, Chiapas
                     </span>
 
-                    <h1 class="display-1 fw-bold lh-1" style="font-family: Georgia, 'Times New Roman', serif; font-size:60px;">
+                    <h1 class="display-1 fw-bold lh-1"
+                        style="font-family: Georgia, 'Times New Roman', serif; font-size:60px;">
                         Conoce y valora <br> Ocosingo antes de <br> visitarlo
                     </h1>
 
@@ -28,7 +28,8 @@
                     </p>
 
                     <div class="d-flex flex-wrap gap-3 mt-4">
-                        <a href="{{ route('destinos.index') }}" class="btn btn-light px-4 py-3 rounded-4 fw-semibold border-0">
+                        <a href="{{ route('destinos.index') }}"
+                            class="btn btn-light px-4 py-3 rounded-4 fw-semibold border-0">
                             Explorar Centros Turísticos <i class="bi bi-arrow-right ms-2"></i>
                         </a>
 
@@ -55,92 +56,11 @@
             </div>
 
             <div class="row g-4">
-                <div class="col-lg-4">
-                    <article class="home-card-destino">
-                        <span class="home-badge-type">
-                            <i class="bi bi-bank"></i> Turisticos
-                        </span>
-
-                        <img src="{{ asset('img/tonina.jpeg') }}" alt="Zona Arqueológica de Toniná">
-                        <div class="home-card-overlay"></div>
-
-                        <div class="home-card-content">
-                            <div class="home-location">
-                                <i class="bi bi-geo-alt"></i>
-                                Ocosingo, Chiapas
-                            </div>
-
-                            <h3 class="home-card-title">Zona Arqueológica de Toniná</h3>
-
-                            <p class="home-card-text">
-                                Antigua ciudad maya con una de las pirámides más altas de Mesoamérica.
-                                Centro ceremonial de gran importancia histórica y cultural.
-                            </p>
-
-                            <a href="{{ route('destinos.show', 1) }}" class="home-link-light">
-                                Conocer más <i class="bi bi-arrow-right"></i>
-                            </a>
-                        </div>
-                    </article>
-                </div>
-
-                <div class="col-lg-4">
-                    <article class="home-card-destino">
-                        <span class="home-badge-type">
-                            <i class="bi bi-droplet-half"></i> Ecoturísticos
-                        </span>
-
-                        <img src="{{ asset('img/ecoturisticos/miramar-1.png') }}" alt="Cascadas">
-                        <div class="home-card-overlay"></div>
-
-                        <div class="home-card-content">
-                            <div class="home-location">
-                                <i class="bi bi-geo-alt"></i>
-                                Tumbalá, Chiapas
-                            </div>
-
-                            <h3 class="home-card-title">Laguna Miramar</h3>
-
-                            <p class="home-card-text">
-                                Uno de los atractivos naturales más representativos de Chiapas,
-                                reconocido por sus aguas turquesa y su entorno selvático.
-                            </p>
-
-                            <a href="{{ route('destinos.show', 2) }}" class="home-link-light">
-                                Conocer más <i class="bi bi-arrow-right"></i>
-                            </a>
-                        </div>
-                    </article>
-                </div>
-
-                <div class="col-lg-4">
-                    <article class="home-card-destino">
-                        <span class="home-badge-type">
-                            <i class="bi bi-tree"></i> Balnearios
-                        </span>
-
-                        <img src="{{ asset('img/balnearios/reyes-1.png') }}" alt="Selva Lacandona">
-                        <div class="home-card-overlay"></div>
-
-                        <div class="home-card-content">
-                            <div class="home-location">
-                                <i class="bi bi-geo-alt"></i>
-                                Ocosingo, Chiapas
-                            </div>
-
-                            <h3 class="home-card-title">Balneario Reyes</h3>
-
-                            <p class="home-card-text">
-                                Espacio recreativo ideal para disfrutar en familia, con albercas,
-                                áreas de descanso y un entorno natural agradable en Ocosingo.
-                            </p>
-
-                            <a href="{{ route('destinos.show', 3) }}" class="home-link-light">
-                                Conocer más <i class="bi bi-arrow-right"></i>
-                            </a>
-                        </div>
-                    </article>
-                </div>
+                @foreach ($destacados as $d)
+                    <div class="col-lg-4">
+                        @include('centros._card', ['d' => $d])
+                    </div>
+                @endforeach
             </div>
 
             <div class="home-btn-center">
@@ -167,7 +87,7 @@
                         que son guardianas de un patrimonio cultural invaluable.
                     </p>
 
-                    
+
                     <a href="{{ route('cultura') }}" class="home-btn home-btn-solid mt-3">
                         Explorar cultura y patrimonio <i class="bi bi-arrow-right"></i>
                     </a>
@@ -401,5 +321,4 @@
 
         </div>
     </section>
-
 @endsection

@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Support\Facades\DB;
+
+class HomeController extends Controller
+{
+    public function index()
+    {
+        $destacados = DB::table('destino as d')
+            ->leftJoin('imagen as i', function ($join) {
+                $join->on('i.id_destino', '=', 'd.id_destino')
+                    ->where('i.entidad', '=', 'destino');
+            })
+            ->where('d.activo', 'activo')
+            ->select(
+                'd.id_destino',
+                'd.nombre',
+                'd.descripcion',
+                'd.telefono',
+                DB::raw('MIN(i.ruta_archivo) as ruta_archivo')
+            )
+            ->groupBy('d.id_destino', 'd.nombre', 'd.descripcion', 'd.telefono')
+            ->orderBy('d.fecha_creacion', 'desc')
+            ->limit(3)
+            ->get();
+
+        foreach ($destacados as $d) {
+            $d->imagen = (object)['ruta_archivo' => $d->ruta_archivo];
+            $d->categorias = DB::table('categoria')
+                ->join('destino_categoria', 'categoria.id_categoria', '=', 'destino_categoria.id_categoria')
+                ->where('destino_categoria.id_destino', $d->id_destino)
+                ->pluck('categoria.nombre');
+        }
+        return view('home', compact('destacados'));
+    }
+}

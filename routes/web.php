@@ -14,6 +14,7 @@ use App\Http\Controllers\PagoController;
 use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\Admin\AdminReportesController;
 use App\Http\Controllers\Admin\AdminCentroController;
+use App\Http\Controllers\HomeController;
 
 
 
@@ -25,7 +26,7 @@ use App\Http\Controllers\Admin\AdminCentroController;
 
 Route::resource('rutas', RutaController::class)->only(['index', 'create', 'store']);
 
-Route::get('/', fn() => view('home'))->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::view('/cultura', 'cultura')->name('cultura');
 
