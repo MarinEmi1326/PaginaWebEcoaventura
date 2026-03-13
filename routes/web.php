@@ -12,6 +12,8 @@ use App\Http\Controllers\ComentarioController;
 use App\Http\Controllers\RutaController;
 use App\Http\Controllers\PagoController;
 use App\Http\Controllers\ReporteController;
+use App\Http\Controllers\Admin\AdminReportesController;
+
 
 
 
@@ -76,8 +78,11 @@ Route::middleware('auth')->group(function () {
     // Perfil
     Route::get('/perfil', [PerfilController::class, 'show'])->name('perfil');
     Route::post('/perfil', [PerfilController::class, 'update']);
-    
+
     Route::get('/rutas/dashboard', fn() => view('admin.gestor_rutas.index'))->name('rutas.dashboard');
+
+
+
 
 
     // reporte
@@ -112,11 +117,17 @@ Route::middleware('auth')->group(function () {
     Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
 
         Route::get('/index', [AdminDashboardController::class, 'index'])->name('index');
-        
+
         Route::get('/destino', fn() => view('admin.centro.index'))->name('destino');
         Route::get('/destino/show', fn() => view('admin.centro.show'))->name('destino.show');
-        Route::get('/reportes', fn() => view('admin.reportes.index'))->name('reportes');
         Route::get('/respaldos', fn() => view('admin.respaldos'))->name('respaldos');
+
+        // Reportes
+        Route::get('/reportes', [AdminReportesController::class, 'index'])->name('reportes');
+        Route::get('/reportes/destino/{id}', [AdminReportesController::class, 'showDestino'])->name('reportes.showDestino');
+        Route::post('/reportes/{id}/resolver', [AdminReportesController::class, 'resolver'])->name('reportes.resolver');
+        Route::post('/reportes/{id}/rechazar', [AdminReportesController::class, 'rechazar'])->name('reportes.rechazar');
+        Route::post('/reportes/comentario/{id}/eliminar', [AdminReportesController::class, 'eliminarComentario'])->name('reportes.comentario.eliminar');
 
         Route::get('/solicitudes', [AdminSolicitudesController::class, 'index'])->name('solicitudes.index');
         Route::get('/solicitudes/crear', [AdminSolicitudesController::class, 'create'])->name('solicitudes.create');

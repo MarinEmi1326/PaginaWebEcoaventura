@@ -80,7 +80,7 @@
                                 default => 'gray'
                             };
 
-                            $reportes = $s->reportes ?? rand(0,4);
+                            $reportes = $s->reportes ?? 0;
                         @endphp
 
                         <tr>

@@ -30,6 +30,7 @@ class GoogleController extends Controller
                 'rol'         => 'turista',
                 'activo'      => true,
                 'estado'      => 'aprobado',
+                'correo_verificado'  => 1,
             ]);
 
             Turista::create([

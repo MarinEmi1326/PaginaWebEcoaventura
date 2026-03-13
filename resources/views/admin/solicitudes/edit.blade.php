@@ -52,14 +52,23 @@
 
               <div class="col-12 col-md-4">
                 <label class="form-label fw-bold">Rol</label>
-                <select name="rol" class="form-select rounded-3 py-2" required>
-                  <option value="admin_destinos" {{ $usuario->rol == 'admin_destinos' ? 'selected' : '' }}>
-                      Administrador de destinos
-                  </option>
-                  <option value="gestor_rutas" {{ $usuario->rol == 'gestor_rutas' ? 'selected' : '' }}>
-                      Gestor de rutas
-                  </option>
-                </select>
+
+                @if($usuario->rol === 'turista')
+                  {{-- Turista: solo lectura, no se puede cambiar de rol --}}
+                  <input type="hidden" name="rol" value="turista">
+                  <input type="text" value="Turista" disabled
+                         class="form-control rounded-3 py-2"
+                         style="background: rgba(0,0,0,.05); color: var(--ea-muted);">
+                @else
+                  <select name="rol" class="form-select rounded-3 py-2" required>
+                    <option value="admin_destinos" {{ $usuario->rol == 'admin_destinos' ? 'selected' : '' }}>
+                        Administrador de destinos
+                    </option>
+                    <option value="gestor_rutas" {{ $usuario->rol == 'gestor_rutas' ? 'selected' : '' }}>
+                        Gestor de rutas
+                    </option>
+                  </select>
+                @endif
               </div>
             </div>
           </div>
