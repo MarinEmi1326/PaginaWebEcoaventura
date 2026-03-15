@@ -1,22 +1,20 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\AdminDashboardController;
-use App\Http\Controllers\AdminDestinoController;
-use App\Http\Controllers\PerfilController;
-use App\Http\Controllers\DestinosController;
-use App\Http\Controllers\Admin\AdminSolicitudesController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\GoogleController;
-use App\Http\Controllers\ComentarioController;
-use App\Http\Controllers\RutaController;
-use App\Http\Controllers\PagoController;
-use App\Http\Controllers\ReporteController;
-use App\Http\Controllers\Admin\AdminReportesController;
 use App\Http\Controllers\Admin\AdminCentroController;
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminReportesController;
+use App\Http\Controllers\Admin\AdminSolicitudesController;
+use App\Http\Controllers\AdminDestinoController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ComentarioController;
+use App\Http\Controllers\DestinosController;
+use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\HomeController;
-
-
+use App\Http\Controllers\PagoController;
+use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\ReporteController;
+use App\Http\Controllers\RutaController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,9 +60,9 @@ Route::get('/centros', [DestinosController::class, 'index'])->name('destinos.ind
 Route::get('/centros/{id}', [DestinosController::class, 'show'])->name('destinos.show');
 
 // OTRAS VISTAS
-Route::get('/mapa', fn() => view('mapa'))->name('mapa');
-Route::get('/turismo-responsable', fn() => view('turismo-responsable'))->name('turismo-responsable');
-Route::get('/ruta', fn() => view('ruta'))->name('ruta');
+Route::get('/mapa', fn () => view('mapa'))->name('mapa');
+Route::get('/turismo-responsable', fn () => view('turismo-responsable'))->name('turismo-responsable');
+Route::get('/ruta', fn () => view('ruta'))->name('ruta');
 
 /*
 |--------------------------------------------------------------------------
@@ -77,19 +75,25 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     // Perfil
-    Route::get('/perfil', [PerfilController::class, 'show'])->name('perfil');
-    Route::post('/perfil', [PerfilController::class, 'update']);
+    // PERFIL SEGÚN ROL
+    Route::get('/perfil', function () {
+        $rol = Auth::user()->rol;
 
-    Route::get('/rutas/dashboard', fn() => view('admin.gestor_rutas.index'))->name('rutas.dashboard');
+        return match ($rol) {
+            'turista' => view('perfil.show-turista'),
+            'gestor_rutas' => view('perfil.show-rutas'),
+            'admin_destinos' => view('perfil.show-destinos'),
+            'admin_general' => view('perfil.show-admin'),
+            default => abort(403, 'Rol no reconocido'),
+        };
+    })->name('perfil');
 
-
-
-
+    // ACCIÓN DE ACTUALIZAR (Agrégala aquí abajo)
+    Route::put('/perfil/actualizar', [PerfilController::class, 'update'])->name('perfil.update');
 
     // reporte
-    Route::post('/destinos/{id}/reportar',    [ReporteController::class, 'reportarDestino'])->name('reportes.destino');
+    Route::post('/destinos/{id}/reportar', [ReporteController::class, 'reportarDestino'])->name('reportes.destino');
     Route::post('/comentarios/{id}/reportar', [ReporteController::class, 'reportarComentario'])->name('reportes.comentario');
-
 
     // PANEL ADMIN DESTINOS
     Route::get('/mis-destinos', [AdminDestinoController::class, 'index'])->name('misdestinos.index');
@@ -104,10 +108,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/centros/{id}/comentar', [ComentarioController::class, 'storeDestino'])->name('comentarios.destino.store');
     Route::delete('/comentarios/{id}', [ComentarioController::class, 'destroy'])->name('comentarios.destroy');
 
-
     // pagos
-    Route::get('/paquetes/{id}/pagar',        [PagoController::class, 'show'])->name('pagos.show');
-    Route::post('/paquetes/{id}/pagar',       [PagoController::class, 'procesar'])->name('pagos.procesar');
+    Route::get('/paquetes/{id}/pagar', [PagoController::class, 'show'])->name('pagos.show');
+    Route::post('/paquetes/{id}/pagar', [PagoController::class, 'procesar'])->name('pagos.procesar');
     Route::get('/paquetes/{id}/confirmacion', [PagoController::class, 'confirmacion'])->name('pagos.confirmacion');
 
     /*
@@ -119,11 +122,10 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/index', [AdminDashboardController::class, 'index'])->name('index');
 
-
         // panel admin general , para que le aparesca los destinos reportados
         Route::get('/destino', [AdminCentroController::class, 'index'])->name('destino');
         Route::post('/destino/{id}/toggle', [AdminCentroController::class, 'toggleActivo'])->name('destino.toggle');
-        Route::get('/respaldos', fn() => view('admin.respaldos'))->name('respaldos');
+        Route::get('/respaldos', fn () => view('admin.respaldos'))->name('respaldos');
 
         // Reportes
         Route::get('/reportes', [AdminReportesController::class, 'index'])->name('reportes');
@@ -141,5 +143,19 @@ Route::middleware('auth')->group(function () {
         Route::get('/solicitudes/{id}', [AdminSolicitudesController::class, 'show'])->name('solicitudes.show');
         Route::post('/solicitudes/{id}/aprobar', [AdminSolicitudesController::class, 'aprobar'])->name('solicitudes.aprobar');
         Route::post('/solicitudes/{id}/rechazar', [AdminSolicitudesController::class, 'rechazar'])->name('solicitudes.rechazar');
+    });
+
+    Route::middleware(['auth'])->group(function () {
+
+        // Ruta principal para ver el perfil y actualizarlo
+        Route::get('/perfil', [PerfilController::class, 'show'])->name('perfil');
+        Route::put('/perfil/update', [PerfilController::class, 'update'])->name('perfil.update');
+
+        // SOLUCIÓN TEMPORAL AL ERROR:
+        // Como tu layout (app.blade.php) ya busca estas rutas pero aún no tienes los dashboards,
+        // las creamos apuntando al perfil para que la web no se rompa.
+        Route::get('/admin/dashboard', [PerfilController::class, 'show'])->name('admin.index');
+        Route::get('/destinos/dashboard', [PerfilController::class, 'show'])->name('destinos.index');
+        Route::get('/rutas/dashboard', [PerfilController::class, 'show'])->name('rutas.dashboard');
     });
 });

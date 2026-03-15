@@ -73,6 +73,7 @@ class AuthController extends Controller
             'nombre'     => $validated['nombre'],
             'apaterno'   => $validated['apaterno'],
             'amaterno'   => $validated['amaterno'] ?? null,
+            'telefono'   => $validated['telefono'],
             'id_usuario' => $usuario->id_usuario,
         ]);
 
