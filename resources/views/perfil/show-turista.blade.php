@@ -27,7 +27,7 @@
             <div class="card shadow-sm border-0" style="border-radius: 15px; overflow: hidden; background-color: #F6F6F2;">
                 
                 {{-- Banner con color representativo del Turista (Verde Naturaleza) --}}
-                <div style="height: 120px; background: linear-gradient(135deg, #198754, #146c43);"></div>
+                <div style="height: 120px; background: linear-gradient(135deg, #0F5A3A, #0B4A30);"></div>
 
                 <div class="card-body px-4 pb-4" style="margin-top: -50px;">
                     
@@ -57,17 +57,17 @@
 
                             <div class="ms-3 mt-5">
                                 <h2 class="h3 mb-0 fw-bold" style="font-family: Georgia, serif;">¡Hola, {{ auth()->user()->perfil->nombre }}!</h2>
-                                <span class="badge rounded-pill" style="background-color: #DFE6DE; color: #146c43;">
-                                    <i class="bi bi-person-heart me-1"></i> Perfil de Explorador
+                                <span class="badge rounded-pill" style="background-color: #DFE6DE; color: #0B4A30;">
+                                    <i class="bi bi-person-walking me-1"></i> Perfil de Explorador
                                 </span>
                             </div>
                         </div>
 
                         {{-- Datos Personales --}}
-                        <h6 class="text-uppercase text-muted fw-bold small mb-3"><i class="bi bi-info-circle me-2"></i>Mis Datos</h6>
+                        <h6 class="text-uppercase text-muted fw-bold small mb-3"><i class="bi bi-person-lines-fill me-2"></i>Información Personal</h6>
                         <div class="row g-3">
                             <div class="col-md-4">
-                                <label class="form-label small fw-bold text-muted text-uppercase">Nombre</label>
+                                <label class="form-label small fw-bold text-muted text-uppercase">Nombre(s)</label>
                                 <input type="text" name="nombre" class="form-control border-0 shadow-sm py-2" 
                                        style="border-radius: 10px;" value="{{ old('nombre', auth()->user()->perfil->nombre) }}" required>
                             </div>
@@ -90,16 +90,14 @@
                                        style="border-radius: 10px;" value="{{ old('telefono', auth()->user()->perfil->telefono) }}">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label small fw-bold text-muted text-uppercase">Correo de la cuenta</label>
+                                <label class="form-label small fw-bold text-muted text-uppercase">Correo Electrónico</label>
                                 <input type="email" name="correo" class="form-control border-0 shadow-sm py-2" 
                                        style="border-radius: 10px;" value="{{ old('correo', auth()->user()->correo) }}" required>
                             </div>
                         </div>
 
                         {{-- Seguridad --}}
-                        <div class="mt-5 mb-3 border-bottom pb-2">
-                            <h5 class="fw-bold" style="color: #146c43;"><i class="bi bi-shield-lock me-2"></i>Seguridad</h5>
-                        </div>
+                        <h6 class="text-uppercase text-muted fw-bold small mb-3 mt-4"><i class="bi bi-key-fill me-2"></i>Cambiar Contraseña</h6>
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted">CAMBIAR CONTRASEÑA</label>
@@ -107,14 +105,14 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted">CONFIRMAR CONTRASEÑA</label>
-                                <input type="password" name="password_confirmation" class="form-control border-0 shadow-sm py-2" placeholder="Repite la contraseña">
+                                <input type="password" name="password_confirmation" class="form-control border-0 shadow-sm py-2" placeholder="Confirmar Contraseña">
                             </div>
                         </div>
 
                         {{-- Botón de Guardar --}}
                         <div class="d-flex justify-content-end mt-5 pt-3 border-top">
                             <button type="submit" class="btn btn-lg px-5 text-white shadow-sm" 
-                                    style="background-color: #198754; border-radius: 10px; font-weight: 600;">
+                                    style="background-color: #0F5A3A; border-radius: 10px; font-weight: 600;">
                                 <i class="bi bi-person-check me-2"></i> Guardar Cambios
                             </button>
                         </div>

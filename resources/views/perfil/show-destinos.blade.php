@@ -55,17 +55,17 @@
 
                             <div class="ms-3 mt-5">
                                 <h2 class="h3 mb-0 fw-bold" style="font-family: Georgia, serif;">{{ auth()->user()->perfil->nombre }} {{ auth()->user()->perfil->apaterno }}</h2>
-                                <span class="badge rounded-pill" style="background-color: #DFE6DE; color: #1F2A24;">
+                                <span class="badge rounded-pill" style="background-color: #DFE6DE; color: #0B4A30;">
                                     <i class="bi bi-geo-alt-fill me-1"></i> Administrador de Destinos
                                 </span>
                             </div>
                         </div>
 
                         {{-- Datos Personales --}}
-                        <h6 class="text-uppercase text-muted fw-bold small mb-3"><i class="bi bi-person-badge me-2"></i>Información Personal</h6>
+                        <h6 class="text-uppercase text-muted fw-bold small mb-3"><i class="bi bi-person-lines-fill me-2"></i>Información Personal</h6>
                         <div class="row g-3">
                             <div class="col-md-4">
-                                <label class="form-label small fw-bold text-muted text-uppercase">Nombre</label>
+                                <label class="form-label small fw-bold text-muted text-uppercase">Nombre(s)</label>
                                 <input type="text" name="nombre" class="form-control border-0 shadow-sm py-2" value="{{ old('nombre', auth()->user()->perfil->nombre) }}" required>
                             </div>
                             <div class="col-md-4">
@@ -85,16 +85,13 @@
                                 <input type="text" name="telefono" class="form-control border-0 shadow-sm py-2" value="{{ old('telefono', auth()->user()->perfil->telefono) }}">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label small fw-bold text-muted text-uppercase">Correo de Inicio de Sesión</label>
+                                <label class="form-label small fw-bold text-muted text-uppercase">Correo Electrónico</label>
                                 <input type="email" name="correo" class="form-control border-0 shadow-sm py-2" value="{{ old('correo', auth()->user()->correo) }}" required>
                             </div>
                         </div>
 
                         {{-- Sección de Redes Sociales --}}
-                        <div class="mt-5 mb-3 border-bottom pb-2">
-                            <h5 class="fw-bold" style="color: #0F5A3A;"><i class="bi bi-share me-2"></i>Presencia Digital</h5>
-                        </div>
-
+                        <h6 class="text-uppercase text-muted fw-bold small mb-3 mt-4"><i class="bi bi-share-fill me-2"></i>Redes Sociales</h6>
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label class="form-label small fw-bold text-muted"><i class="bi bi-facebook me-1"></i> FACEBOOK URL</label>
@@ -111,17 +108,15 @@
                         </div>
 
                         {{-- Sección de Seguridad --}}
-                        <div class="mt-5 mb-3 border-bottom pb-2">
-                            <h5 class="fw-bold" style="color: #0F5A3A;"><i class="bi bi-lock me-2"></i>Seguridad</h5>
-                        </div>
+                        <h6 class="text-uppercase text-muted fw-bold small mb-3 mt-4"><i class="bi bi-key-fill me-2"></i>Cambiar Contraseña</h6>
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted">NUEVA CONTRASEÑA</label>
-                                <input type="password" name="password" class="form-control border-0 shadow-sm py-2" placeholder="Dejar vacío para no cambiar">
+                                <input type="password" name="password" class="form-control border-0 shadow-sm py-2" placeholder="Nueva Contraseña (opcional)">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted">CONFIRMAR CONTRASEÑA</label>
-                                <input type="password" name="password_confirmation" class="form-control border-0 shadow-sm py-2" placeholder="Repite la contraseña">
+                                <input type="password" name="password_confirmation" class="form-control border-0 shadow-sm py-2" placeholder="Confirmar Contraseña">
                             </div>
                         </div>
 

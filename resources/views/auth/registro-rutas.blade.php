@@ -114,7 +114,7 @@
                                name="correo"
                                value="{{ old('correo') }}"
                                class="form-control @error('correo') is-invalid @enderror"
-                               placeholder="tu@email.com"
+                               placeholder="nombre@correo.com"
                                required>
                         @error('correo')
                             <div class="invalid-feedback">{{ $message }}</div>

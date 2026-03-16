@@ -27,7 +27,7 @@
             <div class="card shadow-sm border-0" style="border-radius: 15px; overflow: hidden; background-color: #F6F6F2;">
                 
                 {{-- Banner Ecoaventura --}}
-                <div style="height: 120px; background: linear-gradient(135deg, #146c43, #0F5A3A);"></div>
+                <div style="height: 120px; background: linear-gradient(135deg, #0F5A3A, #0B4A30);"></div>
 
                 <div class="card-body px-4 pb-4" style="margin-top: -50px;">
                     
@@ -58,16 +58,17 @@
                                 <h2 class="h3 mb-0 fw-bold" style="font-family: Georgia, serif;">
                                     {{ auth()->user()->perfil->nombre }} {{ auth()->user()->perfil->apaterno }}
                                 </h2>
-                                <span class="badge rounded-pill" style="background-color: #DFE6DE; color: #1F2A24;">
-                                    <i class="bi bi-map-fill me-1"></i> Gestor de Rutas
+                                <span class="badge rounded-pill" style="background-color: #DFE6DE; color: #0B4A30;">
+                                    <i class="bi bi-signpost-split-fill me-1"></i> Gestor de Rutas
                                 </span>
                             </div>
                         </div>
 
                         {{-- Bloque 1: Datos Personales --}}
+                        <h6 class="text-uppercase text-muted fw-bold small mb-3"><i class="bi bi-person-lines-fill me-2"></i>Información Personal</h6>
                         <div class="row g-3">
                             <div class="col-md-4">
-                                <label class="form-label small fw-bold text-muted text-uppercase">Nombre</label>
+                                <label class="form-label small fw-bold text-muted text-uppercase">Nombre(s)</label>
                                 <input type="text" name="nombre" class="form-control border-0 shadow-sm py-2" value="{{ old('nombre', auth()->user()->perfil->nombre) }}" required>
                             </div>
                             <div class="col-md-4">
@@ -92,37 +93,32 @@
                         </div>
 
                         {{-- Bloque 2: Redes Sociales --}}
-                        <div class="mt-5 mb-3 border-bottom pb-2">
-                            <h5 class="fw-bold" style="color: #0F5A3A;"><i class="bi bi-globe2 me-2"></i>Redes Sociales del Gestor</h5>
-                        </div>
-
+                        <h6 class="text-uppercase text-muted fw-bold small mb-3 mt-4"><i class="bi bi-share-fill me-2"></i>Redes Sociales</h6>
                         <div class="row g-3">
                             <div class="col-md-4">
-                                <label class="form-label small fw-bold text-muted"><i class="bi bi-facebook text-primary me-1"></i> FACEBOOK</label>
-                                <input type="url" name="facebook_url" class="form-control border-0 shadow-sm py-2" value="{{ old('facebook_url', auth()->user()->perfil->facebook_url) }}" placeholder="https://facebook.com/tuperfil">
+                                <label class="form-label small fw-bold text-muted"><i class="bi bi-facebook me-1"></i> FACEBOOK URL</label>
+                                <input type="url" name="facebook_url" class="form-control border-0 shadow-sm py-2" placeholder="https://..." value="{{ old('facebook_url', auth()->user()->perfil->facebook_url) }}">
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label small fw-bold text-muted"><i class="bi bi-instagram text-danger me-1"></i> INSTAGRAM</label>
-                                <input type="url" name="instagram_url" class="form-control border-0 shadow-sm py-2" value="{{ old('instagram_url', auth()->user()->perfil->instagram_url) }}" placeholder="https://instagram.com/tuperfil">
+                                <label class="form-label small fw-bold text-muted"><i class="bi bi-instagram me-1"></i> INSTAGRAM URL</label>
+                                <input type="url" name="instagram_url" class="form-control border-0 shadow-sm py-2" placeholder="https://..." value="{{ old('instagram_url', auth()->user()->perfil->instagram_url) }}">
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label small fw-bold text-muted"><i class="bi bi-tiktok text-dark me-1"></i> TIKTOK</label>
-                                <input type="url" name="tiktok_url" class="form-control border-0 shadow-sm py-2" value="{{ old('tiktok_url', auth()->user()->perfil->tiktok_url) }}" placeholder="https://tiktok.com/@tuusuario">
+                                <label class="form-label small fw-bold text-muted"><i class="bi bi-tiktok me-1"></i> TIKTOK URL</label>
+                                <input type="url" name="tiktok_url" class="form-control border-0 shadow-sm py-2" placeholder="https://..." value="{{ old('tiktok_url', auth()->user()->perfil->tiktok_url) }}">
                             </div>
                         </div>
 
                         {{-- Bloque 3: Seguridad --}}
-                        <div class="mt-5 mb-3 border-bottom pb-2">
-                            <h5 class="fw-bold" style="color: #0F5A3A;"><i class="bi bi-shield-lock me-2"></i>Cambiar Contraseña</h5>
-                        </div>
+                        <h6 class="text-uppercase text-muted fw-bold small mb-3 mt-4"><i class="bi bi-key-fill me-2"></i>Cambiar Contraseña</h6>
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted">NUEVA CONTRASEÑA</label>
-                                <input type="password" name="password" class="form-control border-0 shadow-sm py-2" placeholder="Dejar en blanco si no deseas cambiarla">
+                                <input type="password" name="password" class="form-control border-0 shadow-sm py-2" placeholder="Nueva Contraseña (opcional)">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted">CONFIRMAR CONTRASEÑA</label>
-                                <input type="password" name="password_confirmation" class="form-control border-0 shadow-sm py-2" placeholder="Repite la nueva contraseña">
+                                <input type="password" name="password_confirmation" class="form-control border-0 shadow-sm py-2" placeholder="Confirmar Contraseña">
                             </div>
                         </div>
 

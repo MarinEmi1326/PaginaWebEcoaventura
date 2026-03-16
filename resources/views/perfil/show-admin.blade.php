@@ -57,7 +57,7 @@
                                 <h2 class="h3 mb-0 fw-bold" style="font-family: Georgia, serif;">
                                     {{ auth()->user()->perfil->nombre }} {{ auth()->user()->perfil->apaterno }}
                                 </h2>
-                                <span class="badge rounded-pill" style="background-color: #DFE6DE; color: #1F2A24;">
+                                <span class="badge rounded-pill" style="background-color: #DFE6DE; color: #0B4A30;">
                                     <i class="bi bi-shield-lock me-1"></i> {{ strtoupper(str_replace('_', ' ', auth()->user()->rol)) }}
                                 </span>
                             </div>
@@ -98,17 +98,17 @@
                         </div>
 
                         {{-- Sección 2: Seguridad --}}
-                        <h6 class="text-uppercase text-muted fw-bold small mb-3 mt-4"><i class="bi bi-key-fill me-2"></i>Seguridad (Opcional)</h6>
+                        <h6 class="text-uppercase text-muted fw-bold small mb-3 mt-4"><i class="bi bi-key-fill me-2"></i>Cambiar Contraseña</h6>
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Nueva Contraseña</label>
                                 <input type="password" name="password" class="form-control border-0 shadow-sm py-2" 
-                                       style="border-radius: 10px;" placeholder="Dejar en blanco para no cambiar">
+                                       style="border-radius: 10px;" placeholder="Nueva Contraseña (opcional)">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Confirmar Contraseña</label>
                                 <input type="password" name="password_confirmation" class="form-control border-0 shadow-sm py-2" 
-                                       style="border-radius: 10px;" placeholder="Repite la nueva contraseña">
+                                       style="border-radius: 10px;" placeholder="Confirmar Contraseña">
                             </div>
                         </div>
 
