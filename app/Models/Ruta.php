@@ -10,7 +10,7 @@ class Ruta extends Model
     protected $primaryKey = 'id_ruta';
     public $timestamps    = false;       
 
-   protected $fillable = [
+    protected $fillable = [
         'nombre',
         'descripcion',
         'dificultad',
@@ -19,8 +19,6 @@ class Ruta extends Model
         'recomendaciones',
         'fecha_inicio_operacion',
         'fecha_fin_operacion',
-        'punto_inicio_lat',
-        'punto_inicio_lng',
         'activo',
         'motivo_inactivo',
         'creado_por',
