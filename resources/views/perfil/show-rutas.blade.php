@@ -1,0 +1,141 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            
+            {{-- Errores de Validación --}}
+            @if($errors->any())
+                <div class="alert alert-danger shadow-sm mb-4" style="border-radius: 12px;">
+                    <ul class="mb-0 small">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            {{-- Feedback al usuario --}}
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show mb-4 border-0 shadow-sm" role="alert" style="border-radius: 12px;">
+                    <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            <div class="card shadow-sm border-0" style="border-radius: 15px; overflow: hidden; background-color: #F6F6F2;">
+                
+                {{-- Banner Ecoaventura --}}
+                <div style="height: 120px; background: linear-gradient(135deg, #146c43, #0F5A3A);"></div>
+
+                <div class="card-body px-4 pb-4" style="margin-top: -50px;">
+                    
+                    <form action="{{ route('perfil.update') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT')
+
+                        {{-- Encabezado de Perfil --}}
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="position-relative">
+                                @if(auth()->user()->foto_perfil)
+                                    <img src="{{ asset('storage/' . auth()->user()->foto_perfil) }}" 
+                                         style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover;" 
+                                         class="border border-4 border-white shadow-sm">
+                                @else
+                                    <div class="d-flex align-items-center justify-content-center bg-secondary-subtle border border-4 border-white shadow-sm" 
+                                         style="width: 110px; height: 110px; border-radius: 50%; font-size: 2.5rem; font-weight: 800; color: #1F2A24;">
+                                        {{ strtoupper(substr(auth()->user()->perfil->nombre ?? 'G', 0, 1)) }}
+                                    </div>
+                                @endif
+                                <label for="foto_perfil" class="btn btn-dark btn-sm position-absolute bottom-0 end-0 rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; cursor: pointer;">
+                                    <i class="bi bi-camera-fill"></i>
+                                </label>
+                                <input type="file" id="foto_perfil" name="foto_perfil" hidden accept="image/*">
+                            </div>
+
+                            <div class="ms-3 mt-5">
+                                <h2 class="h3 mb-0 fw-bold" style="font-family: Georgia, serif;">
+                                    {{ auth()->user()->perfil->nombre }} {{ auth()->user()->perfil->apaterno }}
+                                </h2>
+                                <span class="badge rounded-pill" style="background-color: #DFE6DE; color: #1F2A24;">
+                                    <i class="bi bi-map-fill me-1"></i> Gestor de Rutas
+                                </span>
+                            </div>
+                        </div>
+
+                        {{-- Bloque 1: Datos Personales --}}
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted text-uppercase">Nombre</label>
+                                <input type="text" name="nombre" class="form-control border-0 shadow-sm py-2" value="{{ old('nombre', auth()->user()->perfil->nombre) }}" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted text-uppercase">Apellido Paterno</label>
+                                <input type="text" name="apaterno" class="form-control border-0 shadow-sm py-2" value="{{ old('apaterno', auth()->user()->perfil->apaterno) }}" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted text-uppercase">Apellido Materno</label>
+                                <input type="text" name="amaterno" class="form-control border-0 shadow-sm py-2" value="{{ old('amaterno', auth()->user()->perfil->amaterno) }}">
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted text-uppercase">Teléfono de contacto</label>
+                                <input type="text" name="telefono" class="form-control border-0 shadow-sm py-2" value="{{ old('telefono', auth()->user()->perfil->telefono) }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted text-uppercase">Correo de Acceso</label>
+                                <input type="email" name="correo" class="form-control border-0 shadow-sm py-2" value="{{ old('correo', auth()->user()->correo) }}" required>
+                            </div>
+                        </div>
+
+                        {{-- Bloque 2: Redes Sociales --}}
+                        <div class="mt-5 mb-3 border-bottom pb-2">
+                            <h5 class="fw-bold" style="color: #0F5A3A;"><i class="bi bi-globe2 me-2"></i>Redes Sociales del Gestor</h5>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted"><i class="bi bi-facebook text-primary me-1"></i> FACEBOOK</label>
+                                <input type="url" name="facebook_url" class="form-control border-0 shadow-sm py-2" value="{{ old('facebook_url', auth()->user()->perfil->facebook_url) }}" placeholder="https://facebook.com/tuperfil">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted"><i class="bi bi-instagram text-danger me-1"></i> INSTAGRAM</label>
+                                <input type="url" name="instagram_url" class="form-control border-0 shadow-sm py-2" value="{{ old('instagram_url', auth()->user()->perfil->instagram_url) }}" placeholder="https://instagram.com/tuperfil">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted"><i class="bi bi-tiktok text-dark me-1"></i> TIKTOK</label>
+                                <input type="url" name="tiktok_url" class="form-control border-0 shadow-sm py-2" value="{{ old('tiktok_url', auth()->user()->perfil->tiktok_url) }}" placeholder="https://tiktok.com/@tuusuario">
+                            </div>
+                        </div>
+
+                        {{-- Bloque 3: Seguridad --}}
+                        <div class="mt-5 mb-3 border-bottom pb-2">
+                            <h5 class="fw-bold" style="color: #0F5A3A;"><i class="bi bi-shield-lock me-2"></i>Cambiar Contraseña</h5>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">NUEVA CONTRASEÑA</label>
+                                <input type="password" name="password" class="form-control border-0 shadow-sm py-2" placeholder="Dejar en blanco si no deseas cambiarla">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">CONFIRMAR CONTRASEÑA</label>
+                                <input type="password" name="password_confirmation" class="form-control border-0 shadow-sm py-2" placeholder="Repite la nueva contraseña">
+                            </div>
+                        </div>
+
+                        {{-- Botón Guardar --}}
+                        <div class="d-flex justify-content-end mt-5 pt-3 border-top">
+                            <button type="submit" class="btn btn-lg px-5 text-white shadow-sm" style="background-color: #0F5A3A; border-radius: 10px; font-weight: 600;">
+                                <i class="bi bi-person-check me-2"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection

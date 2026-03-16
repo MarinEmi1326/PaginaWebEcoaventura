@@ -45,30 +45,35 @@ class AuthController extends Controller
 
     public function registroTurista(Request $request)
     {
-        $request->validate([
-            'nombre' => 'required',
-            'apaterno' => 'required',
-            'correo' => 'required|email|unique:usuario,correo',
-            'password' => 'required|min:8|confirmed',
-        ]);
+        $mensajes = $this->getMensajesRegistro();
 
+        $validated = $request->validate([
+            'nombre'    => ['required', 'regex:/^[\pL\s]+$/u'],
+            'apaterno'  => ['required', 'regex:/^[\pL\s]+$/u'],
+            'amaterno'  => ['nullable', 'regex:/^[\pL\s]+$/u'],
+            'telefono'  => ['required', 'digits:10'],
+            'correo'    => ['required', 'email', 'unique:usuario,correo'],
+            'password'  => ['required', 'min:8', 'confirmed'],
+        ], $mensajes);
+         
         $usuario = Usuario::create([
-            'correo' => $request->correo,
-            'password' => bcrypt($request->password),
-            'rol' => 'turista',
-            'activo' => true,
-            'estado' => 'aprobado',
-            'correo_verificado' => 1,
+            'correo'             => $validated['correo'],
+            'password'           => Hash::make($validated['password']),
+            'rol'                => 'turista',
+            'activo'             => true,
+            'estado'             => 'aprobado',
+            'correo_verificado'  => 1,
             'token_verificacion' => null,
-            'fecha_solicitud' => now(),
-            'fecha_respuesta' => now(),
-            'motivo_rechazo' => null,
+            'fecha_solicitud'    => now(),
+            'fecha_respuesta'    => now(),
+            'motivo_rechazo'     => null,
         ]);
 
         Turista::create([
-            'nombre' => $request->nombre,
-            'apaterno' => $request->apaterno,
-            'amaterno' => $request->amaterno,
+            'nombre'     => $validated['nombre'],
+            'apaterno'   => $validated['apaterno'],
+            'amaterno'   => $validated['amaterno'] ?? null,
+            'telefono'   => $validated['telefono'],
             'id_usuario' => $usuario->id_usuario,
         ]);
 
@@ -83,10 +88,16 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+        $mensajes = [
+            'correo.required' => 'El correo electrónico es obligatorio.',
+            'correo.email'    => 'El correo no tiene un formato válido.',
+            'password.required' => 'La contraseña es obligatoria.',
+        ];
+
         $request->validate([
-            'correo' => 'required|email',
-            'password' => 'required',
-        ]);
+            'correo'   => ['required', 'email'],
+            'password' => ['required'],
+        ], $mensajes);
 
         $usuario = Usuario::where('correo', $request->correo)->first();
 
@@ -132,55 +143,38 @@ class AuthController extends Controller
 
     public function registroDestinos(Request $request)
     {
-        $request->validate([
-            'nombre' => 'required|regex:/^[\pL\s]+$/u',
-            'apaterno' => 'required|regex:/^[\pL\s]+$/u',
-            'amaterno' => 'nullable|regex:/^[\pL\s]+$/u',
-            'telefono' => 'required|digits:10',
-            'correo' => 'required|email|unique:usuario,correo',
-            'password' => 'required|min:8|confirmed',
-        ],
-        [
-            'nombre.required' => 'El nombre es obligatorio.',
-            'nombre.regex' => 'El nombre solo debe contener letras.',
+        $mensajes = $this->getMensajesRegistro();
 
-            'apaterno.required' => 'El apellido paterno es obligatorio.',
-            'apaterno.regex' => 'El apellido paterno solo debe contener letras.',
+        $validated = $request->validate([
+            'nombre'    => ['required', 'regex:/^[\pL\s]+$/u'],
+            'apaterno'  => ['required', 'regex:/^[\pL\s]+$/u'],
+            'amaterno'  => ['nullable', 'regex:/^[\pL\s]+$/u'],
+            'telefono'  => ['required', 'digits:10'],
+            'correo'    => ['required', 'email', 'unique:usuario,correo'],
+            'password'  => ['required', 'min:8', 'confirmed'],
+        ], $mensajes);
 
-            'amaterno.regex' => 'El apellido materno solo debe contener letras.',
-
-            'telefono.required' => 'El teléfono es obligatorio.',
-            'telefono.digits' => 'El teléfono debe tener exactamente 10 dígitos.',
-
-            'correo.required' => 'El correo electrónico es obligatorio.',
-            'correo.email' => 'Debes ingresar un correo electrónico válido.',
-            'correo.unique' => 'Este correo ya está registrado.',
-
-            'password.required' => 'La contraseña es obligatoria.',
-            'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
-            'password.confirmed' => 'Las contraseñas no coinciden.',
-        ]);
 
         $token = Str::random(60);
 
         $usuario = Usuario::create([
-            'correo' => $request->correo,
-            'password' => bcrypt($request->password),
-            'rol' => 'admin_destinos',
-            'activo' => false,
-            'estado' => 'pendiente',
-            'correo_verificado' => 0,
-            'token_verificacion' => $token,
-            'fecha_solicitud' => now(),
-            'fecha_respuesta' => null,
-            'motivo_rechazo' => null,
+                'correo'             => $validated['correo'],
+                'password'           => Hash::make($validated['password']),
+                'rol'                => 'admin_destinos',
+                'activo'             => false,
+                'estado'             => 'pendiente',
+                'correo_verificado'  => 0,
+                'token_verificacion' => $token,
+                'fecha_solicitud'    => now(),
+                'fecha_respuesta'    => null,
+                'motivo_rechazo'     => null,
         ]);
 
         AdminDestinos::create([
-            'nombre' => $request->nombre,
-            'apaterno' => $request->apaterno,
-            'amaterno' => $request->amaterno,
-            'telefono' => $request->telefono,
+            'nombre'     => $validated['nombre'],
+            'apaterno'   => $validated['apaterno'],
+            'amaterno'   => $validated['amaterno'] ?? null,
+            'telefono'   => $validated['telefono'],
             'id_usuario' => $usuario->id_usuario,
         ]);
 
@@ -195,55 +189,37 @@ class AuthController extends Controller
 
     public function registroRutas(Request $request)
     {
-        $request->validate([
-            'nombre'    => 'required|regex:/^[\pL\s]+$/u',
-            'apaterno'  => 'required|regex:/^[\pL\s]+$/u',
-            'amaterno'  => 'nullable|regex:/^[\pL\s]+$/u',
-            'telefono'  => 'required|digits:10',
-            'correo'    => 'required|email|unique:usuario,correo',
-            'password'  => 'required|min:8|confirmed',
-        ],
-        [
-            'nombre.required' => 'El nombre es obligatorio.',
-            'nombre.regex' => 'El nombre solo debe contener letras.',
+        $mensajes = $this->getMensajesRegistro();
 
-            'apaterno.required' => 'El apellido paterno es obligatorio.',
-            'apaterno.regex' => 'El apellido paterno solo debe contener letras.',
-
-            'amaterno.regex' => 'El apellido materno solo debe contener letras.',
-
-            'telefono.required' => 'El teléfono es obligatorio.',
-            'telefono.digits' => 'El teléfono debe tener exactamente 10 dígitos.',
-
-            'correo.required' => 'El correo electrónico es obligatorio.',
-            'correo.email' => 'Debes ingresar un correo válido.',
-            'correo.unique' => 'Este correo ya está registrado.',
-
-            'password.required' => 'La contraseña es obligatoria.',
-            'password.min' => 'La contraseña debe tener mínimo 8 caracteres.',
-            'password.confirmed' => 'Las contraseñas no coinciden.',
-        ]);
+        $validated = $request->validate([
+            'nombre'    => ['required', 'regex:/^[\pL\s]+$/u'],
+            'apaterno'  => ['required', 'regex:/^[\pL\s]+$/u'],
+            'amaterno'  => ['nullable', 'regex:/^[\pL\s]+$/u'],
+            'telefono'  => ['required', 'digits:10'],
+            'correo'    => ['required', 'email', 'unique:usuario,correo'],
+            'password'  => ['required', 'min:8', 'confirmed'],
+        ], $mensajes);
 
         $token = Str::random(60);
 
-        $usuario = Usuario::create([
-            'correo' => $request->correo,
-            'password' => bcrypt($request->password),
-            'rol' => 'gestor_rutas',
-            'activo' => false,
-            'estado' => 'pendiente',
-            'correo_verificado' => 0,
+       $usuario = Usuario::create([
+            'correo'             => $validated['correo'],
+            'password'           => Hash::make($validated['password']),
+            'rol'                => 'gestor_rutas',
+            'activo'             => false,
+            'estado'             => 'pendiente',
+            'correo_verificado'  => 0,
             'token_verificacion' => $token,
-            'fecha_solicitud' => now(),
-            'fecha_respuesta' => null,
-            'motivo_rechazo' => null,
-        ]);
+            'fecha_solicitud'    => now(),
+            'fecha_respuesta'    => null,
+            'motivo_rechazo'     => null,
+       ]);
 
         GestorRutas::create([
-            'nombre' => $request->nombre,
-            'apaterno' => $request->apaterno,
-            'amaterno' => $request->amaterno,
-            'telefono' => $request->telefono,
+            'nombre'     => $validated['nombre'],
+            'apaterno'   => $validated['apaterno'],
+            'amaterno'   => $validated['amaterno'] ?? null,
+            'telefono'   => $validated['telefono'],
             'id_usuario' => $usuario->id_usuario,
         ]);
 
@@ -282,5 +258,24 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/login');
+    }
+
+    private function getMensajesRegistro (): array
+    {
+        return [
+            'nombre.required'    => 'El nombre es obligatorio.',
+            'nombre.regex'       => 'El nombre solo debe contener letras.',
+            'apaterno.required'  => 'El apellido paterno es obligatorio.',
+            'apaterno.regex'     => 'El apellido paterno solo debe contener letras.',
+            'amaterno.regex'     => 'El apellido materno solo debe contener letras.',
+            'telefono.required'  => 'El teléfono es obligatorio.',
+            'telefono.digits'    => 'El teléfono debe tener exactamente 10 dígitos (ej: 9611234567).',
+            'correo.required'    => 'El correo electrónico es obligatorio.',
+            'correo.email'       => 'Debes ingresar un correo válido.',
+            'correo.unique'      => 'Este correo ya está en uso. ¿Ya tienes cuenta?',
+            'password.required'  => 'La contraseña es obligatoria.',
+            'password.min'       => 'Usa al menos 8 caracteres para mayor seguridad.',
+            'password.confirmed' => 'Las contraseñas no coinciden. Asegúrate de escribirlas igual.',
+        ];
     }
 }
