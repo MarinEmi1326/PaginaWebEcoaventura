@@ -14,6 +14,7 @@ class Turista extends Model
         'nombre',
         'apaterno',
         'amaterno',
+        'telefono',
         'id_usuario',
     ];
 

@@ -9,6 +9,9 @@ use Stripe\Stripe;
 use Stripe\PaymentIntent;
 use App\Mail\ConfirmacionPagoTurista;
 use App\Mail\NotificacionPagoAdmin;
+use Kreait\Firebase\Factory;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Notification;
 
 class PagoController extends Controller
 {
@@ -92,13 +95,27 @@ class PagoController extends Controller
                     ->send(new ConfirmacionPagoTurista($pago, $paquete, $destino, $turista));
 
                 // Correo al admin_destinos dueño del destino
-                $correoAdmin = DB::table('usuario')
+                $adminDestinos = DB::table('usuario')
                     ->where('id_usuario', $destino->creado_por)
-                    ->value('correo');
+                    ->first();
 
-                if ($correoAdmin) {
-                    Mail::to($correoAdmin)
+                if ($adminDestinos) {
+                    Mail::to($adminDestinos->correo)
                         ->send(new NotificacionPagoAdmin($pago, $paquete, $destino, $turista));
+
+                    // Notificación FCM al admin_destinos
+                    if ($adminDestinos->fcm_token) {
+                        $this->enviarNotificacionFCM(
+                            $adminDestinos->fcm_token,
+                            '💰 Nuevo pago recibido',
+                            "{$turista->nombre} {$turista->apaterno} adquirió el paquete {$paquete->nombre} de {$destino->nombre}",
+                            [
+                                'id_pago'    => (string) $id_pago,
+                                'id_destino' => (string) $destino->id_destino,
+                                'tipo'       => 'pago',
+                            ]
+                        );
+                    }
                 }
 
                 return redirect()->route('pagos.confirmacion', $id_paquete)
@@ -106,7 +123,6 @@ class PagoController extends Controller
             }
 
             return back()->with('error', 'El pago no pudo procesarse. Intenta de nuevo.');
-
         } catch (\Stripe\Exception\CardException $e) {
             return back()->with('error', 'Tarjeta rechazada: ' . $e->getError()->message);
         } catch (\Exception $e) {
@@ -121,5 +137,27 @@ class PagoController extends Controller
         $destino = DB::table('destino')->where('id_destino', $paquete->id_destino)->first();
 
         return view('pagos.confirmacion', compact('paquete', 'destino'));
+    }
+
+    // Enviar notificación FCM
+    private function enviarNotificacionFCM(string $token, string $titulo, string $cuerpo, array $data = [])
+    {
+        try {
+            $factory = (new Factory)->withServiceAccount(config('services.firebase.credentials'));
+            $messaging = $factory->createMessaging();
+
+            $message = CloudMessage::fromArray([
+                'token' => $token,
+                'notification' => [
+                    'title' => $titulo,
+                    'body'  => $cuerpo,
+                ],
+                'data' => $data,
+            ]);
+
+            $messaging->send($message);
+        } catch (\Exception $e) {
+            \Log::error('Error FCM: ' . $e->getMessage());
+        }
     }
 }

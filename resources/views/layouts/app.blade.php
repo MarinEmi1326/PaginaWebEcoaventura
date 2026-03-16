@@ -103,10 +103,7 @@
                             $nombre = $user->correo;
                             $panel = '/';
 
-                            if ($user->rol == 'turista' && $user->turista) {
-                                $nombre = $user->turista->nombre;
-                                $panel = route('perfil');
-                            } elseif ($user->rol == 'admin_general' && $user->adminGeneral) {
+                            if ($user->rol == 'admin_general' && $user->adminGeneral) {
                                 $nombre = $user->adminGeneral->nombre;
                                 $panel = route('admin.index');
                             } elseif ($user->rol == 'admin_destinos' && $user->adminDestinos) {
@@ -115,6 +112,10 @@
                             } elseif ($user->rol == 'gestor_rutas' && $user->gestorRutas) {
                                 $nombre = $user->gestorRutas->nombre;
                                 $panel = route('rutas.index');
+                            }
+
+                            if ($user->rol == 'turista' && $user->turista) {
+                                $nombre = $user->turista->nombre;
                             }
                         @endphp
 
@@ -129,11 +130,20 @@
                             <ul class="dropdown-menu dropdown-menu-end">
 
                                 <li>
-                                    <a class="dropdown-item" href="{{ $panel }}">
-                                        <i class="bi bi-speedometer2 me-1"></i>
-                                        Ir a mi panel
+                                    <a class="dropdown-item" href="{{ route('perfil') }}">
+                                        <i class="bi bi-person me-1"></i>
+                                        Mi perfil
                                     </a>
                                 </li>
+
+                                @if($user->rol !== 'turista')
+                                    <li>
+                                        <a class="dropdown-item" href="{{ $panel }}">
+                                            <i class="bi bi-speedometer2 me-1"></i>
+                                            Ir a mi panel
+                                        </a>
+                                    </li>
+                                @endif
 
                                 <li>
                                     <hr class="dropdown-divider">

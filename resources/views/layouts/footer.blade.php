@@ -21,12 +21,12 @@
                 </p>
 
                 <div class="d-flex gap-3 mt-4">
-                    <a href="#"
+                    <a href="https://www.facebook.com/share/18B5t3nDes/?mibextid=wwXIfr"
                         class="rounded-circle d-flex align-items-center justify-content-center text-white"
                         style="width:36px; height:36px; background-color:#065f46;">
                         <i class="bi bi-facebook"></i>
                     </a>
-                    <a href="#" class="rounded-circle d-flex align-items-center justify-content-center text-white"
+                    <a href="https://www.instagram.com/2025_ecoaventura?igsh=bThxNTAxd3Y3dG0z" class="rounded-circle d-flex align-items-center justify-content-center text-white"
                        style="width:36px; height:36px; background-color:#065f46;">
                         <i class="bi bi-instagram"></i>
                     </a>
