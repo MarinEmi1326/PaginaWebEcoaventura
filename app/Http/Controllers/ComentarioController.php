@@ -50,4 +50,34 @@ class ComentarioController extends Controller
 
         return back()->with('success', 'Comentario eliminado.');
     }
+
+    public function storeRuta(Request $request, $id)
+    {
+        $request->validate([
+            'comentario' => 'required|string|max:1000',
+        ]);
+
+        $user = auth()->user();
+
+        if ($user->rol !== 'turista') {
+            return back()->with('error', 'Solo los turistas pueden comentar.');
+        }
+
+        $turista = DB::table('turista')->where('id_usuario', $user->id_usuario)->first();
+
+        if (!$turista) {
+            return back()->with('error', 'No se encontró tu perfil de turista.');
+        }
+
+        DB::table('comentario')->insert([
+            'id_turista' => $turista->id_turista,
+            'entidad'    => 'ruta',
+            'id_ruta'    => $id,
+            'comentario' => $request->comentario,
+            'fecha'      => now(),
+        ]);
+
+        return back()->with('success', 'Comentario publicado.');
+    }
+
 }

@@ -48,7 +48,6 @@ class AdminDestinoController extends Controller
             'recomendaciones'                   => ['nullable'],
             'lat'                               => ['nullable', 'numeric'],
             'lng'                               => ['nullable', 'numeric'],
-            'google_place_id'                   => ['nullable', 'max:120'],
             'fotos'                             => ['nullable', 'array'],
             'fotos.*'                           => ['image', 'mimes:jpg,jpeg,png', 'max:5120'],
             'categorias'                        => ['nullable', 'array'],
@@ -76,7 +75,6 @@ class AdminDestinoController extends Controller
             'recomendaciones' => $request->recomendaciones,
             'lat'             => $request->lat,
             'lng'             => $request->lng,
-            'google_place_id' => $request->google_place_id,
             'activo'          => 'activo',
             'creado_por'      => Auth::id(),
             'fecha_creacion'  => now(),
@@ -196,7 +194,6 @@ class AdminDestinoController extends Controller
             'recomendaciones'                   => ['nullable'],
             'lat'                               => ['nullable', 'numeric'],
             'lng'                               => ['nullable', 'numeric'],
-            'google_place_id'                   => ['nullable', 'max:120'],
             'fotos'                             => ['nullable', 'array'],
             'fotos.*'                           => ['image', 'mimes:jpg,jpeg,png', 'max:5120'],
             'categorias'                        => ['nullable', 'array'],
@@ -223,7 +220,6 @@ class AdminDestinoController extends Controller
             'recomendaciones' => $request->recomendaciones,
             'lat'             => $request->lat,
             'lng'             => $request->lng,
-            'google_place_id' => $request->google_place_id,
         ]);
 
         // Imágenes nuevas
@@ -343,4 +339,73 @@ class AdminDestinoController extends Controller
         return redirect()->route('misdestinos.index')
             ->with('success', 'Destino eliminado correctamente.');
     }
+
+    // ── Suspender o reactivar un destino ──
+    public function toggleActivo(Request $request, $id)
+    {
+        $destino = DB::table('destino')
+            ->where('id_destino', $id)
+            ->where('creado_por', Auth::id())
+            ->first();
+
+        abort_if(!$destino, 404);
+
+        $nuevoEstado = $destino->activo === 'activo' ? 'inactivo' : 'activo';
+
+        // 1. Cambiar el estado del destino
+        DB::table('destino')
+            ->where('id_destino', $id)
+            ->update(['activo' => $nuevoEstado]);
+
+        // 2. Buscar todas las rutas que contienen este destino
+        $idsRutas = DB::table('ruta_destino')
+            ->where('id_destino', $id)
+            ->pluck('id_ruta');
+
+        if ($idsRutas->isEmpty()) {
+            return back()->with('success', 'Estado del destino actualizado.');
+        }
+
+        if ($nuevoEstado === 'inactivo') {
+
+            // 3a. Si se suspendió: inhabilitar todas las rutas que lo contienen
+            //     y guardar el motivo
+            foreach ($idsRutas as $idRuta) {
+                DB::table('ruta')->where('id_ruta', $idRuta)->update([
+                    'activo'          => 'inactivo',
+                    'motivo_inactivo' => 'El destino "' . $destino->nombre . '" se encuentra suspendido.',
+                ]);
+            }
+
+            $mensaje = 'Destino suspendido. Las rutas que lo contienen han sido inhabilitadas.';
+
+        } else {
+
+            // 3b. Si se reactivó: revisar cada ruta afectada
+            //     Solo reactivar si TODOS sus destinos están activos
+            foreach ($idsRutas as $idRuta) {
+
+                // Contar cuántos destinos de esta ruta están inactivos
+                $destinosInactivos = DB::table('ruta_destino')
+                    ->join('destino', 'ruta_destino.id_destino', '=', 'destino.id_destino')
+                    ->where('ruta_destino.id_ruta', $idRuta)
+                    ->where('destino.activo', 'inactivo')
+                    ->count();
+
+                if ($destinosInactivos === 0) {
+                    // Todos los destinos están activos → reactivar la ruta
+                    DB::table('ruta')->where('id_ruta', $idRuta)->update([
+                        'activo'          => 'activo',
+                        'motivo_inactivo' => null,
+                    ]);
+                }
+                // Si aún hay otros destinos inactivos, la ruta se queda inactiva
+            }
+
+            $mensaje = 'Destino reactivado. Las rutas afectadas han sido revisadas.';
+        }
+
+        return back()->with('success', $mensaje);
+    }
+    
 }

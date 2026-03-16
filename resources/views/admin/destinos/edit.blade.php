@@ -100,13 +100,13 @@
                                placeholder="Se llena al hacer clic en el mapa">
                         @error('lng') <div class="small text-danger mt-1">{{ $message }}</div> @enderror
                     </div>
-                    <div class="col-12">
+                    {{-- <div class="col-12">
                         <label class="form-label fw-bold">Google Place ID <span class="text-muted small fw-normal">(opcional)</span></label>
                         <input type="text" name="google_place_id" value="{{ old('google_place_id', $destino->google_place_id) }}"
                                class="form-control rounded-3 py-2 font-monospace"
                                placeholder="Ej. ChIJN1t_tDeuEmsRUsoyG83frY4" maxlength="120">
                         @error('google_place_id') <div class="small text-danger mt-1">{{ $message }}</div> @enderror
-                    </div>
+                    </div> --}}
                 </div>
             </div>
         </div>

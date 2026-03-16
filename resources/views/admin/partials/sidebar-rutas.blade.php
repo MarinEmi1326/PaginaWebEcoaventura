@@ -17,8 +17,8 @@
   {{-- Menú --}}
   <nav class="px-3 py-3 d-grid gap-2">
 
-    <a href="{{ route('rutas.dashboard') }}"
-       class="ea-nav-pill {{ request()->routeIs('rutas.dashboard') ? 'active' : '' }}">
+    <a href="{{ route('rutas.index') }}"
+       class="ea-nav-pill {{ request()->routeIs('rutas.index') ? 'active' : '' }}">
       <i class="bi bi-signpost-2"></i>
       <span>Mis Rutas</span>
     </a>

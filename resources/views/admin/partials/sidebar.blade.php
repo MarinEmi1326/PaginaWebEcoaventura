@@ -41,6 +41,12 @@
         <span>Reportes</span>
     </a>
 
+    <a href="{{ route('admin.categorias.index') }}"
+       class="ea-nav-pill {{ request()->routeIs('admin.categorias') ? 'active' : '' }}">
+      <i class="bi bi-tag"></i>
+      <span>Categorías</span>
+    </a>
+
     <a href="{{ route('admin.respaldos') }}"
         class="ea-nav-pill {{ request()->routeIs('admin.respaldos') ? 'active' : '' }}">
         <i class="bi bi-database"></i>

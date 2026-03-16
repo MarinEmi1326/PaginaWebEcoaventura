@@ -63,7 +63,7 @@ class GoogleController extends Controller
         return match ($usuario->rol) {
             'admin_general'  => redirect('/admin/index'),
             'admin_destinos' => redirect()->route('misdestinos.index'),
-            'gestor_rutas'   => redirect('/rutas/dashboard'),
+            'gestor_rutas' => redirect()->route('rutas.index'),
             'turista'        => redirect('/'),
         };
     }

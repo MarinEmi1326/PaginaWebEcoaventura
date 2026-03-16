@@ -13,6 +13,11 @@
             }, 3000);
         </script>
     @endif
+
+    @if (session('error'))
+        <div class="alert alert-danger rounded-3 mb-4">{{ session('error') }}</div>
+    @endif
+
     {{-- Cards resumen --}}
     <div class="row g-3 mb-4">
         <div class="col-12 col-md-6">
@@ -51,37 +56,68 @@
                         </div>
                     </div>
 
-                    <div class="d-flex align-items-center gap-3 ms-lg-auto">
+                    <div class="d-flex align-items-center gap-3 ms-lg-auto flex-wrap">
 
+                        {{-- Badge de estado --}}
                         @if ($destino->activo === 'activo')
                             <span class="ea-status approved">Publicado</span>
                         @else
-                            <span class="ea-status pending">Inactivo</span>
+                            <span class="ea-status pending">Suspendido</span>
                         @endif
 
                         <div class="ea-actions">
-                            <a href="{{ route('destinos.edit', $destino->id_destino) }}" class="ea-action-btn edit"
-                                title="Editar">
+
+                            {{-- Botón suspender / reactivar --}}
+                            <form action="{{ route('destinos.toggle', $destino->id_destino) }}"
+                                  method="POST" class="d-inline"
+                                  onsubmit="return confirm(
+                                      '{{ $destino->activo === 'activo'
+                                          ? '¿Suspender este destino? Las rutas que lo contienen serán inhabilitadas automáticamente.'
+                                          : '¿Reactivar este destino? Las rutas afectadas serán revisadas automáticamente.' }}'
+                                  )">
+                                @csrf
+                                @if ($destino->activo === 'activo')
+                                    {{-- Suspender --}}
+                                    <button type="submit"
+                                            class="btn btn-sm btn-outline-warning rounded-3"
+                                            title="Suspender destino">
+                                        <i class="bi bi-pause-circle me-1"></i> Suspender
+                                    </button>
+                                @else
+                                    {{-- Reactivar --}}
+                                    <button type="submit"
+                                            class="btn btn-sm btn-outline-success rounded-3"
+                                            title="Reactivar destino">
+                                        <i class="bi bi-play-circle me-1"></i> Reactivar
+                                    </button>
+                                @endif
+                            </form>
+
+                            {{-- Editar --}}
+                            <a href="{{ route('destinos.edit', $destino->id_destino) }}"
+                               class="ea-action-btn edit" title="Editar">
                                 <i class="bi bi-pencil-square"></i>
                             </a>
 
-                            <form action="{{ route('destinos.destroy', $destino->id_destino) }}" method="POST"
-                                class="d-inline" onsubmit="return confirm('¿Eliminar este destino?')">
+                            {{-- Eliminar --}}
+                            <form action="{{ route('destinos.destroy', $destino->id_destino) }}"
+                                  method="POST" class="d-inline"
+                                  onsubmit="return confirm('¿Eliminar este destino?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="ea-action-btn delete border-0 bg-transparent p-0"
-                                    title="Eliminar">
+                                <button type="submit"
+                                        class="ea-action-btn delete border-0 bg-transparent p-0"
+                                        title="Eliminar">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>
-                        </div>
 
+                        </div>
                     </div>
                 </div>
             </div>
 
         @empty
-
             <div class="ea-card text-center py-5">
                 <i class="bi bi-map text-muted" style="font-size: 2.5rem;"></i>
                 <div class="mt-3 fw-semibold text-muted">Aún no tienes destinos registrados.</div>

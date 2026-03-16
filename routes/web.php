@@ -12,6 +12,7 @@ use App\Http\Controllers\ComentarioController;
 use App\Http\Controllers\RutaController;
 use App\Http\Controllers\PagoController;
 use App\Http\Controllers\ReporteController;
+use App\Http\Controllers\Admin\AdminCategoriaController;
 use App\Http\Controllers\Admin\AdminReportesController;
 use App\Http\Controllers\Admin\AdminCentroController;
 use App\Http\Controllers\HomeController;
@@ -24,7 +25,7 @@ use App\Http\Controllers\HomeController;
 |--------------------------------------------------------------------------
 */
 
-Route::resource('rutas', RutaController::class)->only(['index', 'create', 'store']);
+
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -64,7 +65,8 @@ Route::get('/centros/{id}', [DestinosController::class, 'show'])->name('destinos
 // OTRAS VISTAS
 Route::get('/mapa', fn() => view('mapa'))->name('mapa');
 Route::get('/turismo-responsable', fn() => view('turismo-responsable'))->name('turismo-responsable');
-Route::get('/ruta', fn() => view('ruta'))->name('ruta');
+Route::get('/ruta', [RutaController::class, 'publicIndex'])->name('ruta');
+Route::get('/ruta/{id}', [RutaController::class, 'show'])->name('rutas.show'); 
 
 /*
 |--------------------------------------------------------------------------
@@ -80,16 +82,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/perfil', [PerfilController::class, 'show'])->name('perfil');
     Route::post('/perfil', [PerfilController::class, 'update']);
 
-    Route::get('/rutas/dashboard', fn() => view('admin.gestor_rutas.index'))->name('rutas.dashboard');
-
-
-
-
-
+    Route::resource('rutas', RutaController::class)->only(['index', 'create', 'store', 'destroy', 'edit', 'update']);
+    Route::get('/api/destino-info/{id}', [RutaController::class, 'infoDestino'])->name('api.destino.info');
+    Route::delete('/rutas/imagen/{id}', [RutaController::class, 'destroyImagen'])->name('rutas.imagen.destroy');
     // reporte
     Route::post('/destinos/{id}/reportar',    [ReporteController::class, 'reportarDestino'])->name('reportes.destino');
     Route::post('/comentarios/{id}/reportar', [ReporteController::class, 'reportarComentario'])->name('reportes.comentario');
-
+    Route::post('/ruta/{id}/comentar', [ComentarioController::class, 'storeRuta'])->name('comentarios.ruta.store');
 
     // PANEL ADMIN DESTINOS
     Route::get('/mis-destinos', [AdminDestinoController::class, 'index'])->name('misdestinos.index');
@@ -99,7 +98,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/destinos/{id}/editar', [AdminDestinoController::class, 'edit'])->name('destinos.edit');
     Route::put('/destinos/{id}', [AdminDestinoController::class, 'update'])->name('destinos.update');
     Route::delete('/destinos/{id}', [AdminDestinoController::class, 'destroy'])->name('destinos.destroy');
-
+    Route::post('/destinos/{id}/toggle-activo', [AdminDestinoController::class, 'toggleActivo'])->name('destinos.toggle');
     // Comentarios
     Route::post('/centros/{id}/comentar', [ComentarioController::class, 'storeDestino'])->name('comentarios.destino.store');
     Route::delete('/comentarios/{id}', [ComentarioController::class, 'destroy'])->name('comentarios.destroy');
@@ -117,12 +116,14 @@ Route::middleware('auth')->group(function () {
     */
     Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
 
-        Route::get('/index', [AdminDashboardController::class, 'index'])->name('index');
+        Route::get('/', [AdminDashboardController::class, 'index'])->name('index');
 
+        Route::resource('categorias', AdminCategoriaController::class);
 
         // panel admin general , para que le aparesca los destinos reportados
         Route::get('/destino', [AdminCentroController::class, 'index'])->name('destino');
         Route::post('/destino/{id}/toggle', [AdminCentroController::class, 'toggleActivo'])->name('destino.toggle');
+
         Route::get('/respaldos', fn() => view('admin.respaldos'))->name('respaldos');
 
         // Reportes

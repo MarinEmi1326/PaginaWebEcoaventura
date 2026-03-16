@@ -118,9 +118,9 @@ class AuthController extends Controller
         Auth::login($usuario);
 
         return match ($usuario->rol) {
-            'admin_general' => redirect('/admin/index'),
+            'admin_general' => redirect()->route('admin.index'),
             'admin_destinos' => redirect()->route('misdestinos.index'),
-            'gestor_rutas' => redirect()->route('rutas.dashboard'),
+            'gestor_rutas' => redirect()->route('rutas.index'),
             'turista' => redirect('/'),
             default => redirect('/login')->with('error', 'Rol no válido.'),
         };

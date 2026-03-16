@@ -114,7 +114,7 @@
                                 $panel = route('misdestinos.index');
                             } elseif ($user->rol == 'gestor_rutas' && $user->gestorRutas) {
                                 $nombre = $user->gestorRutas->nombre;
-                                $panel = route('rutas.dashboard');
+                                $panel = route('rutas.index');
                             }
                         @endphp
 
