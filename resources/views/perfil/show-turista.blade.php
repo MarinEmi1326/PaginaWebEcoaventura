@@ -56,7 +56,7 @@
                             </div>
 
                             <div class="ms-3 mt-5">
-                                <h2 class="h3 mb-0 fw-bold" style="font-family: Georgia, serif;">¡Hola, {{ auth()->user()->perfil->nombre }}!</h2>
+                                <h2 class="h3 mb-0 fw-bold" style="font-family: Georgia, serif;">¡Hola, {{ auth()->user()->perfil->nombre }} {{ auth()->user()->perfil->apaterno }} {{ auth()->user()->perfil->amaterno }}!</h2>
                                 <span class="badge rounded-pill" style="background-color: #DFE6DE; color: #0B4A30;">
                                     <i class="bi bi-person-walking me-1"></i> Perfil de Explorador
                                 </span>
