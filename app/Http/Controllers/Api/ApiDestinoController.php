@@ -132,7 +132,7 @@ class ApiDestinoController extends Controller
             'lng'         => 'nullable|numeric',
             'google_place_id' => 'nullable|string|max:120',
             'categorias'  => 'nullable|array',
-            'categorias.*'=> 'exists:categoria,id_categoria',
+            'categorias.*' => 'exists:categoria,id_categoria',
             'actividades_existentes'   => 'nullable|array',
             'actividades_existentes.*' => 'exists:actividad,id_actividad',
             'nuevas_actividades'       => 'nullable|array',
@@ -272,5 +272,105 @@ class ApiDestinoController extends Controller
             'success' => true,
             'message' => 'Comentario publicado correctamente.',
         ], 201);
+    }
+
+    // POST /api/destinos/{id}/reportar
+    public function reportar(Request $request, $id)
+    {
+        $request->validate([
+            'motivo'      => 'required|in:contenido_inapropiado,informacion_falsa,spam,lenguaje_ofensivo,derechos_autor,otro',
+            'descripcion' => 'nullable|string|max:500',
+        ]);
+
+        $user = auth()->user();
+
+        $destino = DB::table('destino')->where('id_destino', $id)->where('activo', 'activo')->first();
+
+        if (!$destino) {
+            return response()->json(['success' => false, 'message' => 'Destino no encontrado.'], 404);
+        }
+
+        // Verificar que no haya reportado ya este destino
+        $yaReporto = DB::table('reporte')
+            ->where('reportado_por', $user->id_usuario)
+            ->where('tipo_objeto', 'destino')
+            ->where('id_destino', $id)
+            ->exists();
+
+        if ($yaReporto) {
+            return response()->json(['success' => false, 'message' => 'Ya reportaste este destino.'], 409);
+        }
+
+        DB::table('reporte')->insert([
+            'reportado_por' => $user->id_usuario,
+            'tipo_objeto'   => 'destino',
+            'id_destino'    => $id,
+            'motivo'        => $request->motivo,
+            'descripcion'   => $request->descripcion,
+            'estado'        => 'pendiente',
+            'fecha'         => now(),
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Reporte enviado correctamente.'], 201);
+    }
+
+
+    // GET /api/favoritos
+    public function favoritos(Request $request)
+    {
+        $user = $request->user();
+        $turista = DB::table('turista')->where('id_usuario', $user->id_usuario)->first();
+
+        if (!$turista) {
+            return response()->json(['success' => false, 'message' => 'No eres turista'], 403);
+        }
+
+        $favoritos = DB::table('favorito')
+            ->join('destino', 'favorito.id_destino', '=', 'destino.id_destino')
+            ->where('favorito.id_turista', $turista->id_turista)
+            ->select('destino.*')
+            ->get();
+
+        foreach ($favoritos as $d) {
+            $d->imagenes = DB::table('imagen')
+                ->where('id_destino', $d->id_destino)->get();
+            $d->categorias = DB::table('categoria')
+                ->join('destino_categoria', 'categoria.id_categoria', '=', 'destino_categoria.id_categoria')
+                ->where('destino_categoria.id_destino', $d->id_destino)
+                ->select('categoria.*')->get();
+        }
+
+        return response()->json(['success' => true, 'data' => $favoritos]);
+    }
+
+    // POST /api/favoritos/{id}/toggle
+    public function toggleFavorito(Request $request, $id)
+    {
+        $user = $request->user();
+        $turista = DB::table('turista')->where('id_usuario', $user->id_usuario)->first();
+
+        if (!$turista) {
+            return response()->json(['success' => false, 'message' => 'No eres turista'], 403);
+        }
+
+        $existe = DB::table('favorito')
+            ->where('id_turista', $turista->id_turista)
+            ->where('id_destino', $id)
+            ->exists();
+
+        if ($existe) {
+            DB::table('favorito')
+                ->where('id_turista', $turista->id_turista)
+                ->where('id_destino', $id)
+                ->delete();
+            return response()->json(['success' => true, 'favorito' => false, 'message' => 'Eliminado de favoritos']);
+        } else {
+            DB::table('favorito')->insert([
+                'id_turista' => $turista->id_turista,
+                'id_destino' => $id,
+                'fecha' => now(),
+            ]);
+            return response()->json(['success' => true, 'favorito' => true, 'message' => 'Agregado a favoritos']);
+        }
     }
 }
