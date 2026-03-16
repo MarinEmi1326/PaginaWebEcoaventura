@@ -17,6 +17,7 @@ class ApiAuthController extends Controller
         $request->validate([
             'correo'   => 'required|email',
             'password' => 'required',
+            'fcm_token' => 'nullable|string',
         ]);
 
         $usuario = Usuario::where('correo', $request->correo)->first();
@@ -56,6 +57,12 @@ class ApiAuthController extends Controller
 
         $usuario->tokens()->delete();
         $token = $usuario->createToken('api-token')->plainTextToken;
+
+        if ($request->filled('fcm_token')) {
+            DB::table('usuario')
+                ->where('id_usuario', $usuario->id_usuario)
+                ->update(['fcm_token' => $request->fcm_token]);
+        }
 
         return response()->json([
             'success' => true,
@@ -186,5 +193,44 @@ class ApiAuthController extends Controller
         }
 
         return response()->json(['success' => true, 'message' => 'Perfil actualizado correctamente']);
+    }
+
+
+    // GET /api/turista/pagos
+    public function misPagos(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->rol !== 'turista') {
+            return response()->json(['success' => false, 'message' => 'No autorizado'], 403);
+        }
+
+        $turista = DB::table('turista')->where('id_usuario', $user->id_usuario)->first();
+
+        if (!$turista) {
+            return response()->json(['success' => false, 'message' => 'Turista no encontrado'], 404);
+        }
+
+        $pagos = DB::table('pago')
+            ->join('paquete', 'pago.id_paquete', '=', 'paquete.id_paquete')
+            ->join('destino', 'pago.id_destino', '=', 'destino.id_destino')
+            ->where('pago.id_turista', $turista->id_turista)
+            ->select(
+                'pago.id_pago',
+                'pago.monto',
+                'pago.estado',
+                'pago.fecha',
+                'pago.moneda',
+                'destino.nombre as destino_nombre',
+                'paquete.nombre as paquete_nombre'
+            )
+            ->orderByDesc('pago.fecha')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'total'   => count($pagos),
+            'data'    => $pagos,
+        ]);
     }
 }

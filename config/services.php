@@ -2,8 +2,8 @@
 
 return [
     'google_maps' => [
-    'key' => env('GOOGLE_MAPS_API_KEY'),
-],
+        'key' => env('GOOGLE_MAPS_API_KEY'),
+    ],
 
 
     /*
@@ -39,16 +39,19 @@ return [
         ],
     ],
     'google' => [
-    'client_id' => env('GOOGLE_CLIENT_ID'),
-    'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-    'redirect' => env('GOOGLE_REDIRECT_URI'),
-],
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI'),
+    ],
+    'firebase' => [
+        'credentials' => storage_path('app/firebase-credentials.json'),
+    ],
 
 
-'stripe' => [
-    'key'    => env('STRIPE_KEY'),
-    'secret' => env('STRIPE_SECRET'),
-],
+    'stripe' => [
+        'key'    => env('STRIPE_KEY'),
+        'secret' => env('STRIPE_SECRET'),
+    ],
 
 
 ];

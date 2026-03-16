@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ApiAuthController;
 use App\Http\Controllers\Api\ApiAdminDestinosController;
 
 
+
 // Públicas - sin token
 Route::post('/login', [ApiAuthController::class, 'login']);
 Route::post('/registro/turista', [ApiAuthController::class, 'registroTurista']);
@@ -14,7 +15,7 @@ Route::get('/destinos/{id}', [ApiDestinoController::class, 'show']);
 Route::get('/destinos/{id}/comentarios', [ApiDestinoController::class, 'comentarios']);
 Route::get('/destinos/categoria/{id_categoria}', [ApiDestinoController::class, 'porCategoria']);
 
-// Protegidas - requieren token
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [ApiAuthController::class, 'logout']);
     Route::get('/perfil', [ApiAuthController::class, 'perfil']);
@@ -24,13 +25,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/favoritos', [ApiDestinoController::class, 'favoritos']);
     Route::post('/favoritos/{id}/toggle', [ApiDestinoController::class, 'toggleFavorito']);
-    
+
     Route::put('/perfil', [ApiAuthController::class, 'actualizarPerfil']);
 
 
 
-    // Dentro del grupo auth:sanctum
+    
     Route::get('/admin/dashboard', [ApiAdminDestinosController::class, 'dashboard']);
     Route::get('/admin/destinos', [ApiAdminDestinosController::class, 'misDestinos']);
     Route::get('/admin/pagos', [ApiAdminDestinosController::class, 'pagos']);
+
+    Route::get('/turista/pagos', [ApiAuthController::class, 'misPagos']);
 });
