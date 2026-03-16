@@ -2,6 +2,7 @@
 
     {{-- Logo --}}
     <div class="px-4 py-3 d-flex align-items-center gap-3 border-bottom" style="border-color: var(--ea-line) !important;">
+
         <div class="ea-logo-badge" style="background: none; padding: 0;">
             <img src="{{ asset('img/ecoaventura-logo.png') }}" alt="Ecoaventura"
                 style="width: 32px; height: 32px; border-radius: 50%;">
