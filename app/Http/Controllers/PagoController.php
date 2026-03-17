@@ -70,11 +70,12 @@ class PagoController extends Controller
                 ],
             ]);
 
-            // Guardar pago en BD
+            
             $id_pago = DB::table('pago')->insertGetId([
                 'id_turista'            => $turista->id_turista,
                 'id_paquete'            => $paquete->id_paquete,
                 'id_destino'            => $paquete->id_destino,
+                'personas'              => $request->personas ?? 1,
                 'stripe_payment_intent' => $intent->id,
                 'monto'                 => $paquete->precio,
                 'moneda'                => 'mxn',

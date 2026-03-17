@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ApiDestinoController;
 use App\Http\Controllers\Api\ApiAuthController;
 use App\Http\Controllers\Api\ApiAdminDestinosController;
-
+use App\Http\Controllers\Api\ApiRutaController;
 
 
 // Públicas - sin token
@@ -14,6 +14,11 @@ Route::get('/destinos', [ApiDestinoController::class, 'index']);
 Route::get('/destinos/{id}', [ApiDestinoController::class, 'show']);
 Route::get('/destinos/{id}/comentarios', [ApiDestinoController::class, 'comentarios']);
 Route::get('/destinos/categoria/{id_categoria}', [ApiDestinoController::class, 'porCategoria']);
+
+
+
+Route::get('/rutas', [ApiRutaController::class, 'index']);
+Route::get('/rutas/{id}', [ApiRutaController::class, 'show']);
 
 
 Route::middleware('auth:sanctum')->group(function () {

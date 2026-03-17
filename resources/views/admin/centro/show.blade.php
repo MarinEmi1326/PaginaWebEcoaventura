@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+{{-- @extends('layouts.admin')
 
 @section('title', 'Detalle de Reportes')
 
@@ -243,4 +243,4 @@
 
 </div>
 
-@endsection
+@endsection --}}

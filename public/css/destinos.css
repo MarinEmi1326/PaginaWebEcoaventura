@@ -6,6 +6,12 @@
     border-radius: 20px;
     font-size: 12px;
 }
+.badge-sm {
+    font-size: 0.65rem;
+    padding: 0.15em 0.45em;
+    line-height: 1;
+}
+
 
 .filtro-tabs {
     background: #e5ebe7;
