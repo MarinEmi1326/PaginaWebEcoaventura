@@ -6,8 +6,10 @@
     <nav aria-label="breadcrumb" class="py-3">
         <div class="container">
             <ol class="breadcrumb mb-0 small">
-                <li class="breadcrumb-item"><a href="{{ url('/') }}" class="text-success text-decoration-none">Inicio</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('destinos.index') }}" class="text-success text-decoration-none">Centros Turísticos</a></li>
+                <li class="breadcrumb-item"><a href="{{ url('/') }}" class="text-success text-decoration-none">Inicio</a>
+                </li>
+                <li class="breadcrumb-item"><a href="{{ route('destinos.index') }}"
+                        class="text-success text-decoration-none">Centros Turísticos</a></li>
                 <li class="breadcrumb-item active">{{ $destino->nombre }}</li>
             </ol>
         </div>
@@ -33,10 +35,12 @@
                         @endforeach
                     </div>
                     @if ($imagenes->count() > 1)
-                        <button class="carousel-control-prev" type="button" data-bs-target="#carruselDestino" data-bs-slide="prev">
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carruselDestino"
+                            data-bs-slide="prev">
                             <span class="carousel-control-prev-icon"></span>
                         </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#carruselDestino" data-bs-slide="next">
+                        <button class="carousel-control-next" type="button" data-bs-target="#carruselDestino"
+                            data-bs-slide="next">
                             <span class="carousel-control-next-icon"></span>
                         </button>
                     @endif
@@ -77,9 +81,9 @@
 
                     {{-- BOTÓN REPORTAR DESTINO (solo turistas) --}}
                     @auth
-                        @if(auth()->user()->rol === 'turista')
-                            <button type="button" class="btn btn-sm btn-outline-danger rounded-3 mt-2"
-                                    data-bs-toggle="modal" data-bs-target="#modalReportarDestino">
+                        @if (auth()->user()->rol === 'turista')
+                            <button type="button" class="btn btn-sm btn-outline-danger rounded-3 mt-2" data-bs-toggle="modal"
+                                data-bs-target="#modalReportarDestino">
                                 <i class="bi bi-flag me-1"></i> Reportar destino
                             </button>
                         @endif
@@ -91,32 +95,39 @@
             <div class="rounded-3 p-1 mb-4" style="background:#e8ede9;">
                 <ul class="nav" id="detalleTabs" role="tablist">
                     <li class="nav-item">
-                        <button class="nav-link active px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-descripcion" type="button">Descripción</button>
+                        <button class="nav-link active px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-descripcion"
+                            type="button">Descripción</button>
                     </li>
                     @if ($actividades->count() > 0)
                         <li class="nav-item">
-                            <button class="nav-link px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-actividades" type="button">
+                            <button class="nav-link px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-actividades"
+                                type="button">
                                 Actividades
-                                <span class="badge rounded-pill ms-1" style="background:#1F6B4B; font-size:.7rem;">{{ $actividades->count() }}</span>
+                                <span class="badge rounded-pill ms-1"
+                                    style="background:#1F6B4B; font-size:.7rem;">{{ $actividades->count() }}</span>
                             </button>
                         </li>
                     @endif
                     @if ($paquetes->count() > 0)
                         <li class="nav-item">
-                            <button class="nav-link px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-paquetes" type="button">
+                            <button class="nav-link px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-paquetes"
+                                type="button">
                                 Paquetes
-                                <span class="badge rounded-pill ms-1" style="background:#1F6B4B; font-size:.7rem;">{{ $paquetes->count() }}</span>
+                                <span class="badge rounded-pill ms-1"
+                                    style="background:#1F6B4B; font-size:.7rem;">{{ $paquetes->count() }}</span>
                             </button>
                         </li>
                     @endif
                     @if ($destino->recomendaciones)
                         <li class="nav-item">
-                            <button class="nav-link px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-recomendaciones" type="button">Recomendaciones</button>
+                            <button class="nav-link px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-recomendaciones"
+                                type="button">Recomendaciones</button>
                         </li>
                     @endif
                     @if ($destino->lat && $destino->lng)
                         <li class="nav-item">
-                            <button class="nav-link px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-mapa" type="button">
+                            <button class="nav-link px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-mapa"
+                                type="button">
                                 <i class="bi bi-map me-1"></i>Ubicación
                             </button>
                         </li>
@@ -136,11 +147,13 @@
                     <div class="tab-pane fade" id="tab-actividades" role="tabpanel">
                         <div class="d-flex flex-column gap-3">
                             @foreach ($actividades as $act)
-                                <div class="rounded-3 p-4" style="background:#f1f5f2;">
-                                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+                                <div class="rounded-3 p-3" style="background:#f1f5f2;">
+                                    <div class="d-flex align-items-center gap-2 mb-2">
                                         <h6 class="fw-bold mb-0">{{ $act->nombre }}</h6>
-                                        <span class="badge rounded-pill
-                                            {{ $act->dificultad === 'alta' ? 'bg-danger' : ($act->dificultad === 'media' ? 'bg-warning text-dark' : 'bg-success') }}">
+                                        <span class="badge rounded-pill"
+                                            style="font-size: 0.75rem; padding: 4px 10px;
+                            background: {{ $act->dificultad === 'alta' ? '#dc3545' : ($act->dificultad === 'media' ? '#fd7e14' : '#1F6B4B') }};
+                            color: white;">
                                             {{ ucfirst($act->dificultad) }}
                                         </span>
                                     </div>
@@ -149,7 +162,8 @@
                                             <span><i class="bi bi-clock me-1"></i>{{ $act->duracion_estimada }}</span>
                                         @endif
                                         @if ($act->minimo_personas)
-                                            <span><i class="bi bi-people me-1"></i>Mín. {{ $act->minimo_personas }} personas</span>
+                                            <span><i class="bi bi-people me-1"></i>Mín. {{ $act->minimo_personas }}
+                                                personas</span>
                                         @endif
                                     </div>
                                     @if ($act->recomendacion)
@@ -179,11 +193,13 @@
                                         <div class="d-flex flex-wrap gap-3 text-muted small mb-3">
                                             @if ($paq->precio)
                                                 <span class="fw-semibold text-success">
-                                                    <i class="bi bi-tag me-1"></i>${{ number_format($paq->precio, 2) }} MXN
+                                                    <i class="bi bi-tag me-1"></i>${{ number_format($paq->precio, 2) }}
+                                                    MXN
                                                 </span>
                                             @endif
                                             @if ($paq->minimo_personas)
-                                                <span><i class="bi bi-people me-1"></i>Mín. {{ $paq->minimo_personas }} personas</span>
+                                                <span><i class="bi bi-people me-1"></i>Mín. {{ $paq->minimo_personas }}
+                                                    personas</span>
                                             @endif
                                         </div>
                                         @auth
@@ -266,7 +282,11 @@
                     <script>
                         setTimeout(() => {
                             const a = document.getElementById('alerta-com');
-                            if (a) { a.style.transition = 'opacity .5s'; a.style.opacity = '0'; setTimeout(() => a.remove(), 500); }
+                            if (a) {
+                                a.style.transition = 'opacity .5s';
+                                a.style.opacity = '0';
+                                setTimeout(() => a.remove(), 500);
+                            }
                         }, 3000);
                     </script>
                 @endif
@@ -324,12 +344,11 @@
 
                                 {{-- Botón reportar comentario (turista y admin_destinos) --}}
                                 @auth
-                                    @if(in_array(auth()->user()->rol, ['turista', 'admin_destinos']))
-                                        <button type="button"
-                                                class="btn btn-sm btn-outline-danger rounded-3"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#modalReportarComentario{{ $com->id_comentario }}"
-                                                title="Reportar comentario">
+                                    @if (in_array(auth()->user()->rol, ['turista', 'admin_destinos']))
+                                        <button type="button" class="btn btn-sm btn-outline-danger rounded-3"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalReportarComentario{{ $com->id_comentario }}"
+                                            title="Reportar comentario">
                                             <i class="bi bi-flag"></i>
                                         </button>
                                     @endif
@@ -355,7 +374,7 @@
 
                     {{-- Modal Reportar Comentario --}}
                     @auth
-                        @if(in_array(auth()->user()->rol, ['turista', 'admin_destinos']))
+                        @if (in_array(auth()->user()->rol, ['turista', 'admin_destinos']))
                             <div class="modal fade" id="modalReportarComentario{{ $com->id_comentario }}" tabindex="-1">
                                 <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content rounded-4 border-0 shadow">
@@ -365,16 +384,18 @@
                                             </h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                         </div>
-                                        <form action="{{ route('reportes.comentario', $com->id_comentario) }}" method="POST">
+                                        <form action="{{ route('reportes.comentario', $com->id_comentario) }}"
+                                            method="POST">
                                             @csrf
                                             <div class="modal-body pt-2">
                                                 <p class="text-muted small mb-1">Comentario:</p>
                                                 <blockquote class="rounded-3 p-3 mb-3 small fst-italic"
-                                                            style="background:#f7f9f7; border-left:3px solid #dc3545;">
+                                                    style="background:#f7f9f7; border-left:3px solid #dc3545;">
                                                     {{ Str::limit($com->comentario, 100) }}
                                                 </blockquote>
                                                 <div class="mb-3">
-                                                    <label class="form-label fw-bold small">Motivo <span class="text-danger">*</span></label>
+                                                    <label class="form-label fw-bold small">Motivo <span
+                                                            class="text-danger">*</span></label>
                                                     <select name="motivo" class="form-select rounded-3" required>
                                                         <option value="" disabled selected>Selecciona un motivo</option>
                                                         <option value="contenido_inapropiado">Contenido inapropiado</option>
@@ -386,13 +407,14 @@
                                                     </select>
                                                 </div>
                                                 <div class="mb-2">
-                                                    <label class="form-label fw-bold small">Descripción <span class="text-muted fw-normal">(opcional)</span></label>
-                                                    <textarea name="descripcion" class="form-control rounded-3" rows="3"
-                                                              placeholder="Describe el problema..."></textarea>
+                                                    <label class="form-label fw-bold small">Descripción <span
+                                                            class="text-muted fw-normal">(opcional)</span></label>
+                                                    <textarea name="descripcion" class="form-control rounded-3" rows="3" placeholder="Describe el problema..."></textarea>
                                                 </div>
                                             </div>
                                             <div class="modal-footer border-0 pt-0">
-                                                <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Cancelar</button>
+                                                <button type="button" class="btn btn-light rounded-3"
+                                                    data-bs-dismiss="modal">Cancelar</button>
                                                 <button type="submit" class="btn btn-danger rounded-3 px-4">
                                                     <i class="bi bi-flag me-1"></i>Enviar reporte
                                                 </button>
@@ -431,7 +453,7 @@
 
     {{-- MODAL REPORTAR DESTINO (solo turistas) --}}
     @auth
-        @if(auth()->user()->rol === 'turista')
+        @if (auth()->user()->rol === 'turista')
             <div class="modal fade" id="modalReportarDestino" tabindex="-1">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content rounded-4 border-0 shadow">
@@ -460,13 +482,14 @@
                                     </select>
                                 </div>
                                 <div class="mb-2">
-                                    <label class="form-label fw-bold small">Descripción <span class="text-muted fw-normal">(opcional)</span></label>
-                                    <textarea name="descripcion" class="form-control rounded-3" rows="3"
-                                              placeholder="Describe el problema..."></textarea>
+                                    <label class="form-label fw-bold small">Descripción <span
+                                            class="text-muted fw-normal">(opcional)</span></label>
+                                    <textarea name="descripcion" class="form-control rounded-3" rows="3" placeholder="Describe el problema..."></textarea>
                                 </div>
                             </div>
                             <div class="modal-footer border-0 pt-0">
-                                <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="button" class="btn btn-light rounded-3"
+                                    data-bs-dismiss="modal">Cancelar</button>
                                 <button type="submit" class="btn btn-danger rounded-3 px-4">
                                     <i class="bi bi-flag me-1"></i>Enviar reporte
                                 </button>
