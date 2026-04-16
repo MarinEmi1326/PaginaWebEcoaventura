@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Mail\RechazoSolicitudMail;
 use App\Mail\SolicitudAprobadaMail;
+use App\Models\Persona;
+use App\Models\Rol;
+use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -13,13 +16,16 @@ use Illuminate\Validation\Rule;
 
 class AdminSolicitudesController extends Controller
 {
+    // ================================
+    // LISTAR SOLICITUDES
+    // ================================
     public function index(Request $request)
     {
         $query = DB::table('usuario as u')
-            ->leftJoin('admin_destinos as ad', 'ad.id_usuario', '=', 'u.id_usuario')
-            ->leftJoin('gestor_rutas as gr', 'gr.id_usuario', '=', 'u.id_usuario')
-            ->leftJoin('turista as t', 't.id_usuario', '=', 'u.id_usuario')
-            ->whereIn('u.rol', ['admin_destinos', 'gestor_rutas', 'turista'])
+            ->join('persona as p', 'p.id_usuario', '=', 'u.id_usuario')
+            ->join('persona_rol as pr', 'pr.id_persona', '=', 'p.id_persona')
+            ->join('rol as r', 'r.id_rol', '=', 'pr.id_rol')
+            ->whereIn('r.descripcion', ['admin_destinos', 'gestor_rutas', 'turista'])
             ->where('u.correo_verificado', 1);
 
         if ($request->filled('estado') && $request->estado !== 'todos') {
@@ -29,44 +35,50 @@ class AdminSolicitudesController extends Controller
         $solicitudes = $query->select(
             'u.id_usuario',
             'u.correo',
-            'u.rol',
             'u.activo',
             'u.estado',
             'u.fecha_solicitud',
             'u.fecha_respuesta',
-            DB::raw("COALESCE(ad.nombre, gr.nombre, t.nombre) as nombre"),
-            DB::raw("COALESCE(ad.apaterno, gr.apaterno, t.apaterno) as apaterno"),
-            DB::raw("COALESCE(ad.amaterno, gr.amaterno, t.amaterno) as amaterno"),
-            DB::raw("COALESCE(ad.telefono, gr.telefono, t.telefono) as telefono")
+            'p.id_persona',
+            'p.nombre',
+            'p.apellidos',
+            'p.telefono',
+            'r.descripcion as rol'
         )
-            ->orderByDesc('u.fecha_solicitud')
-            ->get();
+        ->orderByDesc('u.fecha_solicitud')
+        ->get();
 
         return view('admin.solicitudes.index', compact('solicitudes'));
     }
 
+    // ================================
+    // VER DETALLE DE SOLICITUD
+    // ================================
     public function show($id)
     {
         $solicitud = DB::table('usuario as u')
-            ->leftJoin('admin_destinos as ad', 'ad.id_usuario', '=', 'u.id_usuario')
-            ->leftJoin('gestor_rutas as gr', 'gr.id_usuario', '=', 'u.id_usuario')
-            ->leftJoin('turista as t', 't.id_usuario', '=', 'u.id_usuario')
+            ->join('persona as p', 'p.id_usuario', '=', 'u.id_usuario')
+            ->join('persona_rol as pr', 'pr.id_persona', '=', 'p.id_persona')
+            ->join('rol as r', 'r.id_rol', '=', 'pr.id_rol')
             ->where('u.id_usuario', $id)
-            ->whereIn('u.rol', ['admin_destinos', 'gestor_rutas', 'turista'])
+            ->whereIn('r.descripcion', ['admin_destinos', 'gestor_rutas', 'turista'])
             ->where('u.correo_verificado', 1)
             ->select(
                 'u.id_usuario',
                 'u.correo',
-                'u.rol',
                 'u.activo',
                 'u.estado',
                 'u.fecha_solicitud',
                 'u.fecha_respuesta',
                 'u.motivo_rechazo',
-                DB::raw("COALESCE(ad.nombre, gr.nombre, t.nombre) as nombre"),
-                DB::raw("COALESCE(ad.apaterno, gr.apaterno, t.apaterno) as apaterno"),
-                DB::raw("COALESCE(ad.amaterno, gr.amaterno, t.amaterno) as amaterno"),
-                DB::raw("COALESCE(ad.telefono, gr.telefono, t.telefono) as telefono")
+                'p.id_persona',
+                'p.nombre',
+                'p.apellidos',
+                'p.telefono',
+                'p.facebook_url',
+                'p.instagram_url',
+                'p.tiktok_url',
+                'r.descripcion as rol'
             )
             ->first();
 
@@ -75,7 +87,7 @@ class AdminSolicitudesController extends Controller
         $reportes = DB::table('reporte')
             ->leftJoin('destino', 'reporte.id_destino', '=', 'destino.id_destino')
             ->leftJoin('comentario', 'reporte.id_comentario', '=', 'comentario.id_comentario')
-            ->where('reporte.reportado_por', $id)
+            ->where('reporte.reportado_por', $solicitud->id_persona)
             ->select(
                 'reporte.id_reporte',
                 'reporte.tipo_objeto',
@@ -90,12 +102,10 @@ class AdminSolicitudesController extends Controller
 
         $reportesRecibidos = DB::table('reporte')
             ->join('comentario', 'reporte.id_comentario', '=', 'comentario.id_comentario')
-            ->join('turista as tAutor', 'comentario.id_turista', '=', 'tAutor.id_turista')
+            ->join('persona as pAutor', 'comentario.id_persona', '=', 'pAutor.id_persona')
             ->leftJoin('destino', 'reporte.id_destino', '=', 'destino.id_destino')
-            ->leftJoin('usuario as reporter', 'reporte.reportado_por', '=', 'reporter.id_usuario')
-            ->leftJoin('turista as tr', 'reporter.id_usuario', '=', 'tr.id_usuario')
-            ->leftJoin('admin_destinos as adr', 'reporter.id_usuario', '=', 'adr.id_usuario')
-            ->where('tAutor.id_usuario', $id)
+            ->leftJoin('persona as reporter', 'reporte.reportado_por', '=', 'reporter.id_persona')
+            ->where('pAutor.id_usuario', $id)
             ->select(
                 'reporte.id_reporte',
                 'reporte.motivo',
@@ -103,14 +113,18 @@ class AdminSolicitudesController extends Controller
                 'reporte.fecha',
                 'comentario.comentario as texto_comentario',
                 'destino.nombre as nombre_destino',
-                DB::raw("COALESCE(tr.nombre, adr.nombre) as nombre_reporter"),
-                DB::raw("COALESCE(tr.apaterno, adr.apaterno) as apaterno_reporter")
+                'reporter.nombre as nombre_reporter',
+                'reporter.apellidos as apellidos_reporter'
             )
             ->orderByDesc('reporte.fecha')
             ->get();
 
         return view('admin.solicitudes.show', compact('solicitud', 'reportes', 'reportesRecibidos'));
     }
+
+    // ================================
+    // CREAR NUEVO ADMIN/GESTOR (desde admin)
+    // ================================
     public function create()
     {
         return view('admin.solicitudes.create');
@@ -123,16 +137,15 @@ class AdminSolicitudesController extends Controller
             'password' => 'required|string|min:8',
             'rol'      => 'required|in:admin_destinos,gestor_rutas',
             'nombre'   => 'required|string|max:60',
-            'apaterno' => 'required|string|max:60',
-            'amaterno' => 'nullable|string|max:60',
+            'apellidos'=> 'required|string|max:120',
             'telefono' => 'required|string|max:20',
         ]);
 
         DB::transaction(function () use ($request) {
+            // Crear usuario
             $idUsuario = DB::table('usuario')->insertGetId([
                 'correo'              => $request->correo,
                 'password'            => Hash::make($request->password),
-                'rol'                 => $request->rol,
                 'estado'              => 'aprobado',
                 'activo'              => 1,
                 'correo_verificado'   => 1,
@@ -141,16 +154,21 @@ class AdminSolicitudesController extends Controller
                 'fecha_respuesta'     => now(),
             ]);
 
-            $tablaPerfil = $request->rol === 'admin_destinos'
-                ? 'admin_destinos'
-                : 'gestor_rutas';
-
-            DB::table($tablaPerfil)->insert([
+            // Crear persona
+            $idPersona = DB::table('persona')->insertGetId([
                 'id_usuario' => $idUsuario,
                 'nombre'     => $request->nombre,
-                'apaterno'   => $request->apaterno,
-                'amaterno'   => $request->amaterno,
+                'apellidos'  => $request->apellidos,
                 'telefono'   => $request->telefono,
+            ]);
+
+            // Obtener id del rol
+            $rol = DB::table('rol')->where('descripcion', $request->rol)->first();
+            
+            // Asignar rol
+            DB::table('persona_rol')->insert([
+                'id_persona' => $idPersona,
+                'id_rol'     => $rol->id_rol,
             ]);
         });
 
@@ -159,26 +177,28 @@ class AdminSolicitudesController extends Controller
             ->with('ok', 'Usuario creado exitosamente.');
     }
 
+    // ================================
+    // EDITAR USUARIO
+    // ================================
     public function edit($id)
     {
         $usuario = DB::table('usuario as u')
-            ->leftJoin('admin_destinos as ad', 'ad.id_usuario', '=', 'u.id_usuario')
-            ->leftJoin('gestor_rutas as gr', 'gr.id_usuario', '=', 'u.id_usuario')
-            ->leftJoin('turista as t', 't.id_usuario', '=', 'u.id_usuario')
+            ->join('persona as p', 'p.id_usuario', '=', 'u.id_usuario')
+            ->join('persona_rol as pr', 'pr.id_persona', '=', 'p.id_persona')
+            ->join('rol as r', 'r.id_rol', '=', 'pr.id_rol')
             ->where('u.id_usuario', $id)
-            ->whereIn('u.rol', ['admin_destinos', 'gestor_rutas', 'turista'])
+            ->whereIn('r.descripcion', ['admin_destinos', 'gestor_rutas', 'turista'])
             ->select(
                 'u.id_usuario',
                 'u.correo',
-                'u.rol',
                 'u.activo',
                 'u.estado',
-                DB::raw("COALESCE(ad.nombre, gr.nombre, t.nombre) as nombre"),
-                DB::raw("COALESCE(ad.apaterno, gr.apaterno, t.apaterno) as apaterno"),
-                DB::raw("COALESCE(ad.amaterno, gr.amaterno, t.amaterno) as amaterno"),
-                DB::raw("COALESCE(ad.telefono, gr.telefono, t.telefono) as telefono")
+                'p.id_persona',
+                'p.nombre',
+                'p.apellidos',
+                'p.telefono',
+                'r.descripcion as rol'
             )
-
             ->first();
 
         if (!$usuario) {
@@ -209,57 +229,55 @@ class AdminSolicitudesController extends Controller
             'password' => 'nullable|string|min:8',
             'rol'      => 'required|in:admin_destinos,gestor_rutas,turista',
             'nombre'   => 'required|string|max:60',
-            'apaterno' => 'required|string|max:60',
-            'amaterno' => 'nullable|string|max:60',
+            'apellidos'=> 'required|string|max:120',
             'telefono' => 'required|string|max:20',
         ]);
 
-        DB::transaction(function () use ($request, $id, $usuarioActual) {
-            $datosUsuario = [
-                'correo' => $request->correo,
-                'rol'    => $request->rol,
-            ];
-
+        DB::transaction(function () use ($request, $id) {
+            // Actualizar usuario
+            $datosUsuario = ['correo' => $request->correo];
             if ($request->filled('password')) {
                 $datosUsuario['password'] = Hash::make($request->password);
             }
-
             DB::table('usuario')->where('id_usuario', $id)->update($datosUsuario);
 
-            // Determinar tabla según rol
-            $tablaRol = fn($rol) => match ($rol) {
-                'admin_destinos' => 'admin_destinos',
-                'gestor_rutas'   => 'gestor_rutas',
-                'turista'        => 'turista',
-            };
+            // Obtener persona
+            $persona = DB::table('persona')->where('id_usuario', $id)->first();
+            
+            // Actualizar persona
+            DB::table('persona')->where('id_persona', $persona->id_persona)->update([
+                'nombre'    => $request->nombre,
+                'apellidos' => $request->apellidos,
+                'telefono'  => $request->telefono,
+            ]);
 
-            $tablaNueva    = $tablaRol($request->rol);
-            $tablaAnterior = $tablaRol($usuarioActual->rol);
-
-            $datosPerfil = [
-                'nombre'   => $request->nombre,
-                'apaterno' => $request->apaterno,
-                'amaterno' => $request->amaterno,
-                'telefono' => $request->telefono,
-            ];
-
-            if ($tablaAnterior === $tablaNueva) {
-                DB::table($tablaNueva)->where('id_usuario', $id)->update($datosPerfil);
-            } else {
-                DB::table($tablaAnterior)->where('id_usuario', $id)->delete();
-                DB::table($tablaNueva)->insert(['id_usuario' => $id] + $datosPerfil);
-            }
+            // Obtener nuevo rol
+            $nuevoRol = DB::table('rol')->where('descripcion', $request->rol)->first();
+            
+            // Eliminar rol actual y asignar nuevo
+            DB::table('persona_rol')->where('id_persona', $persona->id_persona)->delete();
+            DB::table('persona_rol')->insert([
+                'id_persona' => $persona->id_persona,
+                'id_rol'     => $nuevoRol->id_rol,
+            ]);
         });
 
         return redirect()
             ->route('admin.solicitudes.index')
             ->with('ok', 'Usuario actualizado correctamente.');
     }
+
+    // ================================
+    // ACTIVAR/SUSPENDER USUARIO
+    // ================================
     public function toggleActivo($id)
     {
-        $usuario = DB::table('usuario')
-            ->where('id_usuario', $id)
-            ->whereIn('rol', ['admin_destinos', 'gestor_rutas'])
+        $usuario = DB::table('usuario as u')
+            ->join('persona as p', 'p.id_usuario', '=', 'u.id_usuario')
+            ->join('persona_rol as pr', 'pr.id_persona', '=', 'p.id_persona')
+            ->join('rol as r', 'r.id_rol', '=', 'pr.id_rol')
+            ->where('u.id_usuario', $id)
+            ->whereIn('r.descripcion', ['admin_destinos', 'gestor_rutas'])
             ->first();
 
         if (!$usuario) {
@@ -278,18 +296,19 @@ class AdminSolicitudesController extends Controller
         );
     }
 
+    // ================================
+    // APROBAR SOLICITUD
+    // ================================
     public function aprobar($id)
     {
         $u = DB::table('usuario as u')
-            ->leftJoin('admin_destinos as ad', 'ad.id_usuario', '=', 'u.id_usuario')
-            ->leftJoin('gestor_rutas as gr', 'gr.id_usuario', '=', 'u.id_usuario')
+            ->join('persona as p', 'p.id_usuario', '=', 'u.id_usuario')
+            ->join('persona_rol as pr', 'pr.id_persona', '=', 'p.id_persona')
+            ->join('rol as r', 'r.id_rol', '=', 'pr.id_rol')
             ->where('u.id_usuario', $id)
-            ->whereIn('u.rol', ['admin_destinos', 'gestor_rutas'])
+            ->whereIn('r.descripcion', ['admin_destinos', 'gestor_rutas'])
             ->where('u.correo_verificado', 1)
-            ->select(
-                'u.*',
-                DB::raw("COALESCE(ad.nombre, gr.nombre) as nombre_persona")
-            )
+            ->select('u.*', 'p.nombre as nombre_persona')
             ->first();
 
         abort_if(!$u, 404);
@@ -310,6 +329,7 @@ class AdminSolicitudesController extends Controller
         try {
             Mail::to($u->correo)->send(new SolicitudAprobadaMail($u));
         } catch (\Exception $e) {
+            // Log error si quieres
         }
 
         return redirect()
@@ -317,6 +337,9 @@ class AdminSolicitudesController extends Controller
             ->with('ok', 'Solicitud aprobada y correo enviado.');
     }
 
+    // ================================
+    // RECHAZAR SOLICITUD
+    // ================================
     public function rechazar(Request $request, $id)
     {
         $request->validate([
@@ -324,15 +347,13 @@ class AdminSolicitudesController extends Controller
         ]);
 
         $u = DB::table('usuario as u')
-            ->leftJoin('admin_destinos as ad', 'ad.id_usuario', '=', 'u.id_usuario')
-            ->leftJoin('gestor_rutas as gr', 'gr.id_usuario', '=', 'u.id_usuario')
+            ->join('persona as p', 'p.id_usuario', '=', 'u.id_usuario')
+            ->join('persona_rol as pr', 'pr.id_persona', '=', 'p.id_persona')
+            ->join('rol as r', 'r.id_rol', '=', 'pr.id_rol')
             ->where('u.id_usuario', $id)
-            ->whereIn('u.rol', ['admin_destinos', 'gestor_rutas'])
+            ->whereIn('r.descripcion', ['admin_destinos', 'gestor_rutas'])
             ->where('u.correo_verificado', 1)
-            ->select(
-                'u.*',
-                DB::raw("COALESCE(ad.nombre, gr.nombre) as nombre_persona")
-            )
+            ->select('u.*', 'p.nombre as nombre_persona')
             ->first();
 
         abort_if(!$u, 404);
@@ -355,6 +376,7 @@ class AdminSolicitudesController extends Controller
                 new RechazoSolicitudMail($request->motivo_rechazo, $u->nombre_persona)
             );
         } catch (\Exception $e) {
+           
         }
 
         return redirect()

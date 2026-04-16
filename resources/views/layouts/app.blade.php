@@ -100,23 +100,24 @@
 
                         @php
                             $user = auth()->user();
-                            $nombre = $user->correo;
-                            $panel = '/';
+                            $persona = $user->persona;
+                            $roles = $persona?->roles->pluck('descripcion')->toArray() ?? [];
 
-                            if ($user->rol == 'admin_general' && $user->adminGeneral) {
-                                $nombre = $user->adminGeneral->nombre;
-                                $panel = route('admin.index');
-                            } elseif ($user->rol == 'admin_destinos' && $user->adminDestinos) {
-                                $nombre = $user->adminDestinos->nombre;
-                                $panel = route('misdestinos.index');
-                            } elseif ($user->rol == 'gestor_rutas' && $user->gestorRutas) {
-                                $nombre = $user->gestorRutas->nombre;
-                                $panel = route('rutas.index');
+                            // Nombre a mostrar
+                            $nombreMostrar = $persona?->nombre ?? $user->correo;
+
+                            // Determinar panel según rol
+                            $panelUrl = '#';
+                            if (in_array('admin_general', $roles)) {
+                                $panelUrl = route('admin.index');
+                            } elseif (in_array('admin_destinos', $roles)) {
+                                $panelUrl = route('misdestinos.index');
+                            } elseif (in_array('gestor_rutas', $roles)) {
+                                $panelUrl = route('rutas.index');
                             }
 
-                            if ($user->rol == 'turista' && $user->turista) {
-                                $nombre = $user->turista->nombre;
-                            }
+                            // Verificar si es turista
+                            $esTurista = in_array('turista', $roles);
                         @endphp
 
                         <div class="dropdown">
@@ -124,7 +125,7 @@
                             <button class="btn btn-success rounded-pill dropdown-toggle" type="button"
                                 data-bs-toggle="dropdown">
                                 <i class="bi bi-person-circle me-1"></i>
-                                {{ $nombre }}
+                                {{ $nombreMostrar }}
                             </button>
 
                             <ul class="dropdown-menu dropdown-menu-end">
@@ -136,9 +137,10 @@
                                     </a>
                                 </li>
 
-                                @if($user->rol !== 'turista')
+                                {{-- Mostrar "Ir a mi panel" solo para admins y gestores (NO para turistas) --}}
+                                @if (!$esTurista && !empty($roles))
                                     <li>
-                                        <a class="dropdown-item" href="{{ $panel }}">
+                                        <a class="dropdown-item" href="{{ $panelUrl }}">
                                             <i class="bi bi-speedometer2 me-1"></i>
                                             Ir a mi panel
                                         </a>

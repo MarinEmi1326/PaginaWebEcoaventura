@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Turista;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -20,7 +19,7 @@ class ApiAuthController extends Controller
             'fcm_token' => 'nullable|string',
         ]);
 
-        $usuario = Usuario::where('correo', $request->correo)->first();
+        $usuario = Usuario::with('persona.roles')->where('correo', $request->correo)->first();
 
         if (!$usuario || !Hash::check($request->password, $usuario->password)) {
             return response()->json(['success' => false, 'message' => 'Credenciales incorrectas.'], 401);
@@ -42,35 +41,39 @@ class ApiAuthController extends Controller
             return response()->json(['success' => false, 'message' => 'Usuario inactivo.'], 403);
         }
 
-        // Solo turistas y admin_destinos pueden usar la app móvil
-        if (!in_array($usuario->rol, ['turista', 'admin_destinos'])) {
-            return response()->json(['success' => false, 'message' => 'Rol no permitido en la app.'], 403);
+        $persona = $usuario->persona;
+
+        if (!$persona) {
+            return response()->json(['success' => false, 'message' => 'Perfil no encontrado'], 404);
         }
 
-        // Obtener nombre según rol
-        $perfil = null;
-        if ($usuario->rol === 'turista') {
-            $perfil = DB::table('turista')->where('id_usuario', $usuario->id_usuario)->first();
-        } elseif ($usuario->rol === 'admin_destinos') {
-            $perfil = DB::table('admin_destinos')->where('id_usuario', $usuario->id_usuario)->first();
+        $roles = $persona->roles->pluck('descripcion');
+
+        // Solo permitir app móvil
+        if (!$roles->intersect(['turista', 'admin_destinos'])->isNotEmpty()) {
+            return response()->json(['success' => false, 'message' => 'Rol no permitido en la app.'], 403);
         }
 
         $usuario->tokens()->delete();
         $token = $usuario->createToken('api-token')->plainTextToken;
 
         if ($request->filled('fcm_token')) {
-            DB::table('usuario')
-                ->where('id_usuario', $usuario->id_usuario)
-                ->update(['fcm_token' => $request->fcm_token]);
+            $usuario->update(['fcm_token' => $request->fcm_token]);
         }
 
         return response()->json([
             'success' => true,
             'token'   => $token,
-            'rol'     => $usuario->rol,
-            'correo'  => $usuario->correo,
-            'nombre'  => $perfil->nombre ?? null,
-            'apaterno' => $perfil->apaterno ?? null,
+            'usuario' => [
+                'id_usuario' => $usuario->id_usuario,
+                'correo' => $usuario->correo,
+            ],
+            'persona' => [
+                'id_persona' => $persona->id_persona,
+                'nombre' => $persona->nombre,
+                'apellidos' => $persona->apellidos,
+            ],
+            'roles' => $roles
         ]);
     }
 
@@ -79,40 +82,35 @@ class ApiAuthController extends Controller
     {
         $request->validate([
             'nombre'   => 'required',
-            'apaterno' => 'required',
+            'apellidos' => 'required',
             'correo'   => 'required|email|unique:usuario,correo',
             'password' => 'required|min:8',
         ]);
 
         $usuario = Usuario::create([
-            'correo'             => $request->correo,
-            'password'           => bcrypt($request->password),
-            'rol'                => 'turista',
-            'activo'             => true,
-            'estado'             => 'aprobado',
-            'correo_verificado'  => 1,
-            'token_verificacion' => null,
-            'fecha_solicitud'    => now(),
-            'fecha_respuesta'    => now(),
-            'motivo_rechazo'     => null,
+            'correo' => $request->correo,
+            'password' => bcrypt($request->password),
+            'activo' => true,
+            'estado' => 'aprobado',
+            'correo_verificado' => 1,
         ]);
 
-        Turista::create([
-            'nombre'     => $request->nombre,
-            'apaterno'   => $request->apaterno,
-            'amaterno'   => $request->amaterno ?? null,
+        $persona = \App\Models\Persona::create([
             'id_usuario' => $usuario->id_usuario,
+            'nombre' => $request->nombre,
+            'apellidos' => $request->apellidos,
         ]);
+
+        $rol = \App\Models\Rol::where('descripcion', 'turista')->first();
+        $persona->roles()->attach($rol->id_rol);
 
         $token = $usuario->createToken('api-token')->plainTextToken;
 
         return response()->json([
-            'success'  => true,
-            'message'  => 'Registro exitoso.',
-            'token'    => $token,
-            'rol'      => $usuario->rol,
-            'nombre'   => $request->nombre,
-            'apaterno' => $request->apaterno,
+            'success' => true,
+            'token' => $token,
+            'persona' => $persona,
+            'roles' => ['turista']
         ], 201);
     }
 
@@ -127,23 +125,13 @@ class ApiAuthController extends Controller
     // GET /api/perfil
     public function perfil(Request $request)
     {
-        $usuario = $request->user();
-
-        $perfil = null;
-        if ($usuario->rol === 'turista') {
-            $perfil = DB::table('turista')->where('id_usuario', $usuario->id_usuario)->first();
-        } elseif ($usuario->rol === 'admin_destinos') {
-            $perfil = DB::table('admin_destinos')->where('id_usuario', $usuario->id_usuario)->first();
-        }
+        $usuario = $request->user()->load('persona.roles');
 
         return response()->json([
-            'success'  => true,
-            'correo'   => $usuario->correo,
-            'rol'      => $usuario->rol,
-            'nombre'   => $perfil->nombre ?? null,
-            'apaterno' => $perfil->apaterno ?? null,
-            'amaterno' => $perfil->amaterno ?? null,
-            'telefono' => $perfil->telefono ?? null,
+            'success' => true,
+            'correo' => $usuario->correo,
+            'persona' => $usuario->persona,
+            'roles' => $usuario->persona->roles->pluck('descripcion')
         ]);
     }
 
@@ -151,76 +139,38 @@ class ApiAuthController extends Controller
     public function actualizarPerfil(Request $request)
     {
         $user = $request->user();
+        $persona = $user->persona;
 
         $request->validate([
-            'nombre'            => 'required|string|max:60',
-            'apaterno'          => 'required|string|max:60',
-            'amaterno'          => 'nullable|string|max:60',
-            'telefono'          => 'nullable|string|max:20',
-            'password_actual'   => 'nullable|string',
-            'password_nuevo'    => 'nullable|string|min:8',
+            'nombre' => 'required|string|max:60',
+            'apellidos' => 'required|string|max:120',
+            'telefono' => 'nullable|string|max:20',
         ]);
 
-        $tabla = match ($user->rol) {
-            'turista'        => 'turista',
-            'admin_destinos' => 'admin_destinos',
-            default          => null,
-        };
-
-        if (!$tabla) {
-            return response()->json(['success' => false, 'message' => 'Rol no permitido'], 403);
-        }
-
-        // Actualizar datos personales
-        DB::table($tabla)->where('id_usuario', $user->id_usuario)->update([
-            'nombre'   => $request->nombre,
-            'apaterno' => $request->apaterno,
-            'amaterno' => $request->amaterno,
+        $persona->update([
+            'nombre' => $request->nombre,
+            'apellidos' => $request->apellidos,
             'telefono' => $request->telefono,
         ]);
 
-        // Cambiar contraseña si se proporcionó
-        if ($request->filled('password_actual') && $request->filled('password_nuevo')) {
-            if (!Hash::check($request->password_actual, $user->password)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'La contraseña actual es incorrecta'
-                ], 422);
-            }
-            DB::table('usuario')->where('id_usuario', $user->id_usuario)->update([
-                'password' => bcrypt($request->password_nuevo),
-            ]);
-        }
-
-        return response()->json(['success' => true, 'message' => 'Perfil actualizado correctamente']);
+        return response()->json(['success' => true]);
     }
 
 
     // GET /api/turista/pagos
     public function misPagos(Request $request)
     {
-        $user = $request->user();
-
-        if ($user->rol !== 'turista') {
-            return response()->json(['success' => false, 'message' => 'No autorizado'], 403);
-        }
-
-        $turista = DB::table('turista')->where('id_usuario', $user->id_usuario)->first();
-
-        if (!$turista) {
-            return response()->json(['success' => false, 'message' => 'Turista no encontrado'], 404);
-        }
+        $persona = $request->user()->persona;
 
         $pagos = DB::table('pago')
             ->join('paquete', 'pago.id_paquete', '=', 'paquete.id_paquete')
             ->join('destino', 'pago.id_destino', '=', 'destino.id_destino')
-            ->where('pago.id_turista', $turista->id_turista)
+            ->where('pago.id_persona', $persona->id_persona)
             ->select(
                 'pago.id_pago',
                 'pago.monto',
                 'pago.estado',
                 'pago.fecha',
-                'pago.moneda',
                 'destino.nombre as destino_nombre',
                 'paquete.nombre as paquete_nombre'
             )
@@ -229,8 +179,7 @@ class ApiAuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'total'   => count($pagos),
-            'data'    => $pagos,
+            'data' => $pagos
         ]);
     }
     // DELETE /api/perfil
@@ -238,23 +187,9 @@ class ApiAuthController extends Controller
     {
         $user = $request->user();
 
-        $tabla = match ($user->rol) {
-            'turista'        => 'turista',
-            'admin_destinos' => 'admin_destinos',
-            default          => null,
-        };
-
-        if (!$tabla) {
-            return response()->json(['success' => false, 'message' => 'Rol no permitido'], 403);
-        }
-
-        // Revocar tokens
         $user->tokens()->delete();
+        $user->delete(); // cascade elimina persona
 
-        // Eliminar perfil y usuario (CASCADE se encarga del resto)
-        DB::table($tabla)->where('id_usuario', $user->id_usuario)->delete();
-        DB::table('usuario')->where('id_usuario', $user->id_usuario)->delete();
-
-        return response()->json(['success' => true, 'message' => 'Cuenta eliminada correctamente']);
+        return response()->json(['success' => true]);
     }
 }

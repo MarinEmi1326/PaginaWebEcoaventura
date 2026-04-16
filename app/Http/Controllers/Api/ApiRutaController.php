@@ -81,9 +81,9 @@ class ApiRutaController extends Controller
 
         $ruta->destinos = $destinos;
 
-        // Comentarios
+        // CAMBIADO: Comentarios usando persona en lugar de turista
         $ruta->comentarios = DB::table('comentario')
-            ->join('turista', 'comentario.id_turista', '=', 'turista.id_turista')
+            ->join('persona', 'comentario.id_persona', '=', 'persona.id_persona')
             ->where('comentario.entidad', 'ruta')
             ->where('comentario.id_ruta', $id)
             ->orderByDesc('comentario.fecha')
@@ -91,8 +91,8 @@ class ApiRutaController extends Controller
                 'comentario.id_comentario',
                 'comentario.comentario',
                 'comentario.fecha',
-                'turista.nombre',
-                'turista.apaterno'
+                'persona.nombre',
+                'persona.apellidos'
             )
             ->get();
 

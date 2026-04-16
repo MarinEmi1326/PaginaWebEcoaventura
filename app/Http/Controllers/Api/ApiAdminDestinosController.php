@@ -8,41 +8,64 @@ use Illuminate\Support\Facades\DB;
 
 class ApiAdminDestinosController extends Controller
 {
+    // Helper para obtener la persona del usuario autenticado
+    private function getPersona($userId)
+    {
+        return DB::table('persona')->where('id_usuario', $userId)->first();
+    }
+
+    // Helper para verificar si el usuario tiene un rol específico
+    private function tieneRol($userId, $rolNombre)
+    {
+        $persona = $this->getPersona($userId);
+        if (!$persona) return false;
+
+        $rol = DB::table('persona_rol')
+            ->join('rol', 'persona_rol.id_rol', '=', 'rol.id_rol')
+            ->where('persona_rol.id_persona', $persona->id_persona)
+            ->where('rol.descripcion', $rolNombre)
+            ->first();
+
+        return $rol !== null;
+    }
+
     // GET /api/admin/dashboard
     public function dashboard(Request $request)
     {
         $user = $request->user();
 
-        if ($user->rol !== 'admin_destinos') {
+        // CAMBIADO: verificar rol desde persona_rol
+        if (!$this->tieneRol($user->id_usuario, 'admin_destinos')) {
             return response()->json(['success' => false, 'message' => 'No autorizado'], 403);
         }
 
-        $admin = DB::table('admin_destinos')->where('id_usuario', $user->id_usuario)->first();
+        // CAMBIADO: obtener la persona
+        $persona = $this->getPersona($user->id_usuario);
 
-        // Total de destinos publicados
+        // Total de destinos publicados (creado_por ahora es id_persona)
         $totalDestinos = DB::table('destino')
-            ->where('creado_por', $user->id_usuario)
+            ->where('creado_por', $persona->id_persona)
             ->count();
 
         // Total de pagos recibidos
         $totalPagos = DB::table('pago')
             ->join('destino', 'pago.id_destino', '=', 'destino.id_destino')
-            ->where('destino.creado_por', $user->id_usuario)
+            ->where('destino.creado_por', $persona->id_persona)
             ->where('pago.estado', 'completado')
             ->count();
 
         // Total ingresos
         $totalIngresos = DB::table('pago')
             ->join('destino', 'pago.id_destino', '=', 'destino.id_destino')
-            ->where('destino.creado_por', $user->id_usuario)
+            ->where('destino.creado_por', $persona->id_persona)
             ->where('pago.estado', 'completado')
             ->sum('pago.monto');
 
         return response()->json([
             'success' => true,
             'data' => [
-                'nombre'         => $admin->nombre ?? '',
-                'apaterno'       => $admin->apaterno ?? '',
+                'nombre'         => $persona->nombre ?? '',
+                'apellidos'      => $persona->apellidos ?? '',  
                 'totalDestinos'  => $totalDestinos,
                 'totalPagos'     => $totalPagos,
                 'totalIngresos'  => $totalIngresos,
@@ -55,12 +78,17 @@ class ApiAdminDestinosController extends Controller
     {
         $user = $request->user();
 
-        if ($user->rol !== 'admin_destinos') {
+        // CAMBIADO: verificar rol desde persona_rol
+        if (!$this->tieneRol($user->id_usuario, 'admin_destinos')) {
             return response()->json(['success' => false, 'message' => 'No autorizado'], 403);
         }
 
+        // CAMBIADO: obtener la persona
+        $persona = $this->getPersona($user->id_usuario);
+
+        // CAMBIADO: creado_por ahora es id_persona
         $destinos = DB::table('destino')
-            ->where('creado_por', $user->id_usuario)
+            ->where('creado_por', $persona->id_persona)
             ->orderByDesc('fecha_creacion')
             ->get();
 
@@ -94,15 +122,20 @@ class ApiAdminDestinosController extends Controller
     {
         $user = $request->user();
 
-        if ($user->rol !== 'admin_destinos') {
+        // CAMBIADO: verificar rol desde persona_rol
+        if (!$this->tieneRol($user->id_usuario, 'admin_destinos')) {
             return response()->json(['success' => false, 'message' => 'No autorizado'], 403);
         }
 
+        // CAMBIADO: obtener la persona
+        $persona = $this->getPersona($user->id_usuario);
+
+        // CAMBIADO: usar persona en lugar de turista
         $pagos = DB::table('pago')
             ->join('destino', 'pago.id_destino', '=', 'destino.id_destino')
             ->join('paquete', 'pago.id_paquete', '=', 'paquete.id_paquete')
-            ->join('turista', 'pago.id_turista', '=', 'turista.id_turista')
-            ->where('destino.creado_por', $user->id_usuario)
+            ->join('persona', 'pago.id_persona', '=', 'persona.id_persona')  // CAMBIADO: turista → persona
+            ->where('destino.creado_por', $persona->id_persona)
             ->select(
                 'pago.id_pago',
                 'pago.monto',
@@ -111,8 +144,8 @@ class ApiAdminDestinosController extends Controller
                 'pago.moneda',
                 'destino.nombre as destino_nombre',
                 'paquete.nombre as paquete_nombre',
-                'turista.nombre as turista_nombre',
-                'turista.apaterno as turista_apaterno'
+                'persona.nombre as persona_nombre',        // CAMBIADO: turista_nombre → persona_nombre
+                'persona.apellidos as persona_apellidos'   // CAMBIADO: turista_apaterno → persona_apellidos
             )
             ->orderByDesc('pago.fecha')
             ->get();

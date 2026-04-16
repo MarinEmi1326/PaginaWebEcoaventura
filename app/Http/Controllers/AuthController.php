@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Mail\SolicitudPendienteMail;
-use App\Models\AdminDestinos;
-use App\Models\GestorRutas;
-use App\Models\Turista;
+use App\Models\Persona;
+use App\Models\Rol;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -59,7 +58,6 @@ class AuthController extends Controller
         $usuario = Usuario::create([
             'correo'             => $validated['correo'],
             'password'           => Hash::make($validated['password']),
-            'rol'                => 'turista',
             'activo'             => true,
             'estado'             => 'aprobado',
             'correo_verificado'  => 1,
@@ -69,13 +67,23 @@ class AuthController extends Controller
             'motivo_rechazo'     => null,
         ]);
 
-        Turista::create([
-            'nombre'     => $validated['nombre'],
-            'apaterno'   => $validated['apaterno'],
-            'amaterno'   => $validated['amaterno'] ?? null,
+        // Crear persona con nombre y apellidos combinados
+        $nombreCompleto = $validated['nombre'];
+        $apellidosCompletos = $validated['apaterno'];
+        if (!empty($validated['amaterno'])) {
+            $apellidosCompletos .= ' ' . $validated['amaterno'];
+        }
+
+        $persona = Persona::create([
+            'nombre'     => $nombreCompleto,
+            'apellidos'  => $apellidosCompletos,
             'telefono'   => $validated['telefono'],
             'id_usuario' => $usuario->id_usuario,
         ]);
+
+        // Asignar rol TURISTA
+        $rolTurista = Rol::where('descripcion', 'turista')->first();
+        $persona->roles()->attach($rolTurista->id_rol);
 
         Auth::login($usuario);
 
@@ -128,13 +136,25 @@ class AuthController extends Controller
 
         Auth::login($usuario);
 
-        return match ($usuario->rol) {
-            'admin_general' => redirect()->route('admin.index'),
-            'admin_destinos' => redirect()->route('misdestinos.index'),
-            'gestor_rutas' => redirect()->route('rutas.index'),
-            'turista' => redirect('/'),
-            default => redirect('/login')->with('error', 'Rol no válido.'),
-        };
+        // Obtener roles desde persona_rol
+        $persona = $usuario->persona;
+        $roles = $persona?->roles->pluck('descripcion')->toArray() ?? [];
+
+        // Redirigir según el rol
+        if (in_array('admin_general', $roles)) {
+            return redirect()->route('admin.index');
+        }
+        if (in_array('admin_destinos', $roles)) {
+            return redirect()->route('misdestinos.index');
+        }
+        if (in_array('gestor_rutas', $roles)) {
+            return redirect()->route('rutas.index');
+        }
+        if (in_array('turista', $roles)) {
+            return redirect('/');
+        }
+
+        return redirect('/login')->with('error', 'Rol no válido.');
     }
 
     // ================================
@@ -154,29 +174,36 @@ class AuthController extends Controller
             'password'  => ['required', 'min:8', 'confirmed'],
         ], $mensajes);
 
-
         $token = Str::random(60);
 
         $usuario = Usuario::create([
-                'correo'             => $validated['correo'],
-                'password'           => Hash::make($validated['password']),
-                'rol'                => 'admin_destinos',
-                'activo'             => false,
-                'estado'             => 'pendiente',
-                'correo_verificado'  => 0,
-                'token_verificacion' => $token,
-                'fecha_solicitud'    => now(),
-                'fecha_respuesta'    => null,
-                'motivo_rechazo'     => null,
+            'correo'             => $validated['correo'],
+            'password'           => Hash::make($validated['password']),
+            'activo'             => false,
+            'estado'             => 'pendiente',
+            'correo_verificado'  => 0,
+            'token_verificacion' => $token,
+            'fecha_solicitud'    => now(),
+            'fecha_respuesta'    => null,
+            'motivo_rechazo'     => null,
         ]);
 
-        AdminDestinos::create([
-            'nombre'     => $validated['nombre'],
-            'apaterno'   => $validated['apaterno'],
-            'amaterno'   => $validated['amaterno'] ?? null,
+        $nombreCompleto = $validated['nombre'];
+        $apellidosCompletos = $validated['apaterno'];
+        if (!empty($validated['amaterno'])) {
+            $apellidosCompletos .= ' ' . $validated['amaterno'];
+        }
+
+        $persona = Persona::create([
+            'nombre'     => $nombreCompleto,
+            'apellidos'  => $apellidosCompletos,
             'telefono'   => $validated['telefono'],
             'id_usuario' => $usuario->id_usuario,
         ]);
+
+        // Asignar rol ADMIN DESTINOS
+        $rolAdminDestinos = Rol::where('descripcion', 'admin_destinos')->first();
+        $persona->roles()->attach($rolAdminDestinos->id_rol);
 
         Mail::to($usuario->correo)->send(new SolicitudPendienteMail($usuario));
 
@@ -202,10 +229,9 @@ class AuthController extends Controller
 
         $token = Str::random(60);
 
-       $usuario = Usuario::create([
+        $usuario = Usuario::create([
             'correo'             => $validated['correo'],
             'password'           => Hash::make($validated['password']),
-            'rol'                => 'gestor_rutas',
             'activo'             => false,
             'estado'             => 'pendiente',
             'correo_verificado'  => 0,
@@ -213,15 +239,24 @@ class AuthController extends Controller
             'fecha_solicitud'    => now(),
             'fecha_respuesta'    => null,
             'motivo_rechazo'     => null,
-       ]);
+        ]);
 
-        GestorRutas::create([
-            'nombre'     => $validated['nombre'],
-            'apaterno'   => $validated['apaterno'],
-            'amaterno'   => $validated['amaterno'] ?? null,
+        $nombreCompleto = $validated['nombre'];
+        $apellidosCompletos = $validated['apaterno'];
+        if (!empty($validated['amaterno'])) {
+            $apellidosCompletos .= ' ' . $validated['amaterno'];
+        }
+
+        $persona = Persona::create([
+            'nombre'     => $nombreCompleto,
+            'apellidos'  => $apellidosCompletos,
             'telefono'   => $validated['telefono'],
             'id_usuario' => $usuario->id_usuario,
         ]);
+
+        // Asignar rol GESTOR RUTAS
+        $rolGestor = Rol::where('descripcion', 'gestor_rutas')->first();
+        $persona->roles()->attach($rolGestor->id_rol);
 
         Mail::to($usuario->correo)->send(new SolicitudPendienteMail($usuario));
 
@@ -260,7 +295,11 @@ class AuthController extends Controller
         return redirect('/login');
     }
 
-    private function getMensajesRegistro (): array
+    // ================================
+    // MENSAJES DE VALIDACIÓN
+    // ================================
+
+    private function getMensajesRegistro(): array
     {
         return [
             'nombre.required'    => 'El nombre es obligatorio.',

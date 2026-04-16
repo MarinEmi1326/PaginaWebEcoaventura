@@ -9,6 +9,12 @@ use Illuminate\Support\Facades\Storage;
 
 class ApiDestinoController extends Controller
 {
+    // Helper para obtener la persona del usuario autenticado
+    private function getPersona($userId)
+    {
+        return DB::table('persona')->where('id_usuario', $userId)->first();
+    }
+
     // GET /api/destinos
     public function index()
     {
@@ -56,11 +62,13 @@ class ApiDestinoController extends Controller
             ->where('destino_actividad.id_destino', $id)
             ->select('actividad.*')->get();
         $destino->paquetes    = DB::table('paquete')->where('id_destino', $id)->where('activo', 'activo')->get();
+        
+        // CAMBIADO: usar persona en lugar de turista
         $destino->comentarios = DB::table('comentario')
-            ->join('turista', 'comentario.id_turista', '=', 'turista.id_turista')
+            ->join('persona', 'comentario.id_persona', '=', 'persona.id_persona')
             ->where('comentario.id_destino', $id)
             ->where('comentario.entidad', 'destino')
-            ->select('comentario.*', 'turista.nombre', 'turista.apaterno')
+            ->select('comentario.*', 'persona.nombre', 'persona.apellidos')
             ->orderByDesc('comentario.fecha')
             ->get();
 
@@ -96,11 +104,12 @@ class ApiDestinoController extends Controller
             return response()->json(['success' => false, 'message' => 'Destino no encontrado.'], 404);
         }
 
+        // CAMBIADO: usar persona en lugar de turista
         $comentarios = DB::table('comentario')
-            ->join('turista', 'comentario.id_turista', '=', 'turista.id_turista')
+            ->join('persona', 'comentario.id_persona', '=', 'persona.id_persona')
             ->where('comentario.id_destino', $id)
             ->where('comentario.entidad', 'destino')
-            ->select('comentario.*', 'turista.nombre', 'turista.apaterno')
+            ->select('comentario.*', 'persona.nombre', 'persona.apellidos')
             ->orderByDesc('comentario.fecha')
             ->get();
 
@@ -115,8 +124,16 @@ class ApiDestinoController extends Controller
     public function store(Request $request)
     {
         $user = auth()->user();
+        
+        // CAMBIADO: verificar rol desde persona
+        $persona = $this->getPersona($user->id_usuario);
+        $roles = DB::table('persona_rol')
+            ->join('rol', 'persona_rol.id_rol', '=', 'rol.id_rol')
+            ->where('persona_rol.id_persona', $persona->id_persona)
+            ->pluck('rol.descripcion')
+            ->toArray();
 
-        if ($user->rol !== 'admin_destinos') {
+        if (!in_array('admin_destinos', $roles)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Solo los administradores de destinos pueden crear destinos.',
@@ -130,7 +147,6 @@ class ApiDestinoController extends Controller
             'recomendaciones' => 'nullable|string',
             'lat'         => 'nullable|numeric',
             'lng'         => 'nullable|numeric',
-            'google_place_id' => 'nullable|string|max:120',
             'categorias'  => 'nullable|array',
             'categorias.*' => 'exists:categoria,id_categoria',
             'actividades_existentes'   => 'nullable|array',
@@ -144,9 +160,7 @@ class ApiDestinoController extends Controller
             'fotos.*'     => 'image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
-        $adminDestinos = DB::table('admin_destinos')->where('id_usuario', $user->id_usuario)->first();
-
-        // Insertar destino
+        // CAMBIADO: Insertar destino con id_persona
         $id_destino = DB::table('destino')->insertGetId([
             'nombre'          => $request->nombre,
             'descripcion'     => $request->descripcion,
@@ -154,10 +168,9 @@ class ApiDestinoController extends Controller
             'recomendaciones' => $request->recomendaciones,
             'lat'             => $request->lat,
             'lng'             => $request->lng,
-            'google_place_id' => $request->google_place_id,
             'activo'          => 'activo',
-            'creado_por'      => $user->id_usuario,
-            'id_admin_destinos' => $adminDestinos->id_admin_destinos,
+            'creado_por'      => $persona->id_persona,  // CAMBIADO: id_persona
+            'fecha_creacion'  => now(),
         ]);
 
         // Categorías
@@ -218,8 +231,11 @@ class ApiDestinoController extends Controller
             foreach ($request->file('fotos') as $foto) {
                 $ruta = $foto->store('destinos', 'public');
                 DB::table('imagen')->insert([
-                    'id_destino' => $id_destino,
-                    'ruta'       => $ruta,
+                    'entidad'      => 'destino',
+                    'id_destino'   => $id_destino,
+                    'ruta_archivo' => $ruta,
+                    'subida_por'   => $persona->id_persona,
+                    'fecha'        => now(),
                 ]);
             }
         }
@@ -241,8 +257,16 @@ class ApiDestinoController extends Controller
         ]);
 
         $user = auth()->user();
+        
+        // CAMBIADO: verificar rol turista desde persona
+        $persona = $this->getPersona($user->id_usuario);
+        $roles = DB::table('persona_rol')
+            ->join('rol', 'persona_rol.id_rol', '=', 'rol.id_rol')
+            ->where('persona_rol.id_persona', $persona->id_persona)
+            ->pluck('rol.descripcion')
+            ->toArray();
 
-        if ($user->rol !== 'turista') {
+        if (!in_array('turista', $roles)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Solo los turistas pueden comentar.',
@@ -258,10 +282,9 @@ class ApiDestinoController extends Controller
             ], 404);
         }
 
-        $turista = DB::table('turista')->where('id_usuario', $user->id_usuario)->first();
-
+        // CAMBIADO: usar id_persona en lugar de id_turista
         DB::table('comentario')->insert([
-            'id_turista' => $turista->id_turista,
+            'id_persona' => $persona->id_persona,
             'entidad'    => 'destino',
             'id_destino' => $id,
             'comentario' => $request->comentario,
@@ -283,6 +306,7 @@ class ApiDestinoController extends Controller
         ]);
 
         $user = auth()->user();
+        $persona = $this->getPersona($user->id_usuario);
 
         $destino = DB::table('destino')->where('id_destino', $id)->where('activo', 'activo')->first();
 
@@ -292,7 +316,7 @@ class ApiDestinoController extends Controller
 
         // Verificar que no haya reportado ya este destino
         $yaReporto = DB::table('reporte')
-            ->where('reportado_por', $user->id_usuario)
+            ->where('reportado_por', $persona->id_persona)
             ->where('tipo_objeto', 'destino')
             ->where('id_destino', $id)
             ->exists();
@@ -302,7 +326,7 @@ class ApiDestinoController extends Controller
         }
 
         DB::table('reporte')->insert([
-            'reportado_por' => $user->id_usuario,
+            'reportado_por' => $persona->id_persona,
             'tipo_objeto'   => 'destino',
             'id_destino'    => $id,
             'motivo'        => $request->motivo,
@@ -314,20 +338,26 @@ class ApiDestinoController extends Controller
         return response()->json(['success' => true, 'message' => 'Reporte enviado correctamente.'], 201);
     }
 
-
     // GET /api/favoritos
     public function favoritos(Request $request)
     {
         $user = $request->user();
-        $turista = DB::table('turista')->where('id_usuario', $user->id_usuario)->first();
+        $persona = $this->getPersona($user->id_usuario);
+        
+        $roles = DB::table('persona_rol')
+            ->join('rol', 'persona_rol.id_rol', '=', 'rol.id_rol')
+            ->where('persona_rol.id_persona', $persona->id_persona)
+            ->pluck('rol.descripcion')
+            ->toArray();
 
-        if (!$turista) {
+        if (!in_array('turista', $roles)) {
             return response()->json(['success' => false, 'message' => 'No eres turista'], 403);
         }
 
+        // CAMBIADO: usar id_persona en lugar de id_turista
         $favoritos = DB::table('favorito')
             ->join('destino', 'favorito.id_destino', '=', 'destino.id_destino')
-            ->where('favorito.id_turista', $turista->id_turista)
+            ->where('favorito.id_persona', $persona->id_persona)
             ->select('destino.*')
             ->get();
 
@@ -347,26 +377,33 @@ class ApiDestinoController extends Controller
     public function toggleFavorito(Request $request, $id)
     {
         $user = $request->user();
-        $turista = DB::table('turista')->where('id_usuario', $user->id_usuario)->first();
+        $persona = $this->getPersona($user->id_usuario);
+        
+        $roles = DB::table('persona_rol')
+            ->join('rol', 'persona_rol.id_rol', '=', 'rol.id_rol')
+            ->where('persona_rol.id_persona', $persona->id_persona)
+            ->pluck('rol.descripcion')
+            ->toArray();
 
-        if (!$turista) {
+        if (!in_array('turista', $roles)) {
             return response()->json(['success' => false, 'message' => 'No eres turista'], 403);
         }
 
+        // CAMBIADO: usar id_persona en lugar de id_turista
         $existe = DB::table('favorito')
-            ->where('id_turista', $turista->id_turista)
+            ->where('id_persona', $persona->id_persona)
             ->where('id_destino', $id)
             ->exists();
 
         if ($existe) {
             DB::table('favorito')
-                ->where('id_turista', $turista->id_turista)
+                ->where('id_persona', $persona->id_persona)
                 ->where('id_destino', $id)
                 ->delete();
             return response()->json(['success' => true, 'favorito' => false, 'message' => 'Eliminado de favoritos']);
         } else {
             DB::table('favorito')->insert([
-                'id_turista' => $turista->id_turista,
+                'id_persona' => $persona->id_persona,
                 'id_destino' => $id,
                 'fecha' => now(),
             ]);

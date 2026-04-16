@@ -11,10 +11,21 @@ use Illuminate\Support\Facades\DB;
 
 class RutaController extends Controller
 {
+    // Helper para obtener el id_persona del usuario autenticado
+    private function getPersonaId()
+    {
+        $persona = DB::table('persona')->where('id_usuario', Auth::id())->first();
+        return $persona ? $persona->id_persona : null;
+    }
+
     public function index()
     {
+        $personaId = $this->getPersonaId();
+        if (!$personaId) {
+            return redirect()->route('login')->with('error', 'Perfil no encontrado.');
+        }
 
-        $rutas = Ruta::where('creado_por', Auth::id())
+        $rutas = Ruta::where('creado_por', $personaId)
                     ->orderByDesc('fecha_creacion')
                     ->get();
         $total = $rutas->count();
@@ -57,7 +68,7 @@ class RutaController extends Controller
         return view('admin.gestor_rutas.create', compact('destinos'));
     }
 
-   // ── INFO DESTINO: endpoint que consume el JavaScript del formulario ──
+    // ── INFO DESTINO: endpoint que consume el JavaScript del formulario ──
     // Devuelve descripción y actividades de un destino en formato JSON
     public function infoDestino($id)
     {
@@ -68,7 +79,6 @@ class RutaController extends Controller
         }
 
         // Buscamos las actividades del destino con un JOIN
-        // (el modelo Destino no tiene relación actividades(), así que usamos DB)
         $actividades = DB::table('actividad')
             ->join('destino_actividad', 'actividad.id_actividad', '=', 'destino_actividad.id_actividad')
             ->where('destino_actividad.id_destino', $id)
@@ -86,6 +96,11 @@ class RutaController extends Controller
     // ── STORE: guardar la ruta ──
     public function store(Request $request)
     {
+        $personaId = $this->getPersonaId();
+        if (!$personaId) {
+            return redirect()->route('login')->with('error', 'Perfil no encontrado.');
+        }
+
         $request->validate([
             'nombre'                 => 'required|string|max:120',
             'descripcion'            => 'required|string',
@@ -97,14 +112,14 @@ class RutaController extends Controller
             'fecha_fin_operacion'    => 'nullable|date|after_or_equal:fecha_inicio_operacion',
             'destinos'               => 'required|array|min:1',
             'destinos.*'             => 'required|exists:destino,id_destino',
-            'fotos'   => 'nullable|array',
-            'fotos.*' => 'image|mimes:jpg,jpeg,png|max:5120',
+            'fotos'                  => 'nullable|array',
+            'fotos.*'                => 'image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
         // Usamos transacción: si algo falla a la mitad, no queda nada a medias
-        DB::transaction(function () use ($request) {
+        DB::transaction(function () use ($request, $personaId) {
 
-            // 1. Guardar la ruta (igual que antes, con Ruta::create)
+            // 1. Guardar la ruta
             $ruta = Ruta::create([
                 'nombre'                 => $request->nombre,
                 'descripcion'            => $request->descripcion,
@@ -115,7 +130,7 @@ class RutaController extends Controller
                 'fecha_inicio_operacion' => $request->fecha_inicio_operacion,
                 'fecha_fin_operacion'    => $request->fecha_fin_operacion,
                 'activo'                 => 'activo',
-                'creado_por'             => Auth::id(),
+                'creado_por'             => $personaId,
                 'fecha_creacion'         => now(),
             ]);
 
@@ -127,13 +142,13 @@ class RutaController extends Controller
                         'id_ruta'      => $ruta->id_ruta,
                         'id_destino'   => null,
                         'ruta_archivo' => $rutaArchivo,
-                        'subida_por'   => Auth::id(),
+                        'subida_por'   => $personaId,
                         'fecha'        => now(),
                     ]);
                 }
             }
 
-            // 2. Guardar destinos con orden (igual que antes)
+            // 2. Guardar destinos con orden
             foreach ($request->destinos as $index => $idDestino) {
 
                 DB::table('ruta_destino')->insert([
@@ -142,8 +157,7 @@ class RutaController extends Controller
                     'orden'      => $index + 1,
                 ]);
 
-                // 3. NUEVO: guardar actividades seleccionadas para este destino
-                // El nombre del campo en el form es: actividades_{idDestino}[]
+                // 3. Guardar actividades seleccionadas para este destino
                 $actividades = $request->input('actividades_' . $idDestino, []);
 
                 foreach ($actividades as $idActividad) {
@@ -192,9 +206,9 @@ class RutaController extends Controller
                 ->get();
         }
 
-        // 4. Traer comentarios de la ruta
+        // 4. Traer comentarios de la ruta (ahora usando persona en lugar de turista)
         $comentarios = DB::table('comentario')
-            ->join('turista', 'comentario.id_turista', '=', 'turista.id_turista')
+            ->join('persona', 'comentario.id_persona', '=', 'persona.id_persona')
             ->where('comentario.entidad', 'ruta')
             ->where('comentario.id_ruta', $id)
             ->orderByDesc('comentario.fecha')
@@ -202,8 +216,8 @@ class RutaController extends Controller
                 'comentario.id_comentario',
                 'comentario.comentario',
                 'comentario.fecha',
-                'turista.nombre',
-                'turista.apaterno'
+                'persona.nombre',
+                'persona.apellidos'
             )
             ->get();
 
@@ -213,9 +227,14 @@ class RutaController extends Controller
     // ── EDIT: mostrar formulario de edición ──
     public function edit($id)
     {
+        $personaId = $this->getPersonaId();
+        if (!$personaId) {
+            return redirect()->route('login')->with('error', 'Perfil no encontrado.');
+        }
+
         // Verificar que la ruta existe y pertenece al gestor autenticado
         $ruta = Ruta::where('id_ruta', $id)
-                    ->where('creado_por', Auth::id())
+                    ->where('creado_por', $personaId)
                     ->first();
 
         abort_if(!$ruta, 404);
@@ -240,8 +259,13 @@ class RutaController extends Controller
     // ── UPDATE: guardar cambios ──
     public function update(Request $request, $id)
     {
+        $personaId = $this->getPersonaId();
+        if (!$personaId) {
+            return redirect()->route('login')->with('error', 'Perfil no encontrado.');
+        }
+
         $ruta = Ruta::where('id_ruta', $id)
-                    ->where('creado_por', Auth::id())
+                    ->where('creado_por', $personaId)
                     ->first();
 
         abort_if(!$ruta, 404);
@@ -272,7 +296,7 @@ class RutaController extends Controller
                     'id_ruta'      => $id,
                     'id_destino'   => null,
                     'ruta_archivo' => $rutaArchivo,
-                    'subida_por'   => Auth::id(),
+                    'subida_por'   => $personaId,
                     'fecha'        => now(),
                 ]);
             }
@@ -284,12 +308,17 @@ class RutaController extends Controller
 
     public function destroyImagen($id)
     {
+        $personaId = $this->getPersonaId();
+        if (!$personaId) {
+            return response()->json(['error' => 'No autenticado'], 401);
+        }
+
         $imagen = DB::table('imagen')->where('id_imagen', $id)->first();
         abort_if(!$imagen, 404);
 
         // Verificar que la ruta pertenece al gestor autenticado
         $ruta = Ruta::where('id_ruta', $imagen->id_ruta)
-                    ->where('creado_por', Auth::id())
+                    ->where('creado_por', $personaId)
                     ->first();
         abort_if(!$ruta, 403);
 
@@ -298,16 +327,21 @@ class RutaController extends Controller
 
         return response()->json(['ok' => true]);
     }
+
     public function destroy($id)
     {
+        $personaId = $this->getPersonaId();
+        if (!$personaId) {
+            return redirect()->route('login')->with('error', 'Perfil no encontrado.');
+        }
+
         $ruta = Ruta::where('id_ruta', $id)
-                    ->where('creado_por', Auth::id())
+                    ->where('creado_por', $personaId)
                     ->first();
 
         abort_if(!$ruta, 404);
 
         // 1. Eliminar imágenes del storage físico y de la tabla imagen
-        //    Los destinos NO se tocan
         $imagenes = DB::table('imagen')
             ->where('entidad', 'ruta')
             ->where('id_ruta', $id)
@@ -319,7 +353,6 @@ class RutaController extends Controller
         DB::table('imagen')->where('id_ruta', $id)->delete();
 
         // 2. Eliminar solo las relaciones de esta ruta
-        //    Los destinos siguen existiendo e intactos en la tabla destino
         DB::table('ruta_destino_actividad')->where('id_ruta', $id)->delete();
         DB::table('ruta_destino')->where('id_ruta', $id)->delete();
 
@@ -329,5 +362,4 @@ class RutaController extends Controller
         return redirect()->route('rutas.index')
                         ->with('success', 'Ruta eliminada correctamente.');
     }
-
 }

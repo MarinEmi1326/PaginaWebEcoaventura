@@ -5,22 +5,40 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Hash; // Importante para la contraseña
+use Illuminate\Support\Facades\Hash;
 use App\Models\Usuario;
+use App\Models\Persona;
+use Illuminate\Support\Facades\DB;
 
 class PerfilController extends Controller
 {
     public function show()
     {
         $user = Auth::user();
-
-        return match ($user->rol) {
-            'admin_general'  => view('perfil.show-admin', compact('user')),
-            'admin_destinos' => view('perfil.show-destinos', compact('user')),
-            'gestor_rutas'   => view('perfil.show-rutas', compact('user')),
-            'turista'        => view('perfil.show-turista', compact('user')),
-            default          => abort(404),
-        };
+        $persona = $user->persona;
+        
+        if (!$persona) {
+            abort(404, 'Perfil no encontrado');
+        }
+        
+        // Obtener roles de la persona
+        $roles = $persona->roles->pluck('descripcion')->toArray();
+        
+        // Determinar qué vista mostrar según el rol principal o el que tenga
+        if (in_array('admin_general', $roles)) {
+            return view('perfil.show-admin', compact('user', 'persona'));
+        }
+        if (in_array('admin_destinos', $roles)) {
+            return view('perfil.show-destinos', compact('user', 'persona'));
+        }
+        if (in_array('gestor_rutas', $roles)) {
+            return view('perfil.show-rutas', compact('user', 'persona'));
+        }
+        if (in_array('turista', $roles)) {
+            return view('perfil.show-turista', compact('user', 'persona'));
+        }
+        
+        abort(404);
     }
 
     public function update(Request $request)
@@ -28,44 +46,45 @@ class PerfilController extends Controller
         /** @var \App\Models\Usuario $usuario */
         $usuario = Auth::user();
         
-        // Obtenemos la relación dinámica según el rol
-        $perfil = match ($usuario->rol) {
-            'admin_general'  => $usuario->adminGeneral,
-            'admin_destinos' => $usuario->adminDestinos,
-            'gestor_rutas'   => $usuario->gestorRutas,
-            'turista'        => $usuario->turista,
-            default          => null,
-        };
-
-        if (!$perfil) {
+        // Obtener la persona asociada
+        $persona = $usuario->persona;
+        
+        if (!$persona) {
             return back()->with('error', 'No se encontró el perfil asociado.');
         }
-
-        // 1. Validar campos (Usuario + Perfil)
-        $request->validate([
-            // Validamos correo único ignorando el ID actual
+        
+        // Obtener roles de la persona
+        $roles = $persona->roles->pluck('descripcion')->toArray();
+        
+        // 1. Validar campos
+        $rules = [
             'correo'         => 'required|email|unique:usuario,correo,' . $usuario->id_usuario . ',id_usuario',
-            'password'       => 'nullable|min:8|confirmed', // 'confirmed' busca un campo password_confirmation
+            'password'       => 'nullable|min:8|confirmed',
             'nombre'         => 'required|string|max:60',
-            'apaterno'       => 'required|string|max:60',
-            'amaterno'       => 'nullable|string|max:60',
+            'apellidos'      => 'required|string|max:120',
             'telefono'       => 'nullable|string|max:20',
-            'facebook_url'   => 'nullable|url|max:255',
-            'instagram_url'  => 'nullable|url|max:255',
-            'tiktok_url'     => 'nullable|url|max:255',
             'foto_perfil'    => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-        ]);
-
+        ];
+        
+        // Redes sociales solo para admin_destinos y gestor_rutas
+        if (in_array('admin_destinos', $roles) || in_array('gestor_rutas', $roles)) {
+            $rules['facebook_url']  = 'nullable|url|max:255';
+            $rules['instagram_url'] = 'nullable|url|max:255';
+            $rules['tiktok_url']    = 'nullable|url|max:255';
+        }
+        
+        $request->validate($rules);
+        
         // 2. Actualizar Tabla USUARIO (Correo, Password y Foto)
         $datosUsuario = [
             'correo' => $request->correo,
         ];
-
+        
         // Solo si escribió una nueva contraseña
         if ($request->filled('password')) {
             $datosUsuario['password'] = Hash::make($request->password);
         }
-
+        
         // Lógica de Foto de Perfil
         if ($request->hasFile('foto_perfil')) {
             if ($usuario->foto_perfil) {
@@ -73,26 +92,25 @@ class PerfilController extends Controller
             }
             $datosUsuario['foto_perfil'] = $request->file('foto_perfil')->store('perfiles', 'public');
         }
-
+        
         $usuario->update($datosUsuario);
-
-        // 3. Preparar y actualizar Tabla de Perfil Específica
-        $datosPerfil = [
-            'nombre'   => $request->nombre,
-            'apaterno' => $request->apaterno,
-            'amaterno' => $request->amaterno,
-            'telefono' => $request->telefono,
+        
+        // 3. Actualizar Tabla PERSONA (datos unificados)
+        $datosPersona = [
+            'nombre'     => $request->nombre,
+            'apellidos'  => $request->apellidos,
+            'telefono'   => $request->telefono,
         ];
-
-        // Redes sociales solo para roles permitidos
-        if (in_array($usuario->rol, ['admin_destinos', 'gestor_rutas'])) {
-            $datosPerfil['facebook_url']  = $request->facebook_url;
-            $datosPerfil['instagram_url'] = $request->instagram_url;
-            $datosPerfil['tiktok_url']    = $request->tiktok_url;
+        
+        // Redes sociales solo para admin_destinos y gestor_rutas
+        if (in_array('admin_destinos', $roles) || in_array('gestor_rutas', $roles)) {
+            $datosPersona['facebook_url']  = $request->facebook_url;
+            $datosPersona['instagram_url'] = $request->instagram_url;
+            $datosPersona['tiktok_url']    = $request->tiktok_url;
         }
-
-        $perfil->update($datosPerfil);
-
+        
+        $persona->update($datosPersona);
+        
         return back()->with('success', '¡Perfil y datos de acceso actualizados correctamente!');
     }
 }

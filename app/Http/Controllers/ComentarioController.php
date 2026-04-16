@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\Usuario;
 
 class ComentarioController extends Controller
 {
@@ -15,40 +14,25 @@ class ComentarioController extends Controller
         ]);
 
         $user = auth()->user();
+        $persona = $user->persona;
 
-        // Verificar que sea turista
-        if ($user->rol !== 'turista') {
-            return back()->with('error', 'Solo los turistas pueden comentar.');
+        if (!$persona) {
+            return back()->with('error', 'No se encontró tu perfil de persona.');
         }
 
-        $turista = DB::table('turista')->where('id_usuario', $user->id_usuario)->first();
-
-        if (!$turista) {
-            return back()->with('error', 'No se encontró tu perfil de turista.');
+        if (!$persona->tieneRol('turista')) {
+            return back()->with('error', 'Solo los turistas pueden comentar en destinos.');
         }
 
         DB::table('comentario')->insert([
-            'id_turista'  => $turista->id_turista,
-            'entidad'     => 'destino',
-            'id_destino'  => $id,
-            'comentario'  => $request->comentario,
-            'fecha'       => now(),
+            'id_persona' => $persona->id_persona,
+            'entidad'    => 'destino',
+            'id_destino' => $id,
+            'comentario' => $request->comentario,
+            'fecha'      => now(),
         ]);
 
-        return back()->with('success', 'Comentario publicado.');
-    }
-
-    public function destroy($id)
-    {
-        $user = auth()->user();
-
-        if ($user->rol !== 'admin_general') {
-            abort(403);
-        }
-
-        DB::table('comentario')->where('id_comentario', $id)->delete();
-
-        return back()->with('success', 'Comentario eliminado.');
+        return back()->with('success', 'Comentario publicado correctamente.');
     }
 
     public function storeRuta(Request $request, $id)
@@ -58,26 +42,40 @@ class ComentarioController extends Controller
         ]);
 
         $user = auth()->user();
+        $persona = $user->persona;
 
-        if ($user->rol !== 'turista') {
-            return back()->with('error', 'Solo los turistas pueden comentar.');
+        if (!$persona) {
+            return back()->with('error', 'No se encontró tu perfil de persona.');
         }
 
-        $turista = DB::table('turista')->where('id_usuario', $user->id_usuario)->first();
-
-        if (!$turista) {
-            return back()->with('error', 'No se encontró tu perfil de turista.');
+        if (!$persona->tieneRol('turista')) {
+            return back()->with('error', 'Solo los turistas pueden comentar en rutas.');
         }
 
         DB::table('comentario')->insert([
-            'id_turista' => $turista->id_turista,
+            'id_persona' => $persona->id_persona,
             'entidad'    => 'ruta',
             'id_ruta'    => $id,
             'comentario' => $request->comentario,
             'fecha'      => now(),
         ]);
 
-        return back()->with('success', 'Comentario publicado.');
+        return back()->with('success', 'Comentario publicado correctamente.');
     }
 
+    public function destroy($id)
+    {
+        $user = auth()->user();
+        $persona = $user->persona;
+
+        if (!$persona || !$persona->tieneRol('admin_general')) {
+            abort(403, 'No tienes permiso para eliminar comentarios.');
+        }
+
+        DB::table('comentario')
+            ->where('id_comentario', $id)
+            ->delete();
+
+        return back()->with('success', 'Comentario eliminado correctamente.');
+    }
 }

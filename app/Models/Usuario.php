@@ -4,17 +4,11 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use App\Models\AdminGeneral;
-use App\Models\Turista;
-use App\Models\AdminDestinos;
-use App\Models\GestorRutas;
 use Laravel\Sanctum\HasApiTokens;
 
 class Usuario extends Authenticatable
 {
-
-    use HasApiTokens;
-    use Notifiable;
+    use HasApiTokens, Notifiable;
 
     protected $table = 'usuario';
     protected $primaryKey = 'id_usuario';
@@ -27,12 +21,12 @@ class Usuario extends Authenticatable
         'google_id',
         'foto_perfil',
         'password',
-        'rol',
         'activo',
         'estado',
         'fecha_solicitud',
         'fecha_respuesta',
         'motivo_rechazo',
+        'fcm_token'
     ];
 
     protected $hidden = [
@@ -46,84 +40,31 @@ class Usuario extends Authenticatable
         'fecha_respuesta'    => 'datetime',
     ];
 
-    // Le dice a Laravel que el campo login es "correo"
-   public function getAuthIdentifierName()
-{
-    return 'id_usuario';
-}
-
-public function getAuthIdentifier()
-{
-    return $this->id_usuario;
-}
-
-public function getAuthPassword()
-{
-    return $this->password;
-}
-
     // ================================
-    // RELACIONES
+    // AUTH
     // ================================
 
-    public function turista()
+    public function getAuthIdentifierName()
     {
-        return $this->hasOne(Turista::class, 'id_usuario', 'id_usuario');
+        return 'id_usuario';
     }
 
-    public function adminDestinos()
+    public function getAuthIdentifier()
     {
-        return $this->hasOne(AdminDestinos::class, 'id_usuario', 'id_usuario');
+        return $this->id_usuario;
     }
 
-    public function gestorRutas()
+    public function getAuthPassword()
     {
-        return $this->hasOne(GestorRutas::class, 'id_usuario', 'id_usuario');
-    }
-
-    public function adminGeneral()
-    {
-        return $this->hasOne(AdminGeneral::class, 'id_usuario', 'id_usuario');
+        return $this->password;
     }
 
     // ================================
-    // HELPERS DE ROL
+    // NUEVA RELACIÓN
     // ================================
 
-    public function esAdmin()
+    public function persona()
     {
-        return $this->rol === 'admin_general';
-    }
-
-    public function esTurista()
-    {
-        return $this->rol === 'turista';
-    }
-
-    public function esAdminDestinos()
-    {
-        return $this->rol === 'admin_destinos';
-    }
-
-    public function esGestorRutas()
-    {
-        return $this->rol === 'gestor_rutas';
-    }
-
-    public function estaAprobado()
-    {
-        return $this->estado === 'aprobado';
-    }
-
-    // Perfil según rol
-    public function getPerfilAttribute()
-    {
-        return match ($this->rol) {
-            'turista'        => $this->turista,
-            'admin_destinos' => $this->adminDestinos,
-            'gestor_rutas'   => $this->gestorRutas,
-            'admin_general'  => $this->adminGeneral,
-            default          => null,
-        };
+        return $this->hasOne(Persona::class, 'id_usuario');
     }
 }

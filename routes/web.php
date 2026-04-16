@@ -60,8 +60,8 @@ Route::get('/centros', [DestinosController::class, 'index'])->name('destinos.ind
 Route::get('/centros/{id}', [DestinosController::class, 'show'])->name('destinos.show');
 
 // OTRAS VISTAS
-Route::get('/mapa', fn () => view('mapa'))->name('mapa');
-Route::get('/turismo-responsable', fn () => view('turismo-responsable'))->name('turismo-responsable');
+Route::get('/mapa', fn() => view('mapa'))->name('mapa');
+Route::get('/turismo-responsable', fn() => view('turismo-responsable'))->name('turismo-responsable');
 
 // ── Rutas públicas del módulo de rutas (tuyas) ──
 Route::get('/ruta', [RutaController::class, 'publicIndex'])->name('ruta');
@@ -77,16 +77,28 @@ Route::middleware('auth')->group(function () {
     // Cerrar sesión
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Perfil — versión de tus compañeros (por rol)
+    // ============================================================
+    // PERFIL — CORREGIDO: obtener rol desde persona
+    // ============================================================
     Route::get('/perfil', function () {
-        $rol = Auth::user()->rol;
-        return match ($rol) {
-            'turista'        => view('perfil.show-turista'),
-            'gestor_rutas'   => view('perfil.show-rutas'),
-            'admin_destinos' => view('perfil.show-destinos'),
-            'admin_general'  => view('perfil.show-admin'),
-            default          => abort(403, 'Rol no reconocido'),
-        };
+        $user = Auth::user();
+        $persona = $user->persona;
+        $roles = $persona?->roles->pluck('descripcion')->toArray() ?? [];
+
+        if (in_array('admin_general', $roles)) {
+            return view('perfil.show-admin');
+        }
+        if (in_array('admin_destinos', $roles)) {
+            return view('perfil.show-destinos');
+        }
+        if (in_array('gestor_rutas', $roles)) {
+            return view('perfil.show-rutas');
+        }
+        if (in_array('turista', $roles)) {
+            return view('perfil.show-turista');
+        }
+
+        abort(403, 'Rol no reconocido');
     })->name('perfil');
 
     Route::put('/perfil/actualizar', [PerfilController::class, 'update'])->name('perfil.update');
@@ -134,7 +146,7 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/destino', [AdminCentroController::class, 'index'])->name('destino');
         Route::post('/destino/{id}/toggle', [AdminCentroController::class, 'toggleActivo'])->name('destino.toggle');
-        Route::get('/respaldos', fn () => view('admin.respaldos'))->name('respaldos');
+        Route::get('/respaldos', fn() => view('admin.respaldos'))->name('respaldos');
 
         // Reportes
         Route::get('/reportes', [AdminReportesController::class, 'index'])->name('reportes');

@@ -9,10 +9,22 @@ use Illuminate\Support\Facades\Storage;
 
 class AdminDestinoController extends Controller
 {
+    // Helper para obtener el id_persona del usuario autenticado
+    private function getPersonaId()
+    {
+        $persona = DB::table('persona')->where('id_usuario', Auth::id())->first();
+        return $persona ? $persona->id_persona : null;
+    }
+
     public function index()
     {
+        $personaId = $this->getPersonaId();
+        if (!$personaId) {
+            return redirect()->route('login')->with('error', 'Perfil no encontrado.');
+        }
+
         $destinos = DB::table('destino')
-            ->where('creado_por', Auth::id())
+            ->where('creado_por', $personaId)
             ->orderByDesc('fecha_creacion')
             ->get();
 
@@ -41,6 +53,11 @@ class AdminDestinoController extends Controller
 
     public function store(Request $request)
     {
+        $personaId = $this->getPersonaId();
+        if (!$personaId) {
+            return redirect()->route('login')->with('error', 'Perfil no encontrado.');
+        }
+
         $request->validate([
             'nombre'                            => ['required', 'max:120'],
             'descripcion'                       => ['required'],
@@ -76,7 +93,7 @@ class AdminDestinoController extends Controller
             'lat'             => $request->lat,
             'lng'             => $request->lng,
             'activo'          => 'activo',
-            'creado_por'      => Auth::id(),
+            'creado_por'      => $personaId,
             'fecha_creacion'  => now(),
         ]);
 
@@ -88,7 +105,7 @@ class AdminDestinoController extends Controller
                     'entidad'      => 'destino',
                     'id_destino'   => $idDestino,
                     'ruta_archivo' => $ruta,
-                    'subida_por'   => Auth::id(),
+                    'subida_por'   => $personaId,
                     'fecha'        => now(),
                 ]);
             }
@@ -158,9 +175,14 @@ class AdminDestinoController extends Controller
 
     public function edit($id)
     {
+        $personaId = $this->getPersonaId();
+        if (!$personaId) {
+            return redirect()->route('login')->with('error', 'Perfil no encontrado.');
+        }
+
         $destino = DB::table('destino')
             ->where('id_destino', $id)
-            ->where('creado_por', Auth::id())
+            ->where('creado_por', $personaId)
             ->first();
 
         abort_if(!$destino, 404);
@@ -180,9 +202,14 @@ class AdminDestinoController extends Controller
 
     public function update(Request $request, $id)
     {
+        $personaId = $this->getPersonaId();
+        if (!$personaId) {
+            return redirect()->route('login')->with('error', 'Perfil no encontrado.');
+        }
+
         $destino = DB::table('destino')
             ->where('id_destino', $id)
-            ->where('creado_por', Auth::id())
+            ->where('creado_por', $personaId)
             ->first();
 
         abort_if(!$destino, 404);
@@ -230,7 +257,7 @@ class AdminDestinoController extends Controller
                     'entidad'      => 'destino',
                     'id_destino'   => $id,
                     'ruta_archivo' => $ruta,
-                    'subida_por'   => Auth::id(),
+                    'subida_por'   => $personaId,
                     'fecha'        => now(),
                 ]);
             }
@@ -301,12 +328,17 @@ class AdminDestinoController extends Controller
 
     public function destroyImagen($id)
     {
+        $personaId = $this->getPersonaId();
+        if (!$personaId) {
+            return redirect()->route('login')->with('error', 'Perfil no encontrado.');
+        }
+
         $imagen = DB::table('imagen')->where('id_imagen', $id)->first();
         abort_if(!$imagen, 404);
 
         $destino = DB::table('destino')
             ->where('id_destino', $imagen->id_destino)
-            ->where('creado_por', Auth::id())
+            ->where('creado_por', $personaId)
             ->first();
         abort_if(!$destino, 403);
 
@@ -318,9 +350,14 @@ class AdminDestinoController extends Controller
 
     public function destroy($id)
     {
+        $personaId = $this->getPersonaId();
+        if (!$personaId) {
+            return redirect()->route('login')->with('error', 'Perfil no encontrado.');
+        }
+
         $destino = DB::table('destino')
             ->where('id_destino', $id)
-            ->where('creado_por', Auth::id())
+            ->where('creado_por', $personaId)
             ->first();
 
         abort_if(!$destino, 404);
@@ -343,9 +380,14 @@ class AdminDestinoController extends Controller
     // ── Suspender o reactivar un destino ──
     public function toggleActivo(Request $request, $id)
     {
+        $personaId = $this->getPersonaId();
+        if (!$personaId) {
+            return redirect()->route('login')->with('error', 'Perfil no encontrado.');
+        }
+
         $destino = DB::table('destino')
             ->where('id_destino', $id)
-            ->where('creado_por', Auth::id())
+            ->where('creado_por', $personaId)
             ->first();
 
         abort_if(!$destino, 404);
@@ -399,7 +441,6 @@ class AdminDestinoController extends Controller
                         'motivo_inactivo' => null,
                     ]);
                 }
-                // Si aún hay otros destinos inactivos, la ruta se queda inactiva
             }
 
             $mensaje = 'Destino reactivado. Las rutas afectadas han sido revisadas.';
@@ -407,5 +448,4 @@ class AdminDestinoController extends Controller
 
         return back()->with('success', $mensaje);
     }
-    
 }
