@@ -6,13 +6,14 @@
     border-radius: 20px;
     font-size: 12px;
 }
+
 .badge-sm {
     font-size: 0.65rem;
     padding: 0.15em 0.45em;
     line-height: 1;
 }
 
-
+/* 🔽 más integrado (menos blanco) */
 .filtro-tabs {
     background: #e5ebe7;
     display: inline-flex;
@@ -26,17 +27,18 @@
     border-radius: 50rem;
 }
 
+/* ❌ blanco → ✅ gris suave */
 .filtro-tabs .nav-link.active {
-    background: white;
+    background: #f3f6f3;
     color: #1F6B4B;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
 }
 
 .filtro-tabs .nav-link:hover {
-    background: #f3f6f3;
+    background: #eef2ef;
 }
 
-
+/* ===== DETALLE TABS ===== */
 
 #detalleTabs .nav-link {
     border: none;
@@ -45,140 +47,141 @@
     border-radius: 6px;
 }
 
+/* ❌ blanco → ✅ tono suave */
 #detalleTabs .nav-link.active {
-    background: white;
+    background: #f3f6f3;
     color: #1a202c;
     font-weight: 600;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
 #detalleTabs .nav-link:hover:not(.active) {
     color: #1a202c;
-    background: rgba(255, 255, 255, 0.5);
+    background: #eef2ef;
 }
 
-/* =========================================
-   ADMIN DESTINOS - estilos complementarios
-   ========================================= */
+/* ===== ADMIN DESTINOS ===== */
 
-.ea-summary-number{
+.ea-summary-number {
     font-size: 2rem;
     font-weight: 700;
     line-height: 1;
     color: var(--ea-text);
 }
 
-.ea-summary-label{
+.ea-summary-label {
     font-size: 0.9rem;
     color: var(--ea-muted);
     margin-top: 4px;
 }
 
-.ea-summary-number.is-approved{
+.ea-summary-number.is-approved {
     color: #1f6b4b;
 }
 
-.ea-summary-number.is-pending{
+.ea-summary-number.is-pending {
     color: #2f9ed8;
 }
 
-.ea-summary-number.is-rejected{
+.ea-summary-number.is-rejected {
     color: #d14b3a;
 }
 
-.ea-section-heading{
+.ea-section-heading {
     font-family: Georgia, "Times New Roman", serif;
     font-weight: 800;
     color: var(--ea-text);
     margin: 0;
 }
 
-.ea-destination-card{
-    background: rgba(255,255,255,.35);
-    border: 1px solid rgba(15,42,36,.10);
+/* 🔥 ESTE ERA OTRO PROBLEMA */
+.ea-destination-card {
+    background: #ffffff; /* antes transparente raro */
+    border: 1px solid rgba(15,42,36,.08);
     border-radius: 16px;
     padding: 18px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.05);
 }
 
-.ea-destination-title{
+.ea-destination-title {
     font-weight: 800;
     color: var(--ea-text);
     margin-bottom: 2px;
     font-size: 1.05rem;
 }
 
-.ea-destination-meta{
+.ea-destination-meta {
     color: var(--ea-muted);
     font-size: 0.86rem;
 }
 
-.ea-status.approved{
+.ea-status.approved {
     background: #e6f4ea;
     color: #1f6b4b;
     border-color: rgba(31,107,75,.12);
 }
 
-.ea-status.pending{
+.ea-status.pending {
     background: #e8f4fd;
     color: #2f9ed8;
     border-color: rgba(47,158,216,.12);
 }
 
-.ea-status.rejected{
+.ea-status.rejected {
     background: #fdecea;
     color: #d14b3a;
     border-color: rgba(209,75,58,.12);
 }
 
-.ea-status.draft{
+.ea-status.draft {
     background: #eef2ef;
     color: #708176;
     border-color: rgba(112,129,118,.14);
 }
 
-.ea-actions{
+.ea-actions {
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
-.ea-action-btn{
+.ea-action-btn {
     color: var(--ea-muted);
     font-size: 0.95rem;
     line-height: 1;
     transition: .2s ease;
 }
 
-.ea-action-btn:hover{
+.ea-action-btn:hover {
     color: var(--ea-text);
 }
 
-.ea-action-btn.edit:hover{
+.ea-action-btn.edit:hover {
     color: #1e88e5;
 }
 
-.ea-action-btn.send:hover{
+.ea-action-btn.send:hover {
     color: #2f9ed8;
 }
 
-.ea-action-btn.delete:hover{
+.ea-action-btn.delete:hover {
     color: #d14b3a;
 }
 
-.ea-card-tight{
+.ea-card-tight {
     padding: 14px 16px;
 }
 
-@media (max-width: 767.98px){
-    .ea-summary-number{
+@media (max-width: 767.98px) {
+    .ea-summary-number {
         font-size: 1.6rem;
     }
 
-    .ea-destination-card{
+    .ea-destination-card {
         padding: 16px 14px;
     }
 
-    .ea-actions{
+    .ea-actions {
         gap: 10px;
         flex-wrap: wrap;
     }

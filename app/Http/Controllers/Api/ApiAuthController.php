@@ -233,4 +233,28 @@ class ApiAuthController extends Controller
             'data'    => $pagos,
         ]);
     }
+    // DELETE /api/perfil
+    public function eliminarCuenta(Request $request)
+    {
+        $user = $request->user();
+
+        $tabla = match ($user->rol) {
+            'turista'        => 'turista',
+            'admin_destinos' => 'admin_destinos',
+            default          => null,
+        };
+
+        if (!$tabla) {
+            return response()->json(['success' => false, 'message' => 'Rol no permitido'], 403);
+        }
+
+        // Revocar tokens
+        $user->tokens()->delete();
+
+        // Eliminar perfil y usuario (CASCADE se encarga del resto)
+        DB::table($tabla)->where('id_usuario', $user->id_usuario)->delete();
+        DB::table('usuario')->where('id_usuario', $user->id_usuario)->delete();
+
+        return response()->json(['success' => true, 'message' => 'Cuenta eliminada correctamente']);
+    }
 }

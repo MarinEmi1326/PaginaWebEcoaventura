@@ -33,6 +33,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::put('/perfil', [ApiAuthController::class, 'actualizarPerfil']);
 
+    Route::delete('/perfil', [ApiAuthController::class, 'eliminarCuenta']);
+
 
 
     

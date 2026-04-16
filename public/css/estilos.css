@@ -1,10 +1,9 @@
 body {
   font-family: 'Inter', sans-serif;
-  background: #ffffff;
+  background: var(--eco-bg); /* 👈 ESTE ES EL CAMBIO IMPORTANTE */
   color: var(--eco-text);
   overflow-x: hidden;
 }
-
 :root {
   --eco-bg: #F3F6F3;
   --eco-card: #EAF1EC;
@@ -15,11 +14,13 @@ body {
 }
 
 .navbar-glass {
-  background: rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  background: rgba(243, 246, 243, 0.9); /* tono suave, ya no blanco puro */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
 }
 
 .navbar-brand img {
@@ -94,8 +95,19 @@ body {
   text-align: center;
 }
 
+
 .eco-section {
-  padding-top: 2.25rem;
+  padding: 2rem;
+  border-radius: 1.5rem;
+  background-color: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+}
+
+.eco-section:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 15px 40px rgba(0, 128, 2, 0.12);
 }
 
 .eco-section-body {
@@ -106,88 +118,76 @@ body {
   width: 64px;
   height: 64px;
   border-radius: 18px;
-  background: var(--eco-card);
-  border: 1px solid var(--eco-border);
+  background: #e9ecef;
   display: flex;
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  margin-top: 4px;
 }
 
 .eco-iconbox i {
   font-size: 28px;
-  color: var(--eco-primary);
-  line-height: 1;
+  color: #008002;
 }
 
 .eco-h2 {
   font-family: Georgia, "Times New Roman", serif;
   font-weight: 800;
-  font-size: 2.15rem;
+  font-size: 2rem;
   margin: 0;
   color: #1b2a20;
 }
 
 .eco-paragraph {
-  color: var(--eco-muted);
+  color: #6c757d;
   line-height: 1.8;
   margin-top: .75rem;
   text-align: left;
-  max-width: 980px;
 }
 
 .eco-head {
   display: flex;
   align-items: center;
   gap: 14px;
+  margin-bottom: 10px;
 }
 
+
 .eco-items {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
 }
 
 .eco-pill {
-  background: #EEF3EF;
-  border: 1px solid var(--eco-border);
-  border-radius: 18px;
-  padding: 16px 18px;
+  background: none;
+  border: none;
+  padding: 4px 0;
+  width: 100%;
   display: flex;
   align-items: center;
-  gap: 14px;
-  width: 90%;
-  transition: background-color .25s ease, box-shadow .25s ease, transform .25s ease;
-  cursor: default !important;
+  gap: 10px;
 }
 
 .eco-pill:hover {
-  background-color: #E3ECE6;
+  background: none;
   box-shadow: none;
   transform: none;
-  cursor: default !important;
-}
-
-.eco-pill-static,
-.eco-pill-static *,
-.eco-pill-static:hover,
-.eco-pill-static:focus,
-.eco-pill-static:active {
-  cursor: default !important;
-  pointer-events: none !important;
+  cursor: default;
 }
 
 .eco-pin i {
-  font-size: 18px;
-  color: var(--eco-primary);
-  line-height: 1;
+  font-size: 14px;
+  color: #6c757d; 
 }
 
 .eco-pill-text {
-  font-weight: 600;
+  font-weight: 500;
   color: #223226;
 }
+
+/* ===== RESPONSIVE ===== */
 
 @media (max-width: 576px) {
   .eco-wrap {
@@ -199,7 +199,7 @@ body {
   }
 
   .eco-h2 {
-    font-size: 1.6rem !important;
+    font-size: 1.5rem !important;
   }
 
   .eco-lead {
@@ -209,23 +209,14 @@ body {
   .eco-iconbox {
     width: 54px;
     height: 54px;
-    border-radius: 16px;
   }
 
   .eco-iconbox i {
     font-size: 24px;
   }
-
-  .eco-pill {
-    width: 100%;
-  }
-
-  .eco-items {
-    padding-left: 0;
-  }
 }
-
 /* turismo responsable */
+
 .card {
   transition: all 0.3s ease;
   border-radius: 1.5rem !important;
@@ -242,37 +233,41 @@ body {
   line-height: 1;
 }
 
+/* ===== LISTA LIMPIA (SIN BLOQUES) ===== */
+
 .custom-list {
   counter-reset: list-item;
   padding-left: 0;
 }
 
 .custom-list .list-group-item {
-  background-color: #f3f5f3;
-  border: none;
-  border-radius: 1rem;
-  margin-bottom: 1rem;
-  padding: 1rem 1.5rem;
-  font-size: 1.1rem;
+  background: none;           /* ❌ sin fondo */
+  border: none;               /* ❌ sin borde */
+  border-radius: 0;           /* ❌ sin forma de card */
+  margin-bottom: 6px;         /* más compacto */
+  padding: 4px 0;             /* tipo lista */
+  font-size: 1.05rem;
   display: flex;
   align-items: center;
   list-style: none;
 }
 
+/* 🔽 NUMERACIÓN DISCRETA */
 .custom-list .list-group-item::before {
   content: counter(list-item);
   counter-increment: list-item;
-  background-color: #dfe7e1;
-  color: #008002;
-  font-weight: 600;
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 15px;
+
+  background: none;          /* ❌ sin círculo */
+  color: #6c757d;            /* gris suave */
+
+  font-weight: 500;
+  min-width: 20px;
+
+  display: inline-block;
+  margin-right: 10px;
 }
+
+/* ===== ESPACIADO ===== */
 
 .py-5 {
   padding-top: 4rem !important;
@@ -282,7 +277,6 @@ body {
 .shadow-lg {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
 }
-
 /* =======================================================
    =============== PANEL ADMIN ECOAVENTURA ===============
    ======================================================= */
