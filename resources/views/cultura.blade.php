@@ -3,115 +3,171 @@
 @section('title', 'Cultura y Patrimonio')
 
 @section('content')
-<div class="eco-page py-4 py-lg-5">
-    
-    <div class="eco-wrap">
-
-        <div class="text-center mb-5">
-            <div class="eco-kicker mb-2">PATRIMONIO CULTURAL</div>
-            <h1 class="eco-title display-4 mb-3">Cultura y Patrimonio de Ocosingo</h1>
-            <p class="eco-lead">
+    <div class="container py-5">
+        <!-- Hero / Título principal -->
+        <div class="text-center mb-5 pb-4">
+            <p class="lead text-success fw-semibold fs-4 mb-2">PATRIMONIO CULTURAL</p>
+            <h1 class="display-4 fw-bold text-dark mb-3">Cultura y Patrimonio de Ocosingo</h1>
+            <p class="fs-5 text-muted mx-auto" style="max-width: 800px;">
                 Descubre la riqueza cultural de un territorio donde convergen tradiciones milenarias,
-                gastronomía auténtica, artesanía ancestral y comunidades indígenas que son guardianas de un legado invaluable.
+                gastronomía auténtica, artesanía ancestral y comunidades indígenas que son guardianas de un legado
+                invaluable.
             </p>
         </div>
 
-        @php
-            $sections = [
-                [
-                    'icon' => 'bi bi-fire',
-                    'title' => 'Tradiciones y Ceremonias',
-                    'text' => 'Ocosingo, Chiapas, destaca por una rica mezcla de tradiciones mayas tzeltales y cultura mestiza, destacando las fiestas patronales de San Jacinto de Polonia (17 de agosto) y la Candelaria (2 de febrero). Se celebran con misas, música de marimba, ferias, y ceremonias ancestrales pidiendo por las cosechas y la lluvia.',
-                    'items' => [
-                        'Fiesta de San Jacinto de Polonia (17 de agosto)',
-                        'Fiesta de la Candelaria (2 de febrero)',
-                        'Ceremonias de la Santa Cruz (3 de mayo)',
-                        'Tradiciones Tzeltales',
-                        'Día de Muertos',
-                        'Fiestas Patrias'
-                    ]
-                ],
-                [
-                    'icon' => 'bi bi-fork-knife',
-                    'title' => 'Gastronomía',
-                    'text' => 'La comida típica de Ocosingo, Chiapas, destaca por su tradición láctea y sabores de la Selva Lacandona, siendo el famoso queso de bola de Ocosingo (artesanal y relleno de carne) su mayor exponente. Otros platillos emblemáticos incluyen el cochito horneado, tamales de chipilín, sopa de pan, tasajo con pepita y los tradicionales dulces chimbos.',
-                    'items' => [
-                        'Queso de Bola de Ocosingo',
-                        'Cochito Horneado',
-                        'Tamales Chiapanecos',
-                        'Cochito horneado y tasajo chiapaneco',
-                        'Sopa de Pan',
-                        'Chimbos',
-                        'Tasajo con Pepita'
-                    ]
-                ],
-                [
-                    'icon' => 'bi bi-palette',
-                    'title' => 'Artesanías',
-                    'text' => 'Las artesanías de Ocosingo, Chiapas, destacan por su rica tradición textil elaborada en telar de cintura, incluyendo huipiles, blusas bordadas y bolsas de estambre con pompones. También sobresalen los trabajos en madera, la joyería de ámbar, el crochet, y la famosa producción local de quesos artesanales, como el queso de bola.',
-                    'items' => [
-                        'Textiles y Bordados',
-                        'Artesanías en Madera y Materiales Naturales',
-                        'Joyería y Accesorios',
-                        'Quesos Artesanales',
-                        'Puntos de Venta',
-                    ]
-                ],
-                [
-                    'icon' => 'bi bi-music-note',
-                    'title' => 'Festividades',
-                    'text' => 'El calendario festivo de Ocosingo refleja la fusión de tradiciones prehispánicas y coloniales. Cada celebración es una ventana a la identidad comunitaria y una oportunidad para vivir la cultura local.',
-                    'items' => [
-                        'Fiesta de Santo Domingo de Guzmán (4 de agosto) – fiesta patronal',
-                        'Carnaval de Ocosingo – danzas y música tradicional',
-                        'Día de Muertos – altares y ofrendas en comunidades',
-                        'Festival del Queso Bola – celebración gastronómica',
-                        'Ceremonia del Año Nuevo Maya',
-                    ]
-                ],
-                [
-                    'icon' => 'bi bi-people',
-                    'title' => 'Comunidades Indígenas',
-                    'text' => 'Ocosingo es hogar de pueblos originarios que preservan lenguas, saberes y formas de organización social propias. Los tzeltales, tzotziles y lacandones mantienen una relación profunda con el territorio que habitan.',
-                    'items' => [
-                        'Comunidades lacandones de Nahá y Metzabok – guardianes de la selva',
-                        'Pueblos tzeltales – la etnia más numerosa de la región',
-                        'Cooperativas de café orgánico y miel de comunidades indígenas',
-                        'Proyectos de ecoturismo comunitario autogestionados',
-                        'Centros de medicina tradicional y herbolaria maya',
-                    ]
-                ],
-            ];
-        @endphp
+        <!-- Secciones con cards (mismo estilo que Turismo Responsable) -->
+        <div class="row justify-content-center g-5">
 
-        @foreach($sections as $sec)
-            <section class="eco-section mb-5">
-
-                {{-- Header alineado: icono + título --}}
-                <div class="eco-head">
-                    <div class="eco-iconbox">
-                        <i class="{{ $sec['icon'] }}"></i>
-                    </div>
-                    <h2 class="eco-h2 mb-0">{{ $sec['title'] }}</h2>
-                </div>
-
-                {{-- Texto alineado con el título --}}
-                <p class="eco-paragraph eco-indent mb-0">{{ $sec['text'] }}</p>
-
-                <div class="eco-items">
-                    @foreach($sec['items'] as $item)
-                        <div class="eco-pill">
-                            <span class="eco-pin">
-                                <i class="bi bi-geo-alt"></i>
+            <!-- 1. Tradiciones y Ceremonias -->
+            <div class="col-12">
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="d-flex align-items-center mb-4">
+                            <span class="rounded-4 fs-3 p-4 me-4 d-flex align-items-center justify-content-center"
+                                style="width: 70px; height: 70px; background-color: #e9ecef;">
+                                <i class="bi bi-fire text-success"></i>
                             </span>
-                            <span class="eco-pill-text">{{ $item }}</span>
+                            <h2 class="card-title mb-0 fw-bold">Tradiciones y Ceremonias</h2>
                         </div>
-                    @endforeach
+                        <p class="text-muted mb-4 fs-5">
+                            Ocosingo, Chiapas, destaca por una rica mezcla de tradiciones mayas tzeltales y cultura mestiza,
+                            destacando las fiestas patronales de San Jacinto de Polonia (17 de agosto) y la Candelaria (2 de
+                            febrero). Se celebran con misas, música de marimba, ferias, y ceremonias ancestrales pidiendo
+                            por las cosechas y la lluvia.
+                        </p>
+                        <ol class="list-group list-group-numbered custom-list">
+                            <li class="list-group-item border-0 ps-0 py-3">Fiesta de San Jacinto de Polonia (17 de agosto)
+                            </li>
+                            <li class="list-group-item border-0 ps-0 py-3">Fiesta de la Candelaria (2 de febrero)</li>
+                            <li class="list-group-item border-0 ps-0 py-3">Ceremonias de la Santa Cruz (3 de mayo)</li>
+                            <li class="list-group-item border-0 ps-0 py-3">Tradiciones Tzeltales</li>
+                            <li class="list-group-item border-0 ps-0 py-3">Día de Muertos</li>
+                            <li class="list-group-item border-0 ps-0 py-3">Fiestas Patrias</li>
+                        </ol>
+                    </div>
                 </div>
+            </div>
 
-            </section>
-        @endforeach
+            <!-- 2. Gastronomía -->
+            <div class="col-12">
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="d-flex align-items-center mb-4">
+                            <span class="rounded-4 fs-3 p-4 me-4 d-flex align-items-center justify-content-center"
+                                style="width: 70px; height: 70px; background-color: #e9ecef;">
+                                <i class="bi bi-fork-knife text-success"></i>
+                            </span>
+                            <h2 class="card-title mb-0 fw-bold">Gastronomía</h2>
+                        </div>
+                        <p class="text-muted mb-4 fs-5">
+                            La comida típica de Ocosingo, Chiapas, destaca por su tradición láctea y sabores de la Selva
+                            Lacandona, siendo el famoso queso de bola de Ocosingo (artesanal y relleno de carne) su mayor
+                            exponente. Otros platillos emblemáticos incluyen el cochito horneado, tamales de chipilín, sopa
+                            de pan, tasajo con pepita y los tradicionales dulces chimbos.
+                        </p>
+                        <ol class="list-group list-group-numbered custom-list">
+                            <li class="list-group-item border-0 ps-0 py-3">Queso de Bola de Ocosingo</li>
+                            <li class="list-group-item border-0 ps-0 py-3">Cochito Horneado</li>
+                            <li class="list-group-item border-0 ps-0 py-3">Tamales Chiapanecos</li>
+                            <li class="list-group-item border-0 ps-0 py-3">Sopa de Pan</li>
+                            <li class="list-group-item border-0 ps-0 py-3">Chimbos</li>
+                            <li class="list-group-item border-0 ps-0 py-3">Tasajo con Pepita</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
 
+            <!-- 3. Artesanías -->
+            <div class="col-12">
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="d-flex align-items-center mb-4">
+                            <span class="rounded-4 fs-3 p-4 me-4 d-flex align-items-center justify-content-center"
+                                style="width: 70px; height: 70px; background-color: #e9ecef;">
+                                <i class="bi bi-palette text-success"></i>
+                            </span>
+                            <h2 class="card-title mb-0 fw-bold">Artesanías</h2>
+                        </div>
+                        <p class="text-muted mb-4 fs-5">
+                            Las artesanías de Ocosingo, Chiapas, destacan por su rica tradición textil elaborada en telar de
+                            cintura, incluyendo huipiles, blusas bordadas y bolsas de estambre con pompones. También
+                            sobresalen los trabajos en madera, la joyería de ámbar, el crochet, y la famosa producción local
+                            de quesos artesanales, como el queso de bola.
+                        </p>
+                        <ol class="list-group list-group-numbered custom-list">
+                            <li class="list-group-item border-0 ps-0 py-3">Textiles y Bordados</li>
+                            <li class="list-group-item border-0 ps-0 py-3">Artesanías en Madera y Materiales Naturales</li>
+                            <li class="list-group-item border-0 ps-0 py-3">Joyería y Accesorios</li>
+                            <li class="list-group-item border-0 ps-0 py-3">Quesos Artesanales</li>
+                            <li class="list-group-item border-0 ps-0 py-3">Puntos de Venta</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Festividades -->
+            <div class="col-12">
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="d-flex align-items-center mb-4">
+                            <span class="rounded-4 fs-3 p-4 me-4 d-flex align-items-center justify-content-center"
+                                style="width: 70px; height: 70px; background-color: #e9ecef;">
+                                <i class="bi bi-music-note text-success"></i>
+                            </span>
+                            <h2 class="card-title mb-0 fw-bold">Festividades</h2>
+                        </div>
+                        <p class="text-muted mb-4 fs-5">
+                            El calendario festivo de Ocosingo refleja la fusión de tradiciones prehispánicas y coloniales.
+                            Cada celebración es una ventana a la identidad comunitaria y una oportunidad para vivir la
+                            cultura local.
+                        </p>
+                        <ol class="list-group list-group-numbered custom-list">
+                            <li class="list-group-item border-0 ps-0 py-3">Fiesta de Santo Domingo de Guzmán (4 de agosto) –
+                                fiesta patronal</li>
+                            <li class="list-group-item border-0 ps-0 py-3">Carnaval de Ocosingo – danzas y música
+                                tradicional</li>
+                            <li class="list-group-item border-0 ps-0 py-3">Día de Muertos – altares y ofrendas en
+                                comunidades</li>
+                            <li class="list-group-item border-0 ps-0 py-3">Festival del Queso Bola – celebración
+                                gastronómica</li>
+                            <li class="list-group-item border-0 ps-0 py-3">Ceremonia del Año Nuevo Maya</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Comunidades Indígenas -->
+            <div class="col-12">
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="d-flex align-items-center mb-4">
+                            <span class="rounded-4 fs-3 p-4 me-4 d-flex align-items-center justify-content-center"
+                                style="width: 70px; height: 70px; background-color: #e9ecef;">
+                                <i class="bi bi-people text-success"></i>
+                            </span>
+                            <h2 class="card-title mb-0 fw-bold">Comunidades Indígenas</h2>
+                        </div>
+                        <p class="text-muted mb-4 fs-5">
+                            Ocosingo es hogar de pueblos originarios que preservan lenguas, saberes y formas de organización
+                            social propias. Los tzeltales, tzotziles y lacandones mantienen una relación profunda con el
+                            territorio que habitan.
+                        </p>
+                        <ol class="list-group list-group-numbered custom-list">
+                            <li class="list-group-item border-0 ps-0 py-3">Comunidades lacandones de Nahá y Metzabok –
+                                guardianes de la selva</li>
+                            <li class="list-group-item border-0 ps-0 py-3">Pueblos tzeltales – la etnia más numerosa de la
+                                región</li>
+                            <li class="list-group-item border-0 ps-0 py-3">Cooperativas de café orgánico y miel de
+                                comunidades indígenas</li>
+                            <li class="list-group-item border-0 ps-0 py-3">Proyectos de ecoturismo comunitario
+                                autogestionados</li>
+                            <li class="list-group-item border-0 ps-0 py-3">Centros de medicina tradicional y herbolaria maya
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
-</div>
 @endsection

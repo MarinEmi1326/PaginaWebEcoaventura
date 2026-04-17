@@ -1,9 +1,11 @@
 body {
   font-family: 'Inter', sans-serif;
-  background: var(--eco-bg); /* 👈 ESTE ES EL CAMBIO IMPORTANTE */
+  background: var(--eco-bg);
+  /* 👈 ESTE ES EL CAMBIO IMPORTANTE */
   color: var(--eco-text);
   overflow-x: hidden;
 }
+
 :root {
   --eco-bg: #F3F6F3;
   --eco-card: #EAF1EC;
@@ -14,7 +16,8 @@ body {
 }
 
 .navbar-glass {
-  background: rgba(243, 246, 243, 0.9); /* tono suave, ya no blanco puro */
+  background: rgba(243, 246, 243, 0.9);
+  /* tono suave, ya no blanco puro */
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 
@@ -62,8 +65,70 @@ body {
   color: white;
 }
 
-/* ===== Cultura ===== */
+/* ===== ESTILOS BASE (de Turismo Responsable) ===== */
 
+.card {
+  transition: all 0.3s ease;
+  border-radius: 1.5rem !important;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 40px rgba(0, 128, 2, 0.12) !important;
+}
+
+.badge.bg-success {
+  background-color: #008002 !important;
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+/* ===== LISTA LIMPIA (SIN BLOQUES) ===== */
+
+.custom-list {
+  counter-reset: list-item;
+  padding-left: 0;
+}
+
+.custom-list .list-group-item {
+  background: none;
+  border: none;
+  border-radius: 0;
+  margin-bottom: 6px;
+  padding: 4px 0;
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  list-style: none;
+}
+
+/* Numeración discreta */
+.custom-list .list-group-item::before {
+  content: counter(list-item);
+  counter-increment: list-item;
+  background: none;
+  color: #6c757d;
+  font-weight: 500;
+  min-width: 28px;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+/* ===== ESPACIADO ===== */
+
+.py-5 {
+  padding-top: 4rem !important;
+  padding-bottom: 4rem !important;
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+}
+
+
+
+
+/* cultura */
 .eco-wrap {
   width: min(1100px, calc(100% - 56px));
   margin: 0 auto;
@@ -94,7 +159,6 @@ body {
   line-height: 1.7;
   text-align: center;
 }
-
 
 .eco-section {
   padding: 2rem;
@@ -152,7 +216,6 @@ body {
   margin-bottom: 10px;
 }
 
-
 .eco-items {
   display: flex;
   flex-direction: column;
@@ -179,7 +242,7 @@ body {
 
 .eco-pin i {
   font-size: 14px;
-  color: #6c757d; 
+  color: #6c757d;
 }
 
 .eco-pill-text {
@@ -215,6 +278,12 @@ body {
     font-size: 24px;
   }
 }
+
+.custom-list .list-group-item:hover::before {
+  color: #008002;
+  transition: color 0.2s ease;
+}
+
 /* turismo responsable */
 
 .card {
@@ -241,11 +310,16 @@ body {
 }
 
 .custom-list .list-group-item {
-  background: none;           /* ❌ sin fondo */
-  border: none;               /* ❌ sin borde */
-  border-radius: 0;           /* ❌ sin forma de card */
-  margin-bottom: 6px;         /* más compacto */
-  padding: 4px 0;             /* tipo lista */
+  background: none;
+  /* ❌ sin fondo */
+  border: none;
+  /* ❌ sin borde */
+  border-radius: 0;
+  /* ❌ sin forma de card */
+  margin-bottom: 6px;
+  /* más compacto */
+  padding: 4px 0;
+  /* tipo lista */
   font-size: 1.05rem;
   display: flex;
   align-items: center;
@@ -257,8 +331,10 @@ body {
   content: counter(list-item);
   counter-increment: list-item;
 
-  background: none;          /* ❌ sin círculo */
-  color: #6c757d;            /* gris suave */
+  background: none;
+  /* ❌ sin círculo */
+  color: #6c757d;
+  /* gris suave */
 
   font-weight: 500;
   min-width: 20px;
@@ -277,6 +353,7 @@ body {
 .shadow-lg {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
 }
+
 /* =======================================================
    =============== PANEL ADMIN ECOAVENTURA ===============
    ======================================================= */
