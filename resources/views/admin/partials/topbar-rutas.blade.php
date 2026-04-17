@@ -9,12 +9,14 @@
 
     <div class="d-flex align-items-center gap-3">
         <div class="ea-avatar" style="width: 34px; height: 34px; font-size: .9rem;">
-            {{ strtoupper(substr(auth()->user()->perfil->nombre ?? 'G', 0, 1)) }}
+            {{-- Inicial desde la tabla persona --}}
+            {{ strtoupper(substr(auth()->user()->persona->nombre ?? 'G', 0, 1)) }}
         </div>
 
         <div class="fw-semibold small" style="color: var(--ea-text);">
-            {{ auth()->user()->perfil->nombre ?? 'Gestor' }}
-            {{ auth()->user()->perfil->apaterno ?? 'de Rutas' }}
+            {{-- Nombre y apellidos desde la tabla persona --}}
+            {{ auth()->user()->persona->nombre ?? 'Gestor' }}
+            {{ auth()->user()->persona->apellidos ?? 'de Rutas' }}
         </div>
     </div>
 </header>

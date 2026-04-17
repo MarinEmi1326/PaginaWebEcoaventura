@@ -12,10 +12,10 @@
     {{-- Usuario --}}
     <div class="px-4 py-3 border-bottom" style="border-color: var(--ea-line) !important;">
         @php
-            $admin = auth()->user()->adminGeneral;
+            $persona = auth()->user()->persona;
         @endphp
         <div class="fw-semibold">
-            {{ $admin->nombre }} {{ $admin->apaterno }} {{ $admin->amaterno }}
+            {{ $persona->nombre ?? 'Usuario' }} {{ $persona->apellidos ?? '' }}
         </div>
         <div class="small" style="color: var(--ea-muted);">Administrador General</div>
     </div>

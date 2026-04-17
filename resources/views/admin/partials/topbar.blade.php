@@ -1,7 +1,7 @@
 @php
 $usuario = auth()->user();
-$perfil = $usuario->perfil;
-$nombre = $perfil->nombre ?? $usuario->correo;
+$persona = $usuario->persona;
+$nombre = $persona->nombre ?? $usuario->correo;
 $inicial = strtoupper(substr($nombre, 0, 1));
 @endphp
 <header class="ea-topbar d-flex align-items-center px-4 px-lg-5">

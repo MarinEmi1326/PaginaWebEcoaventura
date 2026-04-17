@@ -13,7 +13,14 @@ class AdminMiddleware
             return redirect()->route('login');
         }
 
-        if (auth()->user()->rol !== 'admin_general') {
+        // ============================================
+        // CORREGIDO: Obtener roles desde persona
+        // ============================================
+        $user = auth()->user();
+        $persona = $user->persona;
+        $roles = $persona?->roles->pluck('descripcion')->toArray() ?? [];
+
+        if (!in_array('admin_general', $roles)) {
             abort(403, 'No autorizado.');
         }
 

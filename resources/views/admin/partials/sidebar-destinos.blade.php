@@ -12,9 +12,8 @@
     {{-- Usuario --}}
     <div class="px-4 py-3 border-bottom" style="border-color: var(--ea-line) !important;">
         <div class="fw-semibold">
-            {{ auth()->user()->adminDestinos->nombre ?? 'Administrador' }}
-            {{ auth()->user()->adminDestinos->apaterno ?? '' }}
-            {{ auth()->user()->adminDestinos->amaterno ?? '' }}
+            {{ auth()->user()->persona->nombre ?? 'Administrador' }}
+            {{ auth()->user()->persona->apellidos ?? '' }}
         </div>
         <div class="small" style="color: var(--ea-muted);">Administrador de Destinos</div>
     </div>

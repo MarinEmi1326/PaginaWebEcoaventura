@@ -13,11 +13,11 @@
     <div class="px-4 py-3 border-bottom" style="border-color: var(--ea-line) !important;">
 
         @php
-            $gestor = auth()->user()->gestorRutas;
+            $persona = auth()->user()->persona;
         @endphp
 
         <div class="fw-semibold">
-            {{ $gestor->nombre }} {{ $gestor->apaterno }} {{ $gestor->amaterno }}
+            {{ $persona->nombre ?? 'Usuario' }} {{ $persona->apellidos ?? '' }}
         </div>
 
         <div class="small" style="color: var(--ea-muted);">

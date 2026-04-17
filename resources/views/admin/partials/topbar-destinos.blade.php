@@ -13,11 +13,13 @@
 
   <div class="d-flex align-items-center gap-3">
     <div class="ea-avatar">
-      {{ strtoupper(substr(auth()->user()->adminDestinos->nombre ?? 'A', 0, 1)) }}
+      {{-- Obtenemos la inicial desde persona, con 'A' como respaldo --}}
+      {{ strtoupper(substr(auth()->user()->persona->nombre ?? 'A', 0, 1)) }}
     </div>
     <div class="fw-semibold">
-      {{ auth()->user()->adminDestinos->nombre ?? 'Administrador' }}
-      {{ auth()->user()->adminDestinos->apaterno ?? '' }}
+      {{-- Mostramos nombre y apellidos desde la tabla persona --}}
+      {{ auth()->user()->persona->nombre ?? 'Administrador' }}
+      {{ auth()->user()->persona->apellidos ?? '' }}
     </div>
   </div>
 </header>

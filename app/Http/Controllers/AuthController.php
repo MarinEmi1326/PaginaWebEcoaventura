@@ -67,7 +67,6 @@ class AuthController extends Controller
             'motivo_rechazo'     => null,
         ]);
 
-        // Crear persona con nombre y apellidos combinados
         $nombreCompleto = $validated['nombre'];
         $apellidosCompletos = $validated['apaterno'];
         if (!empty($validated['amaterno'])) {
@@ -81,7 +80,6 @@ class AuthController extends Controller
             'id_usuario' => $usuario->id_usuario,
         ]);
 
-        // Asignar rol TURISTA
         $rolTurista = Rol::where('descripcion', 'turista')->first();
         $persona->roles()->attach($rolTurista->id_rol);
 
@@ -91,7 +89,7 @@ class AuthController extends Controller
     }
 
     // ================================
-    // LOGIN
+    // LOGIN (CORREGIDO)
     // ================================
 
     public function login(Request $request)
@@ -134,27 +132,34 @@ class AuthController extends Controller
                 ->with('error', 'Tu cuenta está desactivada.');
         }
 
+        // Iniciar sesión
         Auth::login($usuario);
 
-        // Obtener roles desde persona_rol
+        // ACTUALIZACIÓN: Forzamos la carga de la persona y sus roles para evitar nulos
+        $usuario->load('persona.roles');
+        
         $persona = $usuario->persona;
         $roles = $persona?->roles->pluck('descripcion')->toArray() ?? [];
 
-        // Redirigir según el rol
+        // Redirigir según el rol detectado en la tabla persona_rol
         if (in_array('admin_general', $roles)) {
             return redirect()->route('admin.index');
         }
+        
         if (in_array('admin_destinos', $roles)) {
             return redirect()->route('misdestinos.index');
         }
+        
         if (in_array('gestor_rutas', $roles)) {
             return redirect()->route('rutas.index');
         }
+        
         if (in_array('turista', $roles)) {
             return redirect('/');
         }
 
-        return redirect('/login')->with('error', 'Rol no válido.');
+        // Si llega aquí es porque el usuario no tiene ningún rol asignado en persona_rol
+        return redirect('/login')->with('error', 'Rol no válido o no asignado.');
     }
 
     // ================================
@@ -201,7 +206,6 @@ class AuthController extends Controller
             'id_usuario' => $usuario->id_usuario,
         ]);
 
-        // Asignar rol ADMIN DESTINOS
         $rolAdminDestinos = Rol::where('descripcion', 'admin_destinos')->first();
         $persona->roles()->attach($rolAdminDestinos->id_rol);
 
@@ -254,7 +258,6 @@ class AuthController extends Controller
             'id_usuario' => $usuario->id_usuario,
         ]);
 
-        // Asignar rol GESTOR RUTAS
         $rolGestor = Rol::where('descripcion', 'gestor_rutas')->first();
         $persona->roles()->attach($rolGestor->id_rol);
 
@@ -262,10 +265,6 @@ class AuthController extends Controller
 
         return redirect('/login')->with('success', 'Solicitud enviada. Espera la aprobación del administrador.');
     }
-
-    // ================================
-    // VERIFICAR CORREO
-    // ================================
 
     public function verificarCorreo($token)
     {
@@ -282,10 +281,6 @@ class AuthController extends Controller
         return view('auth.correo_verificado');
     }
 
-    // ================================
-    // LOGOUT
-    // ================================
-
     public function logout(Request $request)
     {
         Auth::logout();
@@ -294,10 +289,6 @@ class AuthController extends Controller
 
         return redirect('/login');
     }
-
-    // ================================
-    // MENSAJES DE VALIDACIÓN
-    // ================================
 
     private function getMensajesRegistro(): array
     {
@@ -308,13 +299,13 @@ class AuthController extends Controller
             'apaterno.regex'     => 'El apellido paterno solo debe contener letras.',
             'amaterno.regex'     => 'El apellido materno solo debe contener letras.',
             'telefono.required'  => 'El teléfono es obligatorio.',
-            'telefono.digits'    => 'El teléfono debe tener exactamente 10 dígitos (ej: 9611234567).',
+            'telefono.digits'    => 'El teléfono debe tener exactamente 10 dígitos.',
             'correo.required'    => 'El correo electrónico es obligatorio.',
             'correo.email'       => 'Debes ingresar un correo válido.',
-            'correo.unique'      => 'Este correo ya está en uso. ¿Ya tienes cuenta?',
+            'correo.unique'      => 'Este correo ya está en uso.',
             'password.required'  => 'La contraseña es obligatoria.',
-            'password.min'       => 'Usa al menos 8 caracteres para mayor seguridad.',
-            'password.confirmed' => 'Las contraseñas no coinciden. Asegúrate de escribirlas igual.',
+            'password.min'       => 'Usa al menos 8 caracteres.',
+            'password.confirmed' => 'Las contraseñas no coinciden.',
         ];
     }
 }
