@@ -54,7 +54,7 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="{{ route('destinos.index') }}"
                                 data-bs-toggle="dropdown">
-                                Centros Turísticos
+                                Destinos
                             </a>
                             <ul class="dropdown-menu">
                                 <li>
@@ -102,11 +102,8 @@
                             $user = auth()->user();
                             $persona = $user->persona;
                             $roles = $persona?->roles->pluck('descripcion')->toArray() ?? [];
-
-                            // Nombre a mostrar
                             $nombreMostrar = $persona?->nombre ?? $user->correo;
 
-                            // Determinar panel según rol
                             $panelUrl = '#';
                             if (in_array('admin_general', $roles)) {
                                 $panelUrl = route('admin.index');
