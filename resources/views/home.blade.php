@@ -238,50 +238,42 @@
             </div>
 
             <div class="home-rutas-grid">
-                <div class="home-ruta-card">
-                    <div class="home-ruta-top">
-                        <div class="home-ruta-icon">
-                            <i class="bi bi-map"></i>
+                @forelse($rutasDestacadas as $r)
+                    <a href="{{ route('rutas.show', $r->id_ruta) }}" class="text-decoration-none">
+                        <div class="home-ruta-card">
+                            <div class="home-ruta-top">
+                                <div class="home-ruta-icon">
+                                    @if ($r->imagen)
+                                        <img src="{{ Storage::url($r->imagen) }}"
+                                            style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
+                                    @else
+                                        <i class="bi bi-map"></i>
+                                    @endif
+                                </div>
+                                <div>
+                                    <h3 class="home-ruta-title">{{ $r->nombre }}</h3>
+                                    <div class="home-ruta-meta">
+                                        @if ($r->duracion_estimada)
+                                            {{ $r->duracion_estimada }} ·
+                                        @endif
+                                        {{ $r->dificultad === 'baja' ? 'Fácil' : ($r->dificultad === 'media' ? 'Moderada' : 'Alta') }}
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="home-ruta-text">
+                                {{ Str::limit($r->descripcion, 100) }}
+                            </p>
+                            <div class="d-flex gap-3 small text-muted mt-2">
+                                @if ($r->distancia_km)
+                                    <span><i class="bi bi-geo-alt me-1"></i>{{ $r->distancia_km }} km</span>
+                                @endif
+                                <span><i class="bi bi-flag me-1"></i>{{ $r->total_paradas }} parada(s)</span>
+                            </div>
                         </div>
-                        <div>
-                            <h3 class="home-ruta-title">Ruta Arqueológica</h3>
-                            <div class="home-ruta-meta">2 días · Moderada</div>
-                        </div>
-                    </div>
-                    <p class="home-ruta-text">
-                        Toniná → Bonampak → Yaxchilán. Un recorrido por las grandes ciudades mayas.
-                    </p>
-                </div>
-
-                <div class="home-ruta-card">
-                    <div class="home-ruta-top">
-                        <div class="home-ruta-icon">
-                            <i class="bi bi-map"></i>
-                        </div>
-                        <div>
-                            <h3 class="home-ruta-title">Ruta de Cascadas</h3>
-                            <div class="home-ruta-meta">1 día · Fácil</div>
-                        </div>
-                    </div>
-                    <p class="home-ruta-text">
-                        Agua Azul → Misol-Ha. Cascadas espectaculares en un solo día.
-                    </p>
-                </div>
-
-                <div class="home-ruta-card">
-                    <div class="home-ruta-top">
-                        <div class="home-ruta-icon">
-                            <i class="bi bi-map"></i>
-                        </div>
-                        <div>
-                            <h3 class="home-ruta-title">Ruta Comunitaria</h3>
-                            <div class="home-ruta-meta">3 días · Alta</div>
-                        </div>
-                    </div>
-                    <p class="home-ruta-text">
-                        Comunidades lacandonas → Selva → Laguna Miramar. Inmersión cultural total.
-                    </p>
-                </div>
+                    </a>
+                @empty
+                    <p class="text-muted">No hay rutas disponibles aún.</p>
+                @endforelse
             </div>
 
             <div class="home-season-grid">
@@ -294,21 +286,16 @@
                             Seca (Nov-Abr)
                             <span class="home-season-badge">Recomendada</span>
                         </div>
-                        <p class="home-season-text">
-                            Ideal para senderismo y cascadas.
-                        </p>
+                        <p class="home-season-text">Ideal para senderismo y cascadas.</p>
                     </div>
                 </div>
-
                 <div class="home-season-card">
                     <div class="home-season-icon">
                         <i class="bi bi-cloud-rain"></i>
                     </div>
                     <div>
                         <div class="home-season-title">Lluvias (May-Oct)</div>
-                        <p class="home-season-text">
-                            Selva exuberante, menos visitantes.
-                        </p>
+                        <p class="home-season-text">Selva exuberante, menos visitantes.</p>
                     </div>
                 </div>
             </div>
