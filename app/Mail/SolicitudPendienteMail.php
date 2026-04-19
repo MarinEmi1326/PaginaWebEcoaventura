@@ -2,68 +2,33 @@
 
 namespace App\Mail;
 
+use App\Models\Usuario;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
 class SolicitudPendienteMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $user;
+    public $usuario;
+    public $nombrePersona;
 
-    /**
-     * Crear una nueva instancia de mensaje.
-     *
-     * @param  \App\Models\Usuario  $user
-     * @return void
-     */
-    public function __construct($user)
+    public function __construct(Usuario $usuario)
     {
-         $this->user = $user;
+        $this->usuario = $usuario;
+        // Cargamos el nombre de la persona de forma segura
+        $this->nombrePersona = $usuario->persona?->nombre ?? 'Usuario';
     }
 
-    /**
-     * Construir el mensaje.
-     *
-     * @return $this
-     */
-    
-    
-    public function envelope(): Envelope
+    public function build()
     {
-        return new Envelope(
-            subject: 'Solicitud Recibida - En Espera de Aprobación',
-        );
-    }
-
-    /**
-     * Get the message content definition.
-     */
-    public function content(): Content
-    {
-        return new Content(
-            // 1. Quitamos 'view.name' y ponemos tu ruta real
-            view: 'email.solicitud_pendiente', 
-            with: [
-                // 2. Usamos el accesor perfil->nombre para no tener errores
-                'nombre' => $this->user->perfil->nombre,
-                'correo' => $this->user->correo,
-                'token'  => $this->user->token_verificacion
-            ],
-        );
-    }
-
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
-    public function attachments(): array
-    {
-        return [];
+        return $this->view('email.solicitud_pendiente')
+                    ->subject('Solicitud en Espera - EcoAventura')
+                    ->with([
+                        'nombre' => $this->nombrePersona,
+                        'correo' => $this->usuario->correo,
+                        'token'  => $this->usuario->token_verificacion,
+                    ]);
     }
 }

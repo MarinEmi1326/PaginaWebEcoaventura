@@ -25,7 +25,6 @@ use Illuminate\Support\Facades\Auth;
 */
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-
 Route::view('/cultura', 'cultura')->name('cultura');
 
 // LOGIN
@@ -39,15 +38,16 @@ Route::post('/registro/turista', [AuthController::class, 'registroTurista'])->na
 // REGISTRO ADMIN DESTINOS
 Route::get('/registro/destinos', [AuthController::class, 'showRegistroDestinos'])->name('registro.destinos');
 Route::post('/registro/destinos', [AuthController::class, 'registroDestinos'])->name('registro.destinos.post');
-
-// VISTA DE ÉXITO DEL REGISTRO
 Route::get('/registro/destinos/exito', function () {
     return view('auth.registro-destinos-exito');
 })->name('registro.destinos.exito');
 
 // REGISTRO GESTOR RUTAS
-Route::get('/registro/rutas', [AuthController::class, 'showRegistroRutas'])->name('registro.rutas');
-Route::post('/registro/rutas', [AuthController::class, 'registroRutas']);
+Route::get('/registro/rutas', [AuthController::class, 'showRegistroRutas'])->name('registro.rutas.form');
+Route::post('/registro/rutas', [AuthController::class, 'registroRutas'])->name('registro.rutas');
+Route::get('/registro/rutas/exito', function () {
+    return view('auth.registro-rutas-exito');
+})->name('registro.rutas.exito');
 
 // VERIFICAR CORREO
 Route::get('/verificar-correo/{token}', [AuthController::class, 'verificarCorreo'])->name('verificar.correo');
@@ -63,7 +63,7 @@ Route::get('/centros/{id}', [DestinosController::class, 'show'])->name('destinos
 Route::get('/mapa', fn() => view('mapa'))->name('mapa');
 Route::get('/turismo-responsable', fn() => view('turismo-responsable'))->name('turismo-responsable');
 
-// ── Rutas públicas del módulo de rutas (tuyas) ──
+// Rutas públicas del módulo de rutas
 Route::get('/ruta', [RutaController::class, 'publicIndex'])->name('ruta');
 Route::get('/ruta/{id}', [RutaController::class, 'show'])->name('rutas.show');
 
@@ -74,12 +74,9 @@ Route::get('/ruta/{id}', [RutaController::class, 'show'])->name('rutas.show');
 */
 Route::middleware('auth')->group(function () {
 
-    // Cerrar sesión
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // ============================================================
-    // PERFIL — CORREGIDO: obtener rol desde persona
-    // ============================================================
+    // PERFIL
     Route::get('/perfil', function () {
         $user = Auth::user();
         $persona = $user->persona;
@@ -103,7 +100,7 @@ Route::middleware('auth')->group(function () {
 
     Route::put('/perfil/actualizar', [PerfilController::class, 'update'])->name('perfil.update');
 
-    // ── Módulo de rutas turísticas (tuyo) ──
+    // Módulo de rutas turísticas
     Route::resource('rutas', RutaController::class)->only(['index', 'create', 'store', 'destroy', 'edit', 'update']);
     Route::get('/api/destino-info/{id}', [RutaController::class, 'infoDestino'])->name('api.destino.info');
     Route::delete('/rutas/imagen/{id}', [RutaController::class, 'destroyImagen'])->name('rutas.imagen.destroy');
@@ -141,7 +138,6 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/', [AdminDashboardController::class, 'index'])->name('index');
 
-        // ── Categorías (tuyo) ──
         Route::resource('categorias', AdminCategoriaController::class);
 
         Route::get('/destino', [AdminCentroController::class, 'index'])->name('destino');
@@ -155,12 +151,13 @@ Route::middleware('auth')->group(function () {
         Route::post('/reportes/{id}/rechazar', [AdminReportesController::class, 'rechazar'])->name('reportes.rechazar');
         Route::post('/reportes/comentario/{id}/eliminar', [AdminReportesController::class, 'eliminarComentario'])->name('reportes.comentario.eliminar');
 
+        // Solicitudes (usuarios)
         Route::get('/solicitudes', [AdminSolicitudesController::class, 'index'])->name('solicitudes.index');
         Route::get('/solicitudes/crear', [AdminSolicitudesController::class, 'create'])->name('solicitudes.create');
         Route::post('/solicitudes/guardar', [AdminSolicitudesController::class, 'store'])->name('solicitudes.store');
         Route::get('/solicitudes/{id}/edit', [AdminSolicitudesController::class, 'edit'])->name('solicitudes.edit');
         Route::put('/solicitudes/{id}', [AdminSolicitudesController::class, 'update'])->name('solicitudes.update');
-        Route::post('/solicitudes/{id}/toggle-activo', [AdminSolicitudesController::class, 'toggleActivo'])->name('solicitudes.toggle');
+        Route::post('/solicitudes/{id}/toggle', [AdminSolicitudesController::class, 'toggle'])->name('solicitudes.toggle');
         Route::get('/solicitudes/{id}', [AdminSolicitudesController::class, 'show'])->name('solicitudes.show');
         Route::post('/solicitudes/{id}/aprobar', [AdminSolicitudesController::class, 'aprobar'])->name('solicitudes.aprobar');
         Route::post('/solicitudes/{id}/rechazar', [AdminSolicitudesController::class, 'rechazar'])->name('solicitudes.rechazar');

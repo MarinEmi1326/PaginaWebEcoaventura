@@ -50,9 +50,7 @@
                     $nombreCompleto = trim(
                         ($solicitud->nombre ?? '') .
                             ' ' .
-                            ($solicitud->apaterno ?? '') .
-                            ' ' .
-                            ($solicitud->amaterno ?? ''),
+                            ($solicitud->apellidos ?? '')
                     );
                     $estado = strtolower($solicitud->estado ?? 'pendiente');
 

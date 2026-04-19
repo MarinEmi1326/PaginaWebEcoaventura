@@ -58,17 +58,15 @@
 
     {{-- Paneles --}}
     <div class="row g-3">
-
         {{-- Cola de aprobación --}}
         <div class="col-12 col-lg-6">
             <div class="ea-card p-4">
                 <h5 class="fw-semibold mb-3" style="font-family: Georgia, 'Times New Roman', serif;">Cola de aprobación</h5>
-
                 <div class="d-grid gap-3">
                     @forelse($colaAprobacion as $sol)
                         <div class="ea-soft-row d-flex align-items-center justify-content-between">
                             <div>
-                                <div class="fw-semibold">{{ $sol->nombre }} {{ $sol->apaterno }}</div>
+                                <div class="fw-semibold">{{ $sol->nombre }} {{ $sol->apellidos }}</div>
                                 <div class="small" style="color: var(--ea-muted);">
                                     {{ $sol->rol === 'admin_destinos' ? 'Admin. de Destinos' : 'Gestor de Rutas' }}
                                     @if ($sol->fecha_solicitud)
@@ -85,7 +83,6 @@
                         <p class="text-muted small text-center py-3">No hay solicitudes pendientes.</p>
                     @endforelse
                 </div>
-
             </div>
         </div>
 
@@ -93,27 +90,24 @@
         <div class="col-12 col-lg-6">
             <div class="ea-card p-4">
                 <h5 class="fw-semibold mb-3" style="font-family: Georgia, 'Times New Roman', serif;">Actividad reciente</h5>
-
                 <div class="d-grid gap-3">
                     @forelse($actividadReciente as $act)
                         <div class="ea-soft-row d-flex align-items-center justify-content-between">
                             <div>
                                 <div class="fw-semibold">{{ $act->nombre }}</div>
                                 <div class="small" style="color: var(--ea-muted);">
-                                    Destino · {{ \Carbon\Carbon::parse($act->fecha_creacion)->format('Y-m-d') }}
+                                    Destino · {{ \Carbon\Carbon::parse($act->fecha_solicitud)->format('Y-m-d') }}
                                 </div>
                             </div>
-                            <span class="ea-chip {{ $act->activo === 'activo' ? 'green' : 'red' }}">
-                                {{ $act->activo === 'activo' ? 'Activo' : 'Inactivo' }}
+                            <span class="ea-chip {{ $act->activo ? 'green' : 'red' }}">
+                                {{ $act->activo ? 'Activo' : 'Inactivo' }}
                             </span>
                         </div>
                     @empty
                         <p class="text-muted small text-center py-3">Sin actividad reciente.</p>
                     @endforelse
                 </div>
-
             </div>
         </div>
-
     </div>
 @endsection

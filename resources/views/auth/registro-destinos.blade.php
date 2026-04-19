@@ -20,22 +20,23 @@
                     Completa tus datos para enviar tu solicitud de registro.
                 </p>
 
-                <div class="alert alert-light border rounded-3 mb-4">
-                    <strong>Importante:</strong> tu cuenta quedará pendiente de aprobación
-                    hasta que el administrador la revise.
+                <div class="alert alert-info border-0 bg-light rounded-3 mb-4">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>Importante:</strong> Tu cuenta quedará pendiente de aprobación hasta que el administrador la revise.
                 </div>
 
-                <!-- Mensaje general de errores (visible si hay cualquier error) -->
-                @if ($errors->any())
+                {{-- Mensajes de error --}}
+                @if (session('error'))
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <strong>¡Atención!</strong> Corrige los errores en el formulario.
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        {{ session('error') }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
 
-                @if (session('success'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        {{ session('success') }}
+                @if ($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>¡Atención!</strong> Revisa los campos marcados en rojo.
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
@@ -43,115 +44,102 @@
                 <form method="POST" action="{{ route('registro.destinos.post') }}" novalidate>
                     @csrf
 
-                    <!-- Nombre -->
-                    <div class="mb-3">
-                        <label for="nombre" class="form-label fw-semibold">Nombre *</label>
-                        <input type="text"
-                               id="nombre"
-                               name="nombre"
-                               value="{{ old('nombre') }}"
-                               class="form-control @error('nombre') is-invalid @enderror"
-                               placeholder="Tu nombre"
-                               required
-                               autofocus>
-                        @error('nombre')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label for="nombre" class="form-label fw-semibold">Nombre(s) *</label>
+                            <input type="text" 
+                                   id="nombre" 
+                                   name="nombre" 
+                                   value="{{ old('nombre') }}" 
+                                   class="form-control @error('nombre') is-invalid @enderror" 
+                                   placeholder="Ej. Juan Carlos" 
+                                   required autofocus>
+                            @error('nombre')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        {{-- Campo único para apellidos (igual que gestor rutas) --}}
+                        <div class="col-12 mb-3">
+                            <label for="apellidos" class="form-label fw-semibold">Apellidos *</label>
+                            <input type="text" 
+                                   id="apellidos" 
+                                   name="apellidos" 
+                                   value="{{ old('apellidos') }}" 
+                                   class="form-control @error('apellidos') is-invalid @enderror" 
+                                   placeholder="Ej. Pérez García" 
+                                   required>
+                            @error('apellidos')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
                     </div>
 
-                    <!-- Apellido Paterno -->
                     <div class="mb-3">
-                        <label for="apaterno" class="form-label fw-semibold">Apellido paterno *</label>
-                        <input type="text"
-                               id="apaterno"
-                               name="apaterno"
-                               value="{{ old('apaterno') }}"
-                               class="form-control @error('apaterno') is-invalid @enderror"
-                               placeholder="Apellido paterno"
-                               required>
-                        @error('apaterno')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- Apellido Materno -->
-                    <div class="mb-3">
-                        <label for="amaterno" class="form-label fw-semibold">Apellido materno</label>
-                        <input type="text"
-                               id="amaterno"
-                               name="amaterno"
-                               value="{{ old('amaterno') }}"
-                               class="form-control @error('amaterno') is-invalid @enderror"
-                               placeholder="Apellido materno (opcional)">
-                        @error('amaterno')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- Teléfono -->
-                    <div class="mb-3">
-                        <label for="telefono" class="form-label fw-semibold">Teléfono *</label>
-                        <input type="tel"
-                               id="telefono"
-                               name="telefono"
-                               value="{{ old('telefono') }}"
-                               class="form-control @error('telefono') is-invalid @enderror"
+                        <label for="telefono" class="form-label fw-semibold">Teléfono (10 dígitos) *</label>
+                        <input type="tel" 
+                               id="telefono" 
+                               name="telefono" 
+                               value="{{ old('telefono') }}" 
+                               class="form-control @error('telefono') is-invalid @enderror" 
+                               maxlength="10" 
                                placeholder="9611234567"
-                               maxlength="10"
-                               pattern="\d{10}"
-                               inputmode="numeric"
                                required>
                         @error('telefono')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
-                    <!-- Correo -->
+                    <hr class="my-4 text-muted">
+
                     <div class="mb-3">
                         <label for="correo" class="form-label fw-semibold">Correo electrónico *</label>
-                        <input type="email"
-                               id="correo"
-                               name="correo"
-                               value="{{ old('correo') }}"
-                               class="form-control @error('correo') is-invalid @enderror"
-                               placeholder="nombre@correo.com"
+                        <input type="email" 
+                               id="correo" 
+                               name="correo" 
+                               value="{{ old('correo') }}" 
+                               class="form-control @error('correo') is-invalid @enderror" 
+                               placeholder="nombre@ejemplo.com"
                                required>
                         @error('correo')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
-                    <!-- Contraseña -->
-                    <div class="mb-3">
-                        <label for="password" class="form-label fw-semibold">Contraseña *</label>
-                        <input type="password"
-                               id="password"
-                               name="password"
-                               class="form-control @error('password') is-invalid @enderror"
-                               placeholder="••••••••"
-                               required>
-                        @error('password')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="password" class="form-label fw-semibold">Contraseña *</label>
+                            <input type="password" 
+                                   id="password" 
+                                   name="password" 
+                                   class="form-control @error('password') is-invalid @enderror" 
+                                   placeholder="Mín. 8 caracteres"
+                                   required>
+                            @error('password')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label for="password_confirmation" class="form-label fw-semibold">Confirmar contraseña *</label>
+                            <input type="password" 
+                                   id="password_confirmation" 
+                                   name="password_confirmation" 
+                                   class="form-control" 
+                                   placeholder="Repite tu contraseña"
+                                   required>
+                        </div>
                     </div>
 
-                    <!-- Confirmar Contraseña -->
-                    <div class="mb-4">
-                        <label for="password_confirmation" class="form-label fw-semibold">Confirmar contraseña *</label>
-                        <input type="password"
-                               id="password_confirmation"
-                               name="password_confirmation"
-                               class="form-control"
-                               placeholder="••••••••"
-                               required>
-                    </div>
-
-                    <button type="submit" class="btn btn-success w-100 py-2 fw-semibold">
-                        Enviar solicitud
+                    <button type="submit" class="btn btn-success w-100 py-3 fw-bold shadow-sm">
+                        ENVIAR SOLICITUD DE REGISTRO
                     </button>
+                    
+                    <p class="text-center mt-4 text-muted small">
+                        ¿Ya tienes cuenta? <a href="{{ route('login') }}" class="text-success fw-semibold">Inicia sesión</a>
+                    </p>
                 </form>
             </div>
-
         </div>
     </div>
 </div>

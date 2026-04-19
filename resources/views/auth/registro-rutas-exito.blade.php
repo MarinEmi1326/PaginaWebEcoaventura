@@ -11,6 +11,11 @@
                     Tu registro como <strong>Gestor de Rutas</strong> fue enviado.
                     Ahora tu solicitud será revisada por el administrador.
                 </p>
+                <div class="alert alert-light border rounded-3 mb-4 text-start">
+                    <strong>Importante:</strong><br>
+                    Revisa el correo electrónico que registraste, porque ahí recibirás la notificación
+                    cuando tu solicitud sea aprobada o rechazada.
+                </div>
                 <a href="{{ route('home') }}" class="btn btn-success px-4 py-2 fw-semibold">
                     Volver al inicio
                 </a>

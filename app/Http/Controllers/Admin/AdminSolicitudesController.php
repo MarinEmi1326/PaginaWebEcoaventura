@@ -3,384 +3,330 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Mail\RechazoSolicitudMail;
-use App\Mail\SolicitudAprobadaMail;
 use App\Models\Persona;
 use App\Models\Rol;
 use App\Models\Usuario;
+use App\Mail\SolicitudAprobadaMail;
+use App\Mail\RechazoSolicitudMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class AdminSolicitudesController extends Controller
 {
-    // ================================
-    // LISTAR SOLICITUDES
-    // ================================
-    public function index(Request $request)
+    /**
+     * DASHBOARD PRINCIPAL
+     */
+    public function dashboard()
     {
-        $query = DB::table('usuario as u')
+        $usuariosBase = DB::table('usuario as u')
             ->join('persona as p', 'p.id_usuario', '=', 'u.id_usuario')
             ->join('persona_rol as pr', 'pr.id_persona', '=', 'p.id_persona')
             ->join('rol as r', 'r.id_rol', '=', 'pr.id_rol')
-            ->whereIn('r.descripcion', ['admin_destinos', 'gestor_rutas', 'turista'])
-            ->where('u.correo_verificado', 1);
+            ->select('u.*', 'p.nombre', 'p.apellidos', 'r.descripcion as rol')
+            ->where('r.descripcion', '!=', 'admin_general')
+            ->orderByDesc('u.fecha_solicitud')
+            ->get();
 
-        if ($request->filled('estado') && $request->estado !== 'todos') {
-            $query->where('u.estado', $request->estado);
-        }
+        $totalUsuarios = DB::table('usuario')->count();
+        $pendientes    = DB::table('usuario')->where('estado', 'pendiente')->count();
+        $publicados    = DB::table('usuario')->where('estado', 'aprobado')->count();
+        $rechazados    = DB::table('usuario')->where('estado', 'rechazado')->count();
 
-        $solicitudes = $query->select(
-            'u.id_usuario',
-            'u.correo',
-            'u.activo',
-            'u.estado',
-            'u.fecha_solicitud',
-            'u.fecha_respuesta',
-            'p.id_persona',
-            'p.nombre',
-            'p.apellidos',
-            'p.telefono',
-            'r.descripcion as rol'
-        )
-        ->orderByDesc('u.fecha_solicitud')
-        ->get();
+        $colaAprobacion = $usuariosBase->where('estado', 'pendiente');
+        $actividadReciente = $usuariosBase->take(5);
+
+        return view('admin.index', compact(
+            'totalUsuarios', 
+            'pendientes', 
+            'publicados', 
+            'rechazados', 
+            'colaAprobacion', 
+            'actividadReciente'
+        ));
+    }
+
+    /**
+     * LISTADO DE USUARIOS
+     */
+    public function index()
+    {
+        $solicitudes = DB::table('usuario as u')
+            ->join('persona as p', 'p.id_usuario', '=', 'u.id_usuario')
+            ->join('persona_rol as pr', 'pr.id_persona', '=', 'p.id_persona')
+            ->join('rol as r', 'r.id_rol', '=', 'pr.id_rol')
+            ->select('u.*', 'p.nombre', 'p.apellidos', 'r.descripcion as rol')
+            ->where('r.descripcion', '!=', 'admin_general')
+            ->orderByDesc('u.id_usuario')
+            ->get();
 
         return view('admin.solicitudes.index', compact('solicitudes'));
     }
 
-    // ================================
-    // VER DETALLE DE SOLICITUD
-    // ================================
+    /**
+     * MOSTRAR DETALLE
+     */
     public function show($id)
     {
         $solicitud = DB::table('usuario as u')
             ->join('persona as p', 'p.id_usuario', '=', 'u.id_usuario')
             ->join('persona_rol as pr', 'pr.id_persona', '=', 'p.id_persona')
             ->join('rol as r', 'r.id_rol', '=', 'pr.id_rol')
-            ->where('u.id_usuario', $id)
-            ->whereIn('r.descripcion', ['admin_destinos', 'gestor_rutas', 'turista'])
-            ->where('u.correo_verificado', 1)
             ->select(
-                'u.id_usuario',
-                'u.correo',
-                'u.activo',
-                'u.estado',
-                'u.fecha_solicitud',
-                'u.fecha_respuesta',
-                'u.motivo_rechazo',
-                'p.id_persona',
-                'p.nombre',
-                'p.apellidos',
+                'u.*', 
+                'p.nombre', 
+                'p.apellidos', 
                 'p.telefono',
-                'p.facebook_url',
-                'p.instagram_url',
-                'p.tiktok_url',
                 'r.descripcion as rol'
             )
+            ->where('u.id_usuario', $id)
             ->first();
 
-        abort_if(!$solicitud, 404);
+        if (!$solicitud) {
+            return redirect()->route('admin.solicitudes.index')->with('error', 'Usuario no encontrado');
+        }
 
-        $reportes = DB::table('reporte')
-            ->leftJoin('destino', 'reporte.id_destino', '=', 'destino.id_destino')
-            ->leftJoin('comentario', 'reporte.id_comentario', '=', 'comentario.id_comentario')
-            ->where('reporte.reportado_por', $solicitud->id_persona)
-            ->select(
-                'reporte.id_reporte',
-                'reporte.tipo_objeto',
-                'reporte.motivo',
-                'reporte.estado',
-                'reporte.fecha',
-                'destino.nombre as nombre_destino',
-                'comentario.comentario as texto_comentario'
-            )
-            ->orderByDesc('reporte.fecha')
-            ->get();
+        $reportes = collect();
+        $reportesRecibidos = collect();
+        $reportesEnviados = collect();
 
-        $reportesRecibidos = DB::table('reporte')
-            ->join('comentario', 'reporte.id_comentario', '=', 'comentario.id_comentario')
-            ->join('persona as pAutor', 'comentario.id_persona', '=', 'pAutor.id_persona')
-            ->leftJoin('destino', 'reporte.id_destino', '=', 'destino.id_destino')
-            ->leftJoin('persona as reporter', 'reporte.reportado_por', '=', 'reporter.id_persona')
-            ->where('pAutor.id_usuario', $id)
-            ->select(
-                'reporte.id_reporte',
-                'reporte.motivo',
-                'reporte.estado',
-                'reporte.fecha',
-                'comentario.comentario as texto_comentario',
-                'destino.nombre as nombre_destino',
-                'reporter.nombre as nombre_reporter',
-                'reporter.apellidos as apellidos_reporter'
-            )
-            ->orderByDesc('reporte.fecha')
-            ->get();
-
-        return view('admin.solicitudes.show', compact('solicitud', 'reportes', 'reportesRecibidos'));
+        return view('admin.solicitudes.show', compact(
+            'solicitud', 
+            'reportes', 
+            'reportesRecibidos', 
+            'reportesEnviados'
+        ));
     }
 
-    // ================================
-    // CREAR NUEVO ADMIN/GESTOR (desde admin)
-    // ================================
-    public function create()
-    {
-        return view('admin.solicitudes.create');
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'correo'   => 'required|email|unique:usuario,correo',
-            'password' => 'required|string|min:8',
-            'rol'      => 'required|in:admin_destinos,gestor_rutas',
-            'nombre'   => 'required|string|max:60',
-            'apellidos'=> 'required|string|max:120',
-            'telefono' => 'required|string|max:20',
-        ]);
-
-        DB::transaction(function () use ($request) {
-            // Crear usuario
-            $idUsuario = DB::table('usuario')->insertGetId([
-                'correo'              => $request->correo,
-                'password'            => Hash::make($request->password),
-                'estado'              => 'aprobado',
-                'activo'              => 1,
-                'correo_verificado'   => 1,
-                'token_verificacion'  => null,
-                'fecha_solicitud'     => now(),
-                'fecha_respuesta'     => now(),
-            ]);
-
-            // Crear persona
-            $idPersona = DB::table('persona')->insertGetId([
-                'id_usuario' => $idUsuario,
-                'nombre'     => $request->nombre,
-                'apellidos'  => $request->apellidos,
-                'telefono'   => $request->telefono,
-            ]);
-
-            // Obtener id del rol
-            $rol = DB::table('rol')->where('descripcion', $request->rol)->first();
-            
-            // Asignar rol
-            DB::table('persona_rol')->insert([
-                'id_persona' => $idPersona,
-                'id_rol'     => $rol->id_rol,
-            ]);
-        });
-
-        return redirect()
-            ->route('admin.solicitudes.index')
-            ->with('ok', 'Usuario creado exitosamente.');
-    }
-
-    // ================================
-    // EDITAR USUARIO
-    // ================================
+    /**
+     * FORMULARIO EDITAR
+     */
     public function edit($id)
     {
         $usuario = DB::table('usuario as u')
             ->join('persona as p', 'p.id_usuario', '=', 'u.id_usuario')
             ->join('persona_rol as pr', 'pr.id_persona', '=', 'p.id_persona')
             ->join('rol as r', 'r.id_rol', '=', 'pr.id_rol')
-            ->where('u.id_usuario', $id)
-            ->whereIn('r.descripcion', ['admin_destinos', 'gestor_rutas', 'turista'])
             ->select(
                 'u.id_usuario',
                 'u.correo',
                 'u.activo',
                 'u.estado',
-                'p.id_persona',
                 'p.nombre',
                 'p.apellidos',
                 'p.telefono',
                 'r.descripcion as rol'
             )
+            ->where('u.id_usuario', $id)
             ->first();
 
         if (!$usuario) {
-            return redirect()
-                ->route('admin.solicitudes.index')
-                ->with('error', 'Usuario no encontrado.');
+            return redirect()->route('admin.solicitudes.index')->with('error', 'Usuario no encontrado');
+        }
+
+        $apellidos = $usuario->apellidos ?? '';
+        $espacio = strpos($apellidos, ' ');
+        if ($espacio !== false) {
+            $usuario->apaterno = substr($apellidos, 0, $espacio);
+            $usuario->amaterno = substr($apellidos, $espacio + 1);
+        } else {
+            $usuario->apaterno = $apellidos;
+            $usuario->amaterno = '';
         }
 
         return view('admin.solicitudes.edit', compact('usuario'));
     }
 
+    /**
+     * ACTUALIZAR USUARIO
+     */
     public function update(Request $request, $id)
     {
-        $usuarioActual = DB::table('usuario')->where('id_usuario', $id)->first();
-
-        if (!$usuarioActual) {
-            return redirect()
-                ->route('admin.solicitudes.index')
-                ->with('error', 'Usuario no encontrado.');
-        }
-
-        $request->validate([
-            'correo'   => [
-                'required',
-                'email',
-                Rule::unique('usuario', 'correo')->ignore($id, 'id_usuario'),
-            ],
-            'password' => 'nullable|string|min:8',
+        $validated = $request->validate([
+            'correo'   => 'required|email|unique:usuario,correo,' . $id . ',id_usuario',
+            'password' => 'nullable|min:8|confirmed',
             'rol'      => 'required|in:admin_destinos,gestor_rutas,turista',
             'nombre'   => 'required|string|max:60',
-            'apellidos'=> 'required|string|max:120',
-            'telefono' => 'required|string|max:20',
+            'apaterno' => 'required|string|max:60',
+            'amaterno' => 'nullable|string|max:60',
+            'telefono' => 'required|digits:10',
         ]);
 
-        DB::transaction(function () use ($request, $id) {
-            // Actualizar usuario
-            $datosUsuario = ['correo' => $request->correo];
-            if ($request->filled('password')) {
-                $datosUsuario['password'] = Hash::make($request->password);
+        try {
+            DB::beginTransaction();
+
+            $usuarioData = ['correo' => $validated['correo']];
+            if (!empty($validated['password'])) {
+                $usuarioData['password'] = Hash::make($validated['password']);
             }
-            DB::table('usuario')->where('id_usuario', $id)->update($datosUsuario);
+            Usuario::where('id_usuario', $id)->update($usuarioData);
 
-            // Obtener persona
-            $persona = DB::table('persona')->where('id_usuario', $id)->first();
-            
-            // Actualizar persona
-            DB::table('persona')->where('id_persona', $persona->id_persona)->update([
-                'nombre'    => $request->nombre,
-                'apellidos' => $request->apellidos,
-                'telefono'  => $request->telefono,
+            $persona = Persona::where('id_usuario', $id)->first();
+            if (!$persona) {
+                throw new \Exception('Persona no encontrada para este usuario');
+            }
+
+            $apellidosCompleto = trim($validated['apaterno'] . ' ' . ($validated['amaterno'] ?? ''));
+            $persona->update([
+                'nombre'    => $validated['nombre'],
+                'apellidos' => $apellidosCompleto,
+                'telefono'  => $validated['telefono'],
             ]);
 
-            // Obtener nuevo rol
-            $nuevoRol = DB::table('rol')->where('descripcion', $request->rol)->first();
-            
-            // Eliminar rol actual y asignar nuevo
-            DB::table('persona_rol')->where('id_persona', $persona->id_persona)->delete();
-            DB::table('persona_rol')->insert([
-                'id_persona' => $persona->id_persona,
-                'id_rol'     => $nuevoRol->id_rol,
-            ]);
-        });
+            $nuevoRol = Rol::where('descripcion', $validated['rol'])->first();
+            if (!$nuevoRol) {
+                throw new \Exception('Rol no válido');
+            }
+            $persona->roles()->sync([$nuevoRol->id_rol]);
 
-        return redirect()
-            ->route('admin.solicitudes.index')
-            ->with('ok', 'Usuario actualizado correctamente.');
-    }
-
-    // ================================
-    // ACTIVAR/SUSPENDER USUARIO
-    // ================================
-    public function toggleActivo($id)
-    {
-        $usuario = DB::table('usuario as u')
-            ->join('persona as p', 'p.id_usuario', '=', 'u.id_usuario')
-            ->join('persona_rol as pr', 'pr.id_persona', '=', 'p.id_persona')
-            ->join('rol as r', 'r.id_rol', '=', 'pr.id_rol')
-            ->where('u.id_usuario', $id)
-            ->whereIn('r.descripcion', ['admin_destinos', 'gestor_rutas'])
-            ->first();
-
-        if (!$usuario) {
-            return back()->with('error', 'Usuario no encontrado.');
+            DB::commit();
+            return redirect()->route('admin.solicitudes.index')->with('ok', 'Usuario actualizado correctamente.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Error al actualizar usuario: " . $e->getMessage());
+            return back()->withInput()->with('error', 'Error al actualizar: ' . $e->getMessage());
         }
-
-        $nuevoEstado = $usuario->activo ? 0 : 1;
-
-        DB::table('usuario')
-            ->where('id_usuario', $id)
-            ->update(['activo' => $nuevoEstado]);
-
-        return back()->with(
-            'ok',
-            $nuevoEstado ? 'Usuario habilitado con éxito.' : 'Usuario suspendido correctamente.'
-        );
     }
 
-    // ================================
-    // APROBAR SOLICITUD
-    // ================================
+    /**
+     * FORMULARIO CREAR (admin)
+     */
+    public function create()
+    {
+        return view('admin.solicitudes.create');
+    }
+
+    /**
+     * GUARDAR NUEVO USUARIO (admin)
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'correo'   => 'required|email|unique:usuario,correo',
+            'password' => 'required|min:8|confirmed',
+            'rol'      => 'required|in:admin_destinos,gestor_rutas',
+            'nombre'   => 'required|string|max:60',
+            'apaterno' => 'required|string|max:60',
+            'amaterno' => 'nullable|string|max:60',
+            'telefono' => 'required|digits:10',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $rol = Rol::where('descripcion', $validated['rol'])->first();
+            if (!$rol) {
+                throw new \Exception('El rol seleccionado no existe en la BD.');
+            }
+
+            $usuario = Usuario::create([
+                'correo'             => $validated['correo'],
+                'password'           => Hash::make($validated['password']),
+                'activo'             => true,
+                'estado'             => 'aprobado',
+                'correo_verificado'  => 1,
+                'token_verificacion' => null,
+                'fecha_solicitud'    => now(),
+                'fecha_respuesta'    => now(),
+            ]);
+
+            $apellidosCompleto = trim($validated['apaterno'] . ' ' . ($validated['amaterno'] ?? ''));
+            $persona = Persona::create([
+                'id_usuario' => $usuario->id_usuario,
+                'nombre'     => $validated['nombre'],
+                'apellidos'  => $apellidosCompleto,
+                'telefono'   => $validated['telefono'],
+            ]);
+
+            $persona->roles()->attach($rol->id_rol);
+
+            DB::commit();
+            return redirect()->route('admin.solicitudes.index')->with('ok', 'Usuario creado y aprobado correctamente.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Error al crear usuario desde admin: " . $e->getMessage());
+            return back()->withInput()->with('error', 'Error al crear: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * APROBAR SOLICITUD
+     */
     public function aprobar($id)
     {
-        $u = DB::table('usuario as u')
-            ->join('persona as p', 'p.id_usuario', '=', 'u.id_usuario')
-            ->join('persona_rol as pr', 'pr.id_persona', '=', 'p.id_persona')
-            ->join('rol as r', 'r.id_rol', '=', 'pr.id_rol')
-            ->where('u.id_usuario', $id)
-            ->whereIn('r.descripcion', ['admin_destinos', 'gestor_rutas'])
-            ->where('u.correo_verificado', 1)
-            ->select('u.*', 'p.nombre as nombre_persona')
-            ->first();
+        $usuario = Usuario::find($id);
+        if (!$usuario) return back()->with('error', 'Usuario no encontrado');
+        if ($usuario->estado !== 'pendiente') return back()->with('error', 'Esta solicitud ya fue atendida.');
+        $persona = $usuario->persona;
+        if (!$persona) return back()->with('error', 'Datos de persona no encontrados');
 
-        abort_if(!$u, 404);
+        $nombreCompleto = $persona->nombre . ' ' . $persona->apellidos;
 
-        if ($u->estado !== 'pendiente') {
-            return back()->with('error', 'Esta solicitud ya fue atendida.');
-        }
-
-        DB::table('usuario')
-            ->where('id_usuario', $id)
-            ->update([
-                'estado'          => 'aprobado',
-                'activo'          => 1,
-                'fecha_respuesta' => now(),
-                'motivo_rechazo'  => null,
-            ]);
-
-        try {
-            Mail::to($u->correo)->send(new SolicitudAprobadaMail($u));
-        } catch (\Exception $e) {
-            // Log error si quieres
-        }
-
-        return redirect()
-            ->route('admin.solicitudes.index')
-            ->with('ok', 'Solicitud aprobada y correo enviado.');
-    }
-
-    // ================================
-    // RECHAZAR SOLICITUD
-    // ================================
-    public function rechazar(Request $request, $id)
-    {
-        $request->validate([
-            'motivo_rechazo' => 'required|string|min:5|max:150',
+        $usuario->update([
+            'estado'          => 'aprobado',
+            'activo'          => true,
+            'fecha_respuesta' => now(),
         ]);
 
-        $u = DB::table('usuario as u')
-            ->join('persona as p', 'p.id_usuario', '=', 'u.id_usuario')
-            ->join('persona_rol as pr', 'pr.id_persona', '=', 'p.id_persona')
-            ->join('rol as r', 'r.id_rol', '=', 'pr.id_rol')
-            ->where('u.id_usuario', $id)
-            ->whereIn('r.descripcion', ['admin_destinos', 'gestor_rutas'])
-            ->where('u.correo_verificado', 1)
-            ->select('u.*', 'p.nombre as nombre_persona')
-            ->first();
-
-        abort_if(!$u, 404);
-
-        if ($u->estado !== 'pendiente') {
-            return back()->with('error', 'Esta solicitud ya fue atendida.');
+        try {
+            Mail::to($usuario->correo)->send(new SolicitudAprobadaMail($usuario, $nombreCompleto));
+        } catch (\Exception $e) {
+            Log::warning("Error al enviar correo de aprobación: " . $e->getMessage());
         }
 
-        DB::table('usuario')
-            ->where('id_usuario', $id)
-            ->update([
-                'estado'          => 'rechazado',
-                'activo'          => 0,
-                'fecha_respuesta' => now(),
-                'motivo_rechazo'  => $request->motivo_rechazo,
-            ]);
+        return back()->with('ok', 'Usuario aprobado correctamente.');
+    }
+
+    /**
+     * RECHAZAR SOLICITUD
+     */
+    public function rechazar(Request $request, $id)
+    {
+        $request->validate(['motivo_rechazo' => 'required|string|max:255']);
+
+        $usuario = Usuario::find($id);
+        if (!$usuario) return back()->with('error', 'Usuario no encontrado');
+        if ($usuario->estado !== 'pendiente') return back()->with('error', 'Esta solicitud ya fue atendida.');
+
+        $persona = $usuario->persona;
+        $nombreCompleto = $persona ? ($persona->nombre . ' ' . $persona->apellidos) : 'Usuario';
+
+        $usuario->update([
+            'estado'          => 'rechazado',
+            'activo'          => false,
+            'motivo_rechazo'  => $request->motivo_rechazo,
+            'fecha_respuesta' => now(),
+        ]);
 
         try {
-            Mail::to($u->correo)->send(
-                new RechazoSolicitudMail($request->motivo_rechazo, $u->nombre_persona)
-            );
+            Mail::to($usuario->correo)->send(new RechazoSolicitudMail($request->motivo_rechazo, $nombreCompleto));
         } catch (\Exception $e) {
-           
+            Log::warning("Error al enviar correo de rechazo: " . $e->getMessage());
         }
 
-        return redirect()
-            ->route('admin.solicitudes.index')
-            ->with('ok', 'Solicitud rechazada y notificación enviada.');
+        return back()->with('ok', 'Solicitud rechazada. Se ha enviado un correo al usuario.');
+    }
+
+    /**
+     * SUSPENDER / HABILITAR
+     */
+    public function toggle($id)
+    {
+        $usuario = Usuario::find($id);
+        if (!$usuario) return back()->with('error', 'Usuario no encontrado');
+
+        if ($usuario->estado === 'pendiente') {
+            return back()->with('error', 'No se puede cambiar el estado de una solicitud pendiente. Aprueba o rechaza primero.');
+        }
+
+        $nuevoEstado = !$usuario->activo;
+        $usuario->update(['activo' => $nuevoEstado]);
+
+        $mensaje = $nuevoEstado ? 'Usuario habilitado correctamente.' : 'Usuario suspendido correctamente.';
+        return back()->with('ok', $mensaje);
     }
 }

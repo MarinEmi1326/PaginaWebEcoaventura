@@ -15,23 +15,12 @@ class Usuario extends Authenticatable
     public $timestamps = false;
 
     protected $fillable = [
-        'correo',
-        'correo_verificado',
-        'token_verificacion',
-        'google_id',
-        'foto_perfil',
-        'password',
-        'activo',
-        'estado',
-        'fecha_solicitud',
-        'fecha_respuesta',
-        'motivo_rechazo',
-        'fcm_token'
+        'correo', 'correo_verificado', 'token_verificacion', 'google_id',
+        'foto_perfil', 'password', 'activo', 'estado', 'fecha_solicitud',
+        'fecha_respuesta', 'motivo_rechazo', 'fcm_token'
     ];
 
-    protected $hidden = [
-        'password',
-    ];
+    protected $hidden = ['password'];
 
     protected $casts = [
         'activo'             => 'boolean',
@@ -40,31 +29,10 @@ class Usuario extends Authenticatable
         'fecha_respuesta'    => 'datetime',
     ];
 
-    // ================================
-    // AUTH
-    // ================================
-
-    public function getAuthIdentifierName()
-    {
-        return 'id_usuario';
-    }
-
-    public function getAuthIdentifier()
-    {
-        return $this->id_usuario;
-    }
-
-    public function getAuthPassword()
-    {
-        return $this->password;
-    }
-
-    // ================================
-    // NUEVA RELACIÓN
-    // ================================
+    public function getAuthIdentifierName() { return 'id_usuario'; }
 
     public function persona()
     {
-        return $this->hasOne(Persona::class, 'id_usuario');
+        return $this->hasOne(Persona::class, 'id_usuario', 'id_usuario');
     }
 }
