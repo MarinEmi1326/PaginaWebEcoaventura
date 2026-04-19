@@ -16,7 +16,7 @@ class NotificacionPagoAdmin extends Mailable
         public $pago,
         public $paquete,
         public $destino,
-        public $turista
+        public $persona
     ) {}
 
     public function envelope(): Envelope

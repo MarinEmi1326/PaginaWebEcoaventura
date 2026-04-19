@@ -44,6 +44,62 @@
 
                     <input type="hidden" name="payment_method_id" id="payment_method_id">
 
+                    {{-- Fecha de visita --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">
+                            <i class="bi bi-calendar3 me-1 text-success"></i>Fecha de visita
+                        </label>
+                        <input type="date" name="fecha_visita"
+                            class="form-control rounded-3 py-2 @error('fecha_visita') is-invalid @enderror"
+                            min="{{ date('Y-m-d', strtotime('+1 day')) }}" value="{{ old('fecha_visita') }}" required>
+                        @error('fecha_visita')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    {{-- Número de personas --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">
+                            <i class="bi bi-people me-1 text-success"></i>Número de personas
+                        </label>
+                        <input type="number" name="personas"
+                            class="form-control rounded-3 py-2 @error('personas') is-invalid @enderror"
+                            min="{{ $paquete->minimo_personas ?? 1 }}"
+                            value="{{ old('personas', $paquete->minimo_personas ?? 1) }}"
+                            placeholder="Cantidad de personas" required>
+                        @error('personas')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        @if ($paquete->minimo_personas)
+                            <div class="form-text text-muted">Mínimo {{ $paquete->minimo_personas }} personas</div>
+                        @endif
+                    </div>
+
+                    {{-- Horario --}}
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small">
+                            <i class="bi bi-clock me-1 text-success"></i>Horario preferido
+                        </label>
+                        <select name="horario" class="form-select rounded-3 py-2 @error('horario') is-invalid @enderror"
+                            required>
+                            <option value="" disabled {{ old('horario') ? '' : 'selected' }}>Selecciona un horario
+                            </option>
+                            <option value="08:00" {{ old('horario') == '08:00' ? 'selected' : '' }}>8:00 AM</option>
+                            <option value="09:00" {{ old('horario') == '09:00' ? 'selected' : '' }}>9:00 AM</option>
+                            <option value="10:00" {{ old('horario') == '10:00' ? 'selected' : '' }}>10:00 AM</option>
+                            <option value="11:00" {{ old('horario') == '11:00' ? 'selected' : '' }}>11:00 AM</option>
+                            <option value="12:00" {{ old('horario') == '12:00' ? 'selected' : '' }}>12:00 PM</option>
+                            <option value="13:00" {{ old('horario') == '13:00' ? 'selected' : '' }}>1:00 PM</option>
+                            <option value="14:00" {{ old('horario') == '14:00' ? 'selected' : '' }}>2:00 PM</option>
+                            <option value="15:00" {{ old('horario') == '15:00' ? 'selected' : '' }}>3:00 PM</option>
+                            <option value="16:00" {{ old('horario') == '16:00' ? 'selected' : '' }}>4:00 PM</option>
+                        </select>
+                        @error('horario')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    {{-- Datos tarjeta --}}
                     <div class="mb-3">
                         <label class="form-label fw-bold small">Nombre en la tarjeta</label>
                         <input type="text" id="nombre-tarjeta" class="form-control rounded-3 py-2"
@@ -59,8 +115,6 @@
                     <div class="rounded-3 p-3 mb-4 small" style="background:#f1f5f2;">
                         <i class="bi bi-shield-lock me-1 text-success"></i>
                         Pago seguro procesado por Stripe. Tus datos están cifrados.
-                        <br>
-
                     </div>
 
                     <button type="submit" id="btn-pagar" class="btn btn-success w-100 rounded-3 py-2 fw-semibold">

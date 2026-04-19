@@ -46,7 +46,6 @@
             text-align: center;
             margin-bottom: 24px;
             font-size: 48px;
-            color: #1F6B4B;
         }
 
         h2 {
@@ -96,6 +95,20 @@
             font-size: 16px;
         }
 
+        .highlight {
+            background: #e2ece9;
+            border-radius: 8px;
+            padding: 16px 24px;
+            margin: 16px 0;
+        }
+
+        .highlight p {
+            margin: 0;
+            color: #1F6B4B;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
         .footer {
             background: #f7f9f7;
             padding: 20px 40px;
@@ -113,20 +126,25 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1><i class="bi bi-leaf-fill me-2"></i>Ecoaventura</h1>
+            <h1>🌿 Ecoaventura</h1>
             <p>Panel de administración</p>
         </div>
         <div class="body">
-            <div class="bell">
-                <i class="bi bi-bell-fill"></i>
-            </div>
+            <div class="bell">💰</div>
             <h2>Nuevo pago recibido</h2>
             <p>Se ha realizado un nuevo pago en tu destino <strong>{{ $destino->nombre }}</strong>.</p>
+
+            {{-- Detalles de la visita destacados --}}
+            <div class="highlight">
+                <p>📅 Fecha de visita: {{ \Carbon\Carbon::parse($pago->fecha_visita)->format('d/m/Y') }}</p>
+                <p style="margin-top:8px;">🕐 Horario: {{ $pago->horario }}</p>
+                <p style="margin-top:8px;">👥 Personas: {{ $pago->personas }}</p>
+            </div>
 
             <div class="card">
                 <div class="row">
                     <span class="label">Turista</span>
-                    <span class="value">{{ $turista->nombre }} {{ $turista->apaterno }}</span>
+                    <span class="value">{{ $persona->nombre }} {{ $persona->apellidos }}</span>
                 </div>
                 <div class="row">
                     <span class="label">Paquete adquirido</span>
@@ -137,14 +155,12 @@
                     <span class="value" style="font-size:12px;">{{ $pago->stripe_payment_intent }}</span>
                 </div>
                 <div class="row">
-                    <span class="label">Fecha</span>
+                    <span class="label">Fecha de pago</span>
                     <span class="value">{{ \Carbon\Carbon::parse($pago->fecha)->format('d/m/Y H:i') }}</span>
                 </div>
                 <div class="row total">
                     <span class="label">Monto recibido</span>
-                    <span class="value">
-                        <i class="bi bi-currency-dollar me-1"></i>${{ number_format($pago->monto, 2) }} MXN
-                    </span>
+                    <span class="value">${{ number_format($pago->monto, 2) }} MXN</span>
                 </div>
             </div>
         </div>
