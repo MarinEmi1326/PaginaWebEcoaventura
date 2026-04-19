@@ -46,7 +46,19 @@ class PagoController extends Controller
 
         if (!$paquete) abort(404);
 
-        $user = auth()->user();
+        $request->validate([
+            'fecha_visita' => 'required|date|after:today',
+            'personas'     => 'required|integer|min:' . ($paquete->minimo_personas ?? 1),
+            'horario'      => 'required|string',
+        ], [
+            'fecha_visita.required' => 'La fecha de visita es obligatoria.',
+            'fecha_visita.after'    => 'La fecha de visita debe ser a partir de mañana.',
+            'personas.required'     => 'El número de personas es obligatorio.',
+            'personas.min'          => 'El mínimo de personas es ' . ($paquete->minimo_personas ?? 1) . '.',
+            'horario.required'      => 'El horario es obligatorio.',
+        ]);
+
+        $user    = auth()->user();
         $persona = DB::table('persona')->where('id_usuario', $user->id_usuario)->first();
 
         if (!$persona) {
@@ -57,12 +69,12 @@ class PagoController extends Controller
             $monto = intval($paquete->precio * 100);
 
             $intent = PaymentIntent::create([
-                'amount'               => $monto,
-                'currency'             => 'mxn',
-                'payment_method'       => $request->payment_method_id,
-                'confirmation_method'  => 'manual',
-                'confirm'              => true,
-                'return_url'           => route('pagos.confirmacion', $id_paquete),
+                'amount'              => $monto,
+                'currency'            => 'mxn',
+                'payment_method'      => $request->payment_method_id,
+                'confirmation_method' => 'manual',
+                'confirm'             => true,
+                'return_url'          => route('pagos.confirmacion', $id_paquete),
                 'metadata' => [
                     'paquete'    => $paquete->nombre,
                     'id_persona' => $persona->id_persona,
@@ -73,7 +85,9 @@ class PagoController extends Controller
                 'id_persona'            => $persona->id_persona,
                 'id_paquete'            => $paquete->id_paquete,
                 'id_destino'            => $paquete->id_destino,
-                'personas'              => $request->personas ?? 1,
+                'personas'              => $request->personas,
+                'fecha_visita'          => $request->fecha_visita,
+                'horario'               => $request->horario,
                 'stripe_payment_intent' => $intent->id,
                 'monto'                 => $paquete->precio,
                 'moneda'                => 'mxn',
@@ -85,7 +99,7 @@ class PagoController extends Controller
                 $pago    = DB::table('pago')->where('id_pago', $id_pago)->first();
                 $destino = DB::table('destino')->where('id_destino', $paquete->id_destino)->first();
 
-                // Correo al turista (persona que paga)
+                // Correo al turista
                 $correoTurista = DB::table('usuario')
                     ->where('id_usuario', $user->id_usuario)
                     ->value('correo');
@@ -93,17 +107,12 @@ class PagoController extends Controller
                 Mail::to($correoTurista)
                     ->send(new ConfirmacionPagoTurista($pago, $paquete, $destino, $persona));
 
-                // ============================================================
-                // CAMBIO IMPORTANTE: Obtener el creador del destino (Persona)
-                // Antes: admin_destinos dueño del destino
-                // Ahora: persona que creó el destino (puede tener rol admin_destinos o admin_general)
-                // ============================================================
+                // Obtener creador del destino
                 $creadorDestino = DB::table('persona')
                     ->where('id_persona', $destino->creado_por)
                     ->first();
 
                 if ($creadorDestino) {
-                    // Obtener el usuario asociado a esa persona
                     $usuarioAdmin = DB::table('usuario')
                         ->where('id_usuario', $creadorDestino->id_usuario)
                         ->first();
@@ -113,12 +122,12 @@ class PagoController extends Controller
                         Mail::to($usuarioAdmin->correo)
                             ->send(new NotificacionPagoAdmin($pago, $paquete, $destino, $persona));
 
-                        // Notificación FCM al admin dueño del destino
+                        // Notificación FCM
                         if ($usuarioAdmin->fcm_token) {
                             $this->enviarNotificacionFCM(
                                 $usuarioAdmin->fcm_token,
                                 '💰 Nuevo pago recibido',
-                                "{$persona->nombre} {$persona->apellidos} adquirió el paquete {$paquete->nombre} de {$destino->nombre}",
+                                "{$persona->nombre} {$persona->apellidos} adquirió el paquete {$paquete->nombre} de {$destino->nombre} para el {$request->fecha_visita} a las {$request->horario}",
                                 [
                                     'id_pago'    => (string) $id_pago,
                                     'id_destino' => (string) $destino->id_destino,
@@ -134,6 +143,7 @@ class PagoController extends Controller
             }
 
             return back()->with('error', 'El pago no pudo procesarse. Intenta de nuevo.');
+
         } catch (\Stripe\Exception\CardException $e) {
             return back()->with('error', 'Tarjeta rechazada: ' . $e->getError()->message);
         } catch (\Exception $e) {
@@ -154,16 +164,13 @@ class PagoController extends Controller
     private function enviarNotificacionFCM(string $token, string $titulo, string $cuerpo, array $data = [])
     {
         try {
-            $factory = (new Factory)->withServiceAccount(config('services.firebase.credentials'));
+            $factory   = (new Factory)->withServiceAccount(config('services.firebase.credentials'));
             $messaging = $factory->createMessaging();
 
             $message = CloudMessage::fromArray([
-                'token' => $token,
-                'notification' => [
-                    'title' => $titulo,
-                    'body'  => $cuerpo,
-                ],
-                'data' => $data,
+                'token'        => $token,
+                'notification' => ['title' => $titulo, 'body' => $cuerpo],
+                'data'         => $data,
             ]);
 
             $messaging->send($message);
