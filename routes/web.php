@@ -144,7 +144,7 @@ Route::middleware('auth')->group(function () {
     // Reportes para admin de destinos (PDF)
         Route::get('/reportes-destinos', [AdminDestinoReporteController::class, 'index'])->name('reportes.destinos.index');
         Route::post('/reportes-destinos/data', [AdminDestinoReporteController::class, 'data'])->name('reportes.destinos.data');
-        Route::post('/reportes-destinos/pdf', [AdminDestinoReporteController::class, 'pdf'])->name('reportes.destinos.pdf');
+        Route::get('/reportes-destinos/pdf', [AdminDestinoReporteController::class, 'pdf'])->name('reportes.destinos.pdf');
 
 
     // Pagos

@@ -43,6 +43,7 @@
     </div>
   </div>
 
-  <script src="{{ asset('bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset('bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  @stack('scripts')  {{-- ← agregar esta línea --}}
 </body>
 </html>
