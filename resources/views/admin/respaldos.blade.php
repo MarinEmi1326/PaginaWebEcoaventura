@@ -1,65 +1,85 @@
 @extends('layouts.admin')
 
-@section('title', 'Respaldos | Ecoaventura')
-
 @section('content')
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h2">Respaldo de Información</h1>
+            <a href="{{ route('admin.respaldos.generar') }}" class="btn btn-success">
+                <i class="bi bi-database"></i> Generar Respaldo
+            </a>
+        </div>
 
-  <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
-    <div>
-      <h1 class="ea-page-title mb-1">Respaldo de Información</h1>
+        @if (session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+        @if (session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+        @endif
+
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Tamaño</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($archivos as $archivo)
+                                <tr>
+                                    <td>{{ $archivo['fecha'] }}</td>
+                                    <td>{{ $archivo['tamaño'] }}</td>
+                                    <td><span class="badge"
+                                            style="background-color: #10b981; font-size: 0.7rem; padding: 4px 8px; border-radius: 20px;">
+                                            <i class="bi bi-check-circle me-1" style="font-size: 0.7rem;"></i> completado
+                                        </span></td>
+                                    <td>
+                                        <a href="{{ route('admin.respaldos.descargar', $archivo['nombre']) }}"
+                                            class="btn btn-sm btn-primary">
+                                            <i class="bi bi-download"></i> Descargar
+                                        </a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center">No hay respaldos generados.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <a href="#"
-       class="btn ea-btn-green rounded-3 px-4 py-2 fw-semibold">
-      <i class="bi bi-database me-2"></i>
-      Generar Respaldo
-    </a>
-  </div>
-
-  <div class="ea-card p-0 overflow-hidden">
-    <div class="table-responsive">
-      <table class="table mb-0 ea-table">
-        <thead>
-          <tr>
-            <th class="px-4 py-3">Fecha</th>
-            <th class="px-4 py-3">Tamaño</th>
-            <th class="px-4 py-3">Estado</th>
-            <th class="px-4 py-3 text-end">Acciones</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {{-- Fila 1 --}}
-          <tr>
-            <td class="px-4 py-4">2026-02-13 10:30</td>
-            <td class="px-4 py-4" style="color: var(--ea-muted);">45.2 MB</td>
-            <td class="px-4 py-4">
-              <span class="ea-chip green">completado</span>
-            </td>
-            <td class="px-4 py-4 text-end">
-              <a href="#" class="ea-link-download">
-                <i class="bi bi-download me-2"></i> Descargar
-              </a>
-            </td>
-          </tr>
-
-          {{-- Fila 2 --}}
-          <tr>
-            <td class="px-4 py-4">2026-02-06 10:30</td>
-            <td class="px-4 py-4" style="color: var(--ea-muted);">44.8 MB</td>
-            <td class="px-4 py-4">
-              <span class="ea-chip green">completado</span>
-            </td>
-            <td class="px-4 py-4 text-end">
-              <a href="#" class="ea-link-download">
-                <i class="bi bi-download me-2"></i> Descargar
-              </a>
-            </td>
-          </tr>
-        </tbody>
-
-      </table>
-    </div>
-  </div>
-
 @endsection
+{{-- Script para auto-ocultar alertas después de 3 segundos --}}
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-ocultar alerta de éxito
+            const successAlert = document.getElementById('successAlert');
+            if (successAlert) {
+                setTimeout(function() {
+                    successAlert.classList.remove('show');
+                    setTimeout(function() {
+                        successAlert.remove();
+                    }, 150);
+                }, 3000); // 3 segundos
+            }
+
+            // Auto-ocultar alerta de error (5 segundos)
+            const errorAlert = document.getElementById('errorAlert');
+            if (errorAlert) {
+                setTimeout(function() {
+                    errorAlert.classList.remove('show');
+                    setTimeout(function() {
+                        errorAlert.remove();
+                    }, 150);
+                }, 5000); // 5 segundos
+            }
+        });
+    </script>
