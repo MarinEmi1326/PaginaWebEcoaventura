@@ -20,6 +20,7 @@ use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\RutaController;
 use App\Http\Controllers\Admin\ActividadController;
 use App\Http\Controllers\Admin\RecomendacionController;
+use App\Http\Controllers\Admin\AdminRespaldosController;
 use Illuminate\Support\Facades\Auth;
 
 /*
@@ -169,7 +170,7 @@ Route::middleware('auth')->group(function () {
         
         Route::get('/destino', [AdminCentroController::class, 'index'])->name('destino');
         Route::post('/destino/{id}/toggle', [AdminCentroController::class, 'toggleActivo'])->name('destino.toggle');
-        Route::get('/respaldos', fn() => view('admin.respaldos'))->name('respaldos');
+
 
         // Reportes
         Route::get('/reportes', [AdminReportesController::class, 'index'])->name('reportes');
@@ -188,5 +189,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/solicitudes/{id}', [AdminSolicitudesController::class, 'show'])->name('solicitudes.show');
         Route::post('/solicitudes/{id}/aprobar', [AdminSolicitudesController::class, 'aprobar'])->name('solicitudes.aprobar');
         Route::post('/solicitudes/{id}/rechazar', [AdminSolicitudesController::class, 'rechazar'])->name('solicitudes.rechazar');
+
+        //Respaldos
+        Route::get('/respaldos', [App\Http\Controllers\Admin\AdminRespaldosController::class, 'index'])->name('respaldos');
+        Route::get('/respaldos/generar', [App\Http\Controllers\Admin\AdminRespaldosController::class, 'generar'])->name('respaldos.generar');
+        Route::get('/respaldos/descargar/{nombre}', [AdminRespaldosController::class, 'descargar'])->name('respaldos.descargar');
     });
 });

@@ -33,6 +33,33 @@ class HomeController extends Controller
                 ->where('destino_categoria.id_destino', $d->id_destino)
                 ->pluck('categoria.nombre');
         }
-        return view('home', compact('destacados'));
+
+        $rutasDestacadas = DB::table('ruta as r')
+            ->leftJoin('imagen as i', function ($join) {
+                $join->on('i.id_ruta', '=', 'r.id_ruta')
+                    ->where('i.entidad', '=', 'ruta');
+            })
+            ->where('r.activo', 'activo')
+            ->select(
+                'r.id_ruta',
+                'r.nombre',
+                'r.descripcion',
+                'r.dificultad',
+                'r.duracion_estimada',
+                'r.distancia_km',
+                DB::raw('MIN(i.ruta_archivo) as imagen')
+            )
+            ->groupBy('r.id_ruta', 'r.nombre', 'r.descripcion', 'r.dificultad', 'r.duracion_estimada', 'r.distancia_km')
+            ->orderBy('r.fecha_creacion', 'desc')
+            ->limit(3)
+            ->get();
+
+        foreach ($rutasDestacadas as $r) {
+            $r->total_paradas = DB::table('ruta_destino')
+                ->where('id_ruta', $r->id_ruta)
+                ->count();
+        }
+
+        return view('home', compact('destacados', 'rutasDestacadas'));
     }
 }
