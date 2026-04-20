@@ -192,7 +192,7 @@
 
 
     <script src="{{ asset('bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-
+    @stack('scripts')
 </body>
 
 </html>
