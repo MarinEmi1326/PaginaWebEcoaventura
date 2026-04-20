@@ -2,507 +2,519 @@
 
 @section('content')
 
-    {{-- BREADCRUMB --}}
-    <nav aria-label="breadcrumb" class="py-3">
-        <div class="container">
-            <ol class="breadcrumb mb-0 small">
-                <li class="breadcrumb-item"><a href="{{ url('/') }}" class="text-success text-decoration-none">Inicio</a>
-                </li>
-                <li class="breadcrumb-item"><a href="{{ route('destinos.index') }}"
-                        class="text-success text-decoration-none">Centros Turísticos</a></li>
-                <li class="breadcrumb-item active">{{ $destino->nombre }}</li>
-            </ol>
-        </div>
-    </nav>
+{{-- BREADCRUMB --}}
+<nav aria-label="breadcrumb" class="py-3">
+    <div class="container">
+        <ol class="breadcrumb mb-0 small">
+            <li class="breadcrumb-item"><a href="{{ url('/') }}" class="text-success text-decoration-none">Inicio</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('destinos.index') }}" class="text-success text-decoration-none">Centros Turísticos</a></li>
+            <li class="breadcrumb-item active">{{ $destino->nombre }}</li>
+        </ol>
+    </div>
+</nav>
 
-    {{-- CARRUSEL DE IMÁGENES --}}
-    <section class="pb-4">
-        <div class="container">
-            @if ($imagenes->count() > 0)
-                <div id="carruselDestino" class="carousel slide rounded-4 overflow-hidden" data-bs-ride="carousel">
-                    <div class="carousel-indicators">
-                        @foreach ($imagenes as $i => $img)
-                            <button type="button" data-bs-target="#carruselDestino" data-bs-slide-to="{{ $i }}"
-                                class="{{ $i === 0 ? 'active' : '' }}"></button>
-                        @endforeach
-                    </div>
-                    <div class="carousel-inner" style="height: 420px;">
-                        @foreach ($imagenes as $i => $img)
-                            <div class="carousel-item {{ $i === 0 ? 'active' : '' }} h-100">
-                                <img src="{{ Storage::url($img->ruta_archivo) }}"
-                                    class="d-block w-100 h-100 object-fit-cover" alt="{{ $destino->nombre }}">
-                            </div>
-                        @endforeach
-                    </div>
-                    @if ($imagenes->count() > 1)
-                        <button class="carousel-control-prev" type="button" data-bs-target="#carruselDestino"
-                            data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon"></span>
-                        </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#carruselDestino"
-                            data-bs-slide="next">
-                            <span class="carousel-control-next-icon"></span>
-                        </button>
-                    @endif
-                </div>
-            @else
-                <div class="rounded-4 d-flex align-items-center justify-content-center"
-                    style="height:300px; background:#e2ece9;">
-                    <i class="bi bi-image text-muted fs-1"></i>
-                </div>
-            @endif
-        </div>
-    </section>
-
-    {{-- CONTENIDO --}}
-    <section class="pb-5">
-        <div class="container">
-
-            {{-- Categorías + Título + Botón Reportar Destino --}}
-            <div class="mb-4">
-                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
-                    @foreach ($categorias as $cat)
-                        <span class="badge rounded-pill px-3 py-2"
-                            style="background:#e2ece9; color:#1F6B4B; font-weight:500;">
-                            <i class="bi bi-tag me-1"></i>{{ $cat }}
-                        </span>
+{{-- CARRUSEL DE IMÁGENES --}}
+<section class="pb-4">
+    <div class="container">
+        @if ($imagenes->count() > 0)
+            <div id="carruselDestino" class="carousel slide rounded-4 overflow-hidden shadow-sm" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    @foreach ($imagenes as $i => $img)
+                        <button type="button" data-bs-target="#carruselDestino" data-bs-slide-to="{{ $i }}"
+                            class="{{ $i === 0 ? 'active' : '' }}"></button>
                     @endforeach
-                    <span class="text-muted"><i class="bi bi-geo-alt me-1"></i>Ocosingo, Chiapas</span>
                 </div>
-                <div class="d-flex align-items-start justify-content-between flex-wrap gap-2">
-                    <div>
-                        <h1 class="fw-bold display-5 mb-0">{{ $destino->nombre }}</h1>
-                        @if ($destino->telefono)
-                            <p class="text-muted mt-2 mb-0">
-                                <i class="bi bi-telephone me-1 text-success"></i>{{ $destino->telefono }}
-                            </p>
-                        @endif
-                    </div>
-
-                    {{-- BOTÓN REPORTAR DESTINO (solo turistas) --}}
-                    @auth
-                        @if (auth()->user()->rol === 'turista')
-                            <button type="button" class="btn btn-sm btn-outline-danger rounded-3 mt-2" data-bs-toggle="modal"
-                                data-bs-target="#modalReportarDestino">
-                                <i class="bi bi-flag me-1"></i> Reportar destino
-                            </button>
-                        @endif
-                    @endauth
+                <div class="carousel-inner" style="height: 420px;">
+                    @foreach ($imagenes as $i => $img)
+                        <div class="carousel-item {{ $i === 0 ? 'active' : '' }} h-100">
+                            <img src="{{ Storage::url($img->ruta_archivo) }}"
+                                class="d-block w-100 h-100 object-fit-cover" alt="{{ $destino->nombre }}">
+                        </div>
+                    @endforeach
                 </div>
+                @if ($imagenes->count() > 1)
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carruselDestino" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carruselDestino" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
+                @endif
             </div>
-
-            {{-- TABS --}}
-            <div class="rounded-3 p-1 mb-4" style="background:#e8ede9;">
-                <ul class="nav" id="detalleTabs" role="tablist">
-                    <li class="nav-item">
-                        <button class="nav-link active px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-descripcion"
-                            type="button">Descripción</button>
-                    </li>
-                    @if ($actividades->count() > 0)
-                        <li class="nav-item">
-                            <button class="nav-link px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-actividades"
-                                type="button">
-                                Actividades
-                                <span class="badge rounded-pill ms-1"
-                                    style="background:#1F6B4B; font-size:.7rem;">{{ $actividades->count() }}</span>
-                            </button>
-                        </li>
-                    @endif
-                    @if ($paquetes->count() > 0)
-                        <li class="nav-item">
-                            <button class="nav-link px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-paquetes"
-                                type="button">
-                                Paquetes
-                                <span class="badge rounded-pill ms-1"
-                                    style="background:#1F6B4B; font-size:.7rem;">{{ $paquetes->count() }}</span>
-                            </button>
-                        </li>
-                    @endif
-                    @if ($destino->recomendaciones)
-                        <li class="nav-item">
-                            <button class="nav-link px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-recomendaciones"
-                                type="button">Recomendaciones</button>
-                        </li>
-                    @endif
-                    @if ($destino->lat && $destino->lng)
-                        <li class="nav-item">
-                            <button class="nav-link px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-mapa"
-                                type="button">
-                                <i class="bi bi-map me-1"></i>Ubicación
-                            </button>
-                        </li>
-                    @endif
-                </ul>
+        @else
+            <div class="rounded-4 d-flex align-items-center justify-content-center" style="height:300px; background:#e2ece9;">
+                <i class="bi bi-image text-muted fs-1"></i>
             </div>
+        @endif
+    </div>
+</section>
 
-            <div class="tab-content mb-5" id="detalleTabContent">
+{{-- CONTENIDO --}}
+<section class="pb-5">
+    <div class="container">
 
-                {{-- DESCRIPCIÓN --}}
-                <div class="tab-pane fade show active" id="tab-descripcion" role="tabpanel">
-                    <p class="lh-lg mb-0">{{ $destino->descripcion }}</p>
-                </div>
-
-                {{-- ACTIVIDADES --}}
-                @if ($actividades->count() > 0)
-                    <div class="tab-pane fade" id="tab-actividades" role="tabpanel">
-                        <div class="d-flex flex-column gap-3">
-                            @foreach ($actividades as $act)
-                                <div class="rounded-3 p-3" style="background:#f1f5f2;">
-                                    <div class="d-flex align-items-center gap-2 mb-2">
-                                        <h6 class="fw-bold mb-0">{{ $act->nombre }}</h6>
-                                        <span class="badge rounded-pill"
-                                            style="font-size: 0.75rem; padding: 4px 10px;
-                            background: {{ $act->dificultad === 'alta' ? '#dc3545' : ($act->dificultad === 'media' ? '#fd7e14' : '#1F6B4B') }};
-                            color: white;">
-                                            {{ ucfirst($act->dificultad) }}
-                                        </span>
-                                    </div>
-                                    <div class="d-flex flex-wrap gap-3 text-muted small mb-2">
-                                        @if ($act->duracion_estimada)
-                                            <span><i class="bi bi-clock me-1"></i>{{ $act->duracion_estimada }}</span>
-                                        @endif
-                                        @if ($act->minimo_personas)
-                                            <span><i class="bi bi-people me-1"></i>Mín. {{ $act->minimo_personas }}
-                                                personas</span>
-                                        @endif
-                                    </div>
-                                    @if ($act->recomendacion)
-                                        <p class="text-muted small mb-0">
-                                            <i class="bi bi-lightbulb me-1 text-success"></i>{{ $act->recomendacion }}
-                                        </p>
-                                    @endif
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
-
-                {{-- PAQUETES --}}
-                @if ($paquetes->count() > 0)
-                    <div class="tab-pane fade" id="tab-paquetes" role="tabpanel">
-                        <div class="row g-3">
-                            @foreach ($paquetes as $paq)
-                                <div class="col-md-6">
-                                    <div class="rounded-3 p-4 h-100" style="background:#f1f5f2;">
-                                        <h6 class="fw-bold mb-2">
-                                            <i class="bi bi-backpack me-1 text-success"></i>{{ $paq->nombre }}
-                                        </h6>
-                                        @if ($paq->descripcion)
-                                            <p class="text-muted small mb-3">{{ $paq->descripcion }}</p>
-                                        @endif
-                                        <div class="d-flex flex-wrap gap-3 text-muted small mb-3">
-                                            @if ($paq->precio)
-                                                <span class="fw-semibold text-success">
-                                                    <i class="bi bi-tag me-1"></i>${{ number_format($paq->precio, 2) }}
-                                                    MXN
-                                                </span>
-                                            @endif
-                                            @if ($paq->minimo_personas)
-                                                <span><i class="bi bi-people me-1"></i>Mín. {{ $paq->minimo_personas }}
-                                                    personas</span>
-                                            @endif
-                                        </div>
-                                        @auth
-                                            @if (auth()->user()->rol === 'turista' && $paq->precio)
-                                                <a href="{{ route('pagos.show', $paq->id_paquete) }}"
-                                                    class="btn btn-success btn-sm rounded-3 px-3">
-                                                    <i class="bi bi-credit-card me-1"></i>Adquirir paquete
-                                                </a>
-                                            @endif
-                                        @else
-                                            @if ($paq->precio)
-                                                <a href="{{ route('login') }}"
-                                                    class="btn btn-outline-success btn-sm rounded-3 px-3">
-                                                    <i class="bi bi-person me-1"></i>Inicia sesión para adquirir
-                                                </a>
-                                            @endif
-                                        @endauth
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
-
-                {{-- RECOMENDACIONES --}}
-                @if ($destino->recomendaciones)
-                    <div class="tab-pane fade" id="tab-recomendaciones" role="tabpanel">
-                        <div class="rounded-3 p-4" style="background:#f1f5f2;">
-                            <i class="bi bi-exclamation-triangle-fill text-success me-2"></i>
-                            {{ $destino->recomendaciones }}
-                        </div>
-                    </div>
-                @endif
-
-                {{-- MAPA --}}
-                @if ($destino->lat && $destino->lng)
-                    <div class="tab-pane fade" id="tab-mapa" role="tabpanel">
-                        <div class="rounded-4 overflow-hidden" style="height: 380px;">
-                            <iframe width="100%" height="100%" style="border:0;" loading="lazy" allowfullscreen
-                                referrerpolicy="no-referrer-when-downgrade"
-                                src="https://www.google.com/maps/embed/v1/place?q={{ $destino->nombre }}&key={{ config('services.google_maps.key') }}&center={{ $destino->lat }},{{ $destino->lng }}&zoom=12&maptype=roadmap">
-                            </iframe>
-                        </div>
-                        <p class="small text-muted mt-2">
-                            <i class="bi bi-geo-alt me-1 text-success"></i>
-                            {{ $destino->lat }}, {{ $destino->lng }}
+        {{-- Categorías + Título + Botón Reportar Destino --}}
+        <div class="mb-4">
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                @foreach ($categorias as $cat)
+                    <span class="badge rounded-pill px-3 py-2"
+                        style="background:#e2ece9; color:#1F6B4B; font-weight:500;">
+                        <i class="bi bi-tag me-1"></i>{{ $cat }}
+                    </span>
+                @endforeach
+                <span class="text-muted"><i class="bi bi-geo-alt me-1"></i>Ocosingo, Chiapas</span>
+            </div>
+            <div class="d-flex align-items-start justify-content-between flex-wrap gap-2">
+                <div>
+                    <h1 class="fw-bold display-5 mb-0">{{ $destino->nombre }}</h1>
+                    @if ($destino->telefono)
+                        <p class="text-muted mt-2 mb-0">
+                            <i class="bi bi-telephone me-1 text-success"></i>{{ $destino->telefono }}
                         </p>
-                    </div>
-                @endif
-
-            </div>
-
-            {{-- BOTONES --}}
-            <div class="d-flex flex-wrap gap-3 mb-5 pt-3 border-top">
-                @auth
-                    @if (auth()->user()->rol === 'turista')
-                        <a href="#comentarios" class="btn btn-success rounded-3 px-4 py-2">
-                            <i class="bi bi-chat me-2"></i>Dejar un comentario
-                        </a>
                     @endif
-                @else
-                    <a href="{{ route('login') }}" class="btn btn-success rounded-3 px-4 py-2">
-                        <i class="bi bi-person me-2"></i>Inicia sesión para comentar
-                    </a>
+                    @if ($creador)
+                        <p class="text-muted mt-2 mb-0 small">
+                            <i class="bi bi-person-circle me-1 text-success"></i>
+                            Creado por: {{ $creador->nombre }} {{ $creador->apellidos }}
+                        </p>
+                    @endif
+                </div>
+
+                @auth
+                    @if ($usuarioRol === 'turista')
+                        <button type="button" class="btn btn-sm btn-outline-danger rounded-3 mt-2" data-bs-toggle="modal"
+                            data-bs-target="#modalReportarDestino">
+                            <i class="bi bi-flag me-1"></i> Reportar destino
+                        </button>
+                    @endif
                 @endauth
             </div>
+        </div>
 
-            {{-- COMENTARIOS --}}
-            <div class="mb-5" id="comentarios">
-                <h5 class="fw-bold mb-4">
-                    <i class="bi bi-chat-square-text me-2 text-success"></i>
-                    Comentarios
-                    <span class="badge rounded-pill ms-1"
-                        style="background:#e2ece9; color:#1F6B4B; font-size:.8rem;">{{ $comentarios->count() }}</span>
-                </h5>
-
-                {{-- Mensajes --}}
-                @if (session('success'))
-                    <div class="alert alert-success rounded-3 mb-3" id="alerta-com">{{ session('success') }}</div>
-                    <script>
-                        setTimeout(() => {
-                            const a = document.getElementById('alerta-com');
-                            if (a) {
-                                a.style.transition = 'opacity .5s';
-                                a.style.opacity = '0';
-                                setTimeout(() => a.remove(), 500);
-                            }
-                        }, 3000);
-                    </script>
+        {{-- TABS --}}
+        <div class="rounded-3 p-1 mb-4" style="background:#e8ede9;">
+            <ul class="nav" id="detalleTabs" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-descripcion"
+                        type="button">Descripción</button>
+                </li>
+                @if ($actividades->count() > 0)
+                    <li class="nav-item">
+                        <button class="nav-link px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-actividades"
+                            type="button">
+                            Actividades
+                            <span class="badge rounded-pill ms-1"
+                                style="background:#1F6B4B; font-size:.7rem;">{{ $actividades->count() }}</span>
+                        </button>
+                    </li>
                 @endif
-                @if (session('error'))
-                    <div class="alert alert-danger rounded-3 mb-3">{{ session('error') }}</div>
+                @if ($paquetes->count() > 0)
+                    <li class="nav-item">
+                        <button class="nav-link px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-paquetes"
+                            type="button">
+                            Paquetes
+                            <span class="badge rounded-pill ms-1"
+                                style="background:#1F6B4B; font-size:.7rem;">{{ $paquetes->count() }}</span>
+                        </button>
+                    </li>
                 @endif
+                @if (count($recomendaciones) > 0)
+                    <li class="nav-item">
+                        <button class="nav-link px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-recomendaciones"
+                            type="button">Recomendaciones</button>
+                    </li>
+                @endif
+                @if ($destino->lat && $destino->lng)
+                    <li class="nav-item">
+                        <button class="nav-link px-4 py-2" data-bs-toggle="tab" data-bs-target="#tab-mapa"
+                            type="button">
+                            <i class="bi bi-map me-1"></i>Ubicación
+                        </button>
+                    </li>
+                @endif
+            </ul>
+        </div>
 
-                {{-- Formulario solo para turistas --}}
-                @auth
-                    @if (auth()->user()->rol === 'turista')
-                        <div class="rounded-3 p-4 mb-4" style="background:#f1f5f2;">
-                            <form action="{{ route('comentarios.destino.store', $destino->id_destino) }}" method="POST">
-                                @csrf
-                                <label class="form-label fw-bold small">Tu comentario</label>
-                                <textarea name="comentario" rows="3"
-                                    class="form-control rounded-3 mb-3 @error('comentario') is-invalid @enderror"
-                                    placeholder="Comparte tu experiencia en este destino...">{{ old('comentario') }}</textarea>
-                                @error('comentario')
-                                    <div class="invalid-feedback mb-2">{{ $message }}</div>
-                                @enderror
-                                <button type="submit" class="btn btn-success rounded-3 px-4">
-                                    <i class="bi bi-send me-1"></i> Publicar comentario
-                                </button>
-                            </form>
-                        </div>
-                    @endif
-                @else
-                    <div class="rounded-3 p-4 mb-4 text-center" style="background:#f1f5f2;">
-                        <p class="text-muted small mb-2">Inicia sesión como Turista para comentar</p>
-                        <a href="{{ route('login') }}" class="btn btn-outline-success btn-sm rounded-pill px-4">
-                            <i class="bi bi-person me-1"></i>Iniciar Sesión
-                        </a>
+        <div class="tab-content mb-5" id="detalleTabContent">
+
+            {{-- DESCRIPCIÓN --}}
+            <div class="tab-pane fade show active" id="tab-descripcion" role="tabpanel">
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-body p-4">
+                        <p class="lh-lg mb-0">{{ $destino->descripcion }}</p>
                     </div>
-                @endauth
+                </div>
+            </div>
 
-                {{-- Lista de comentarios --}}
-                @forelse ($comentarios as $com)
-                    <div class="rounded-3 p-4 mb-3" style="background:#f1f5f2;">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold"
-                                    style="width:36px; height:36px; background:#d1d9d4; color:#1F6B4B; font-size:0.85rem;">
-                                    {{ strtoupper(substr($com->nombre, 0, 1)) }}
-                                </div>
-                                <div>
-                                    <p class="fw-semibold mb-0 small">{{ $com->nombre }} {{ $com->apaterno }}</p>
-                                    <p class="text-muted mb-0" style="font-size:0.75rem;">
-                                        {{ \Carbon\Carbon::parse($com->fecha)->format('d/m/Y H:i') }}
-                                    </p>
-                                </div>
-                            </div>
-
-                            {{-- Acciones del comentario --}}
-                            <div class="d-flex align-items-center gap-2">
-
-                                {{-- Botón reportar comentario (turista y admin_destinos) --}}
-                                @auth
-                                    @if (in_array(auth()->user()->rol, ['turista', 'admin_destinos']))
-                                        <button type="button" class="btn btn-sm btn-outline-danger rounded-3"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#modalReportarComentario{{ $com->id_comentario }}"
-                                            title="Reportar comentario">
-                                            <i class="bi bi-flag"></i>
-                                        </button>
-                                    @endif
-                                @endauth
-
-                                {{-- Botón eliminar (solo admin_general) --}}
-                                @auth
-                                    @if (auth()->user()->rol === 'admin_general')
-                                        <form action="{{ route('comentarios.destroy', $com->id_comentario) }}" method="POST"
-                                            onsubmit="return confirm('¿Eliminar este comentario?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-3">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
-                                    @endif
-                                @endauth
-                            </div>
-                        </div>
-                        <p class="text-muted small mb-0">{{ $com->comentario }}</p>
-                    </div>
-
-                    {{-- Modal Reportar Comentario --}}
-                    @auth
-                        @if (in_array(auth()->user()->rol, ['turista', 'admin_destinos']))
-                            <div class="modal fade" id="modalReportarComentario{{ $com->id_comentario }}" tabindex="-1">
-                                <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content rounded-4 border-0 shadow">
-                                        <div class="modal-header border-0 pb-0">
-                                            <h5 class="modal-title fw-bold">
-                                                <i class="bi bi-flag-fill text-danger me-2"></i>Reportar comentario
-                                            </h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                        </div>
-                                        <form action="{{ route('reportes.comentario', $com->id_comentario) }}"
-                                            method="POST">
-                                            @csrf
-                                            <div class="modal-body pt-2">
-                                                <p class="text-muted small mb-1">Comentario:</p>
-                                                <blockquote class="rounded-3 p-3 mb-3 small fst-italic"
-                                                    style="background:#f7f9f7; border-left:3px solid #dc3545;">
-                                                    {{ Str::limit($com->comentario, 100) }}
-                                                </blockquote>
-                                                <div class="mb-3">
-                                                    <label class="form-label fw-bold small">Motivo <span
-                                                            class="text-danger">*</span></label>
-                                                    <select name="motivo" class="form-select rounded-3" required>
-                                                        <option value="" disabled selected>Selecciona un motivo</option>
-                                                        <option value="contenido_inapropiado">Contenido inapropiado</option>
-                                                        <option value="informacion_falsa">Información falsa</option>
-                                                        <option value="spam">Spam</option>
-                                                        <option value="lenguaje_ofensivo">Lenguaje ofensivo</option>
-                                                        <option value="derechos_autor">Derechos de autor</option>
-                                                        <option value="otro">Otro</option>
-                                                    </select>
-                                                </div>
-                                                <div class="mb-2">
-                                                    <label class="form-label fw-bold small">Descripción <span
-                                                            class="text-muted fw-normal">(opcional)</span></label>
-                                                    <textarea name="descripcion" class="form-control rounded-3" rows="3" placeholder="Describe el problema..."></textarea>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer border-0 pt-0">
-                                                <button type="button" class="btn btn-light rounded-3"
-                                                    data-bs-dismiss="modal">Cancelar</button>
-                                                <button type="submit" class="btn btn-danger rounded-3 px-4">
-                                                    <i class="bi bi-flag me-1"></i>Enviar reporte
-                                                </button>
-                                            </div>
-                                        </form>
+            {{-- ACTIVIDADES --}}
+            @if ($actividades->count() > 0)
+                <div class="tab-pane fade" id="tab-actividades" role="tabpanel">
+                    <div class="row g-4">
+                        @foreach ($actividades as $act)
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card border-0 shadow-sm rounded-4 h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold mb-3">{{ $act->nombre }}</h5>
+                                        <p class="card-text text-muted small mb-0">
+                                            Actividad disponible en este destino.
+                                        </p>
                                     </div>
                                 </div>
-                            </div>
-                        @endif
-                    @endauth
-
-                @empty
-                    <div class="text-center text-muted py-4">
-                        <i class="bi bi-chat fs-2 d-block mb-2"></i>
-                        Sé el primero en comentar este destino.
-                    </div>
-                @endforelse
-            </div>
-
-            {{-- OTROS DESTINOS --}}
-            @if ($otrosDestinos->count() > 0)
-                <div class="mb-5">
-                    <h5 class="fw-bold mb-4">Otros destinos que podrían interesarte</h5>
-                    <div class="row g-4">
-                        @foreach ($otrosDestinos as $od)
-                            <div class="col-md-6 col-lg-4">
-                                @include('centros._card', ['d' => $od])
                             </div>
                         @endforeach
                     </div>
                 </div>
             @endif
 
-        </div>
-    </section>
+            {{-- PAQUETES --}}
+            @if ($paquetes->count() > 0)
+                <div class="tab-pane fade" id="tab-paquetes" role="tabpanel">
+                    <div class="row g-4">
+                        @foreach ($paquetes as $paq)
+                            <div class="col-md-6">
+                                <div class="card border-0 shadow-sm rounded-4 h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold mb-3">{{ $paq->nombre }}</h5>
+                                        @if ($paq->descripcion)
+                                            <p class="card-text text-muted small">{{ $paq->descripcion }}</p>
+                                        @endif
+                                        <div class="d-flex flex-wrap justify-content-between align-items-center my-3">
+                                            <div>
+                                                <span class="fw-bold text-success fs-4">${{ number_format($paq->precio, 2) }} MXN</span>
+                                                <span class="text-muted small ms-1">(por persona)</span>
+                                                <i class="bi bi-info-circle-fill text-muted ms-1" data-bs-toggle="tooltip" data-bs-placement="top" title="El precio es por persona, no por grupo."></i>
+                                            </div>
+                                            @if ($paq->tipo_publico == 'especifico')
+                                                <span class="badge bg-info text-dark">
+                                                    Edad {{ $paq->edad_minima }} - {{ $paq->edad_maxima }} años
+                                                    <i class="bi bi-info-circle-fill ms-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Rango de edad permitido para este paquete."></i>
+                                                </span>
+                                            @else
+                                                <span class="badge bg-success">Todo público</span>
+                                            @endif
+                                        </div>
+                                        @if ($paq->actividades->count() > 0)
+                                            <hr>
+                                            <div class="small">
+                                                <strong><i class="bi bi-list-check me-1"></i>Actividades incluidas:</strong>
+                                                <ul class="mt-2 ps-3">
+                                                    @foreach ($paq->actividades as $actPaq)
+                                                        <li>
+                                                            {{ $actPaq->nombre }}
+                                                            <span class="text-muted">
+                                                                ({{ $actPaq->minimo_personas }} - {{ $actPaq->maximo_personas }} pers.)
+                                                                <i class="bi bi-info-circle-fill" data-bs-toggle="tooltip" data-bs-placement="top" title="Mínimo y máximo de personas permitidas para esta actividad dentro del paquete."></i>
+                                                            </span>
+                                                        </li>
+                                                    @endforeach
+                                                </ul>
+                                            </div>
+                                        @endif
+                                        <div class="mt-3">
+                                            @auth
+                                                @if ($usuarioRol === 'turista' && $paq->precio)
+                                                    <a href="{{ route('pagos.show', $paq->id_paquete) }}"
+                                                        class="btn btn-success rounded-3 w-100">
+                                                        <i class="bi bi-credit-card me-1"></i>Adquirir paquete
+                                                    </a>
+                                                @endif
+                                            @else
+                                                @if ($paq->precio)
+                                                    <a href="{{ route('login') }}"
+                                                        class="btn btn-outline-success rounded-3 w-100">
+                                                        <i class="bi bi-person me-1"></i>Inicia sesión para adquirir
+                                                    </a>
+                                                @endif
+                                            @endauth
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
 
-    {{-- MODAL REPORTAR DESTINO (solo turistas) --}}
-    @auth
-        @if (auth()->user()->rol === 'turista')
-            <div class="modal fade" id="modalReportarDestino" tabindex="-1">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content rounded-4 border-0 shadow">
-                        <div class="modal-header border-0 pb-0">
-                            <h5 class="modal-title fw-bold">
-                                <i class="bi bi-flag-fill text-danger me-2"></i>Reportar destino
-                            </h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <form action="{{ route('reportes.destino', $destino->id_destino) }}" method="POST">
+            {{-- RECOMENDACIONES --}}
+            @if (count($recomendaciones) > 0)
+                <div class="tab-pane fade" id="tab-recomendaciones" role="tabpanel">
+                    <div class="row g-3">
+                        @foreach ($recomendaciones as $rec)
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card border-0 shadow-sm rounded-4 h-100">
+                                    <div class="card-body d-flex align-items-center gap-2">
+                                        <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                                        <span class="small">{{ $rec }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
+            {{-- MAPA --}}
+            @if ($destino->lat && $destino->lng)
+                <div class="tab-pane fade" id="tab-mapa" role="tabpanel">
+                    <div class="rounded-4 overflow-hidden shadow-sm" style="height: 380px;">
+                        <iframe width="100%" height="100%" style="border:0;" loading="lazy" allowfullscreen
+                            referrerpolicy="no-referrer-when-downgrade"
+                            src="https://www.google.com/maps/embed/v1/place?q={{ $destino->nombre }}&key={{ config('services.google_maps.key') }}&center={{ $destino->lat }},{{ $destino->lng }}&zoom=12&maptype=roadmap">
+                        </iframe>
+                    </div>
+                </div>
+            @endif
+
+        </div>
+
+        {{-- BOTÓN DE COMENTAR --}}
+        <div class="d-flex flex-wrap gap-3 mb-5 pt-3 border-top">
+            @auth
+                @if ($usuarioRol === 'turista')
+                    <a href="#comentarios" class="btn btn-success rounded-3 px-4 py-2">
+                        <i class="bi bi-chat me-2"></i>Dejar un comentario
+                    </a>
+                @endif
+            @else
+                <a href="{{ route('login') }}" class="btn btn-success rounded-3 px-4 py-2">
+                    <i class="bi bi-person me-2"></i>Inicia sesión para comentar
+                </a>
+            @endauth
+        </div>
+
+        {{-- COMENTARIOS (con diseño de tarjeta) --}}
+        <div class="mb-5" id="comentarios">
+            <h5 class="fw-bold mb-4">
+                <i class="bi bi-chat-square-text me-2 text-success"></i>
+                Comentarios
+                <span class="badge rounded-pill ms-1"
+                    style="background:#e2ece9; color:#1F6B4B; font-size:.8rem;">{{ $comentarios->count() }}</span>
+            </h5>
+
+            @if (session('success'))
+                <div class="alert alert-success rounded-3 mb-3" id="alerta-com">{{ session('success') }}</div>
+                <script>
+                    setTimeout(() => {
+                        const a = document.getElementById('alerta-com');
+                        if (a) {
+                            a.style.transition = 'opacity .5s';
+                            a.style.opacity = '0';
+                            setTimeout(() => a.remove(), 500);
+                        }
+                    }, 3000);
+                </script>
+            @endif
+            @if (session('error'))
+                <div class="alert alert-danger rounded-3 mb-3">{{ session('error') }}</div>
+            @endif
+
+            @auth
+                @if ($usuarioRol === 'turista')
+                    <div class="rounded-3 p-4 mb-4" style="background:#f1f5f2;">
+                        <form action="{{ route('comentarios.destino.store', $destino->id_destino) }}" method="POST">
                             @csrf
-                            <div class="modal-body pt-2">
-                                <p class="text-muted small mb-3">
-                                    Tu reporte será enviado al administrador para su revisión.
-                                </p>
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold small">Motivo <span class="text-danger">*</span></label>
-                                    <select name="motivo" class="form-select rounded-3" required>
-                                        <option value="" disabled selected>Selecciona un motivo</option>
-                                        <option value="contenido_inapropiado">Contenido inapropiado</option>
-                                        <option value="informacion_falsa">Información falsa</option>
-                                        <option value="spam">Spam</option>
-                                        <option value="lenguaje_ofensivo">Lenguaje ofensivo</option>
-                                        <option value="derechos_autor">Derechos de autor</option>
-                                        <option value="otro">Otro</option>
-                                    </select>
-                                </div>
-                                <div class="mb-2">
-                                    <label class="form-label fw-bold small">Descripción <span
-                                            class="text-muted fw-normal">(opcional)</span></label>
-                                    <textarea name="descripcion" class="form-control rounded-3" rows="3" placeholder="Describe el problema..."></textarea>
-                                </div>
-                            </div>
-                            <div class="modal-footer border-0 pt-0">
-                                <button type="button" class="btn btn-light rounded-3"
-                                    data-bs-dismiss="modal">Cancelar</button>
-                                <button type="submit" class="btn btn-danger rounded-3 px-4">
-                                    <i class="bi bi-flag me-1"></i>Enviar reporte
-                                </button>
-                            </div>
+                            <label class="form-label fw-bold small">Tu comentario</label>
+                            <textarea name="comentario" rows="3"
+                                class="form-control rounded-3 mb-3 @error('comentario') is-invalid @enderror"
+                                placeholder="Comparte tu experiencia en este destino...">{{ old('comentario') }}</textarea>
+                            @error('comentario')
+                                <div class="invalid-feedback mb-2">{{ $message }}</div>
+                            @enderror
+                            <button type="submit" class="btn btn-success rounded-3 px-4">
+                                <i class="bi bi-send me-1"></i> Publicar comentario
+                            </button>
                         </form>
                     </div>
+                @endif
+            @else
+                <div class="rounded-3 p-4 mb-4 text-center" style="background:#f1f5f2;">
+                    <p class="text-muted small mb-2">Inicia sesión como Turista para comentar</p>
+                    <a href="{{ route('login') }}" class="btn btn-outline-success btn-sm rounded-pill px-4">
+                        <i class="bi bi-person me-1"></i>Iniciar Sesión
+                    </a>
+                </div>
+            @endauth
+
+            {{-- TARJETAS DE COMENTARIOS --}}
+            @forelse ($comentarios as $com)
+                <div class="rounded-3 p-4 mb-3" style="background:#f1f5f2;">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold"
+                                style="width:36px; height:36px; background:#d1d9d4; color:#1F6B4B; font-size:0.85rem;">
+                                {{ strtoupper(substr($com->nombre, 0, 1)) }}
+                            </div>
+                            <div>
+                                <p class="fw-semibold mb-0 small">{{ $com->nombre }} {{ $com->apellidos }}</p>
+                                <p class="text-muted mb-0" style="font-size:0.75rem;">
+                                    {{ \Carbon\Carbon::parse($com->fecha)->format('d/m/Y H:i') }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            @auth
+                                @if (in_array($usuarioRol, ['turista', 'admin_destinos']))
+                                    <button type="button" class="btn btn-sm btn-outline-danger rounded-3"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalReportarComentario{{ $com->id_comentario }}"
+                                        title="Reportar comentario">
+                                        <i class="bi bi-flag"></i>
+                                    </button>
+                                @endif
+                                @if ($usuarioRol === 'admin_general')
+                                    <form action="{{ route('comentarios.destroy', $com->id_comentario) }}" method="POST"
+                                        onsubmit="return confirm('¿Eliminar este comentario?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-3">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                @endif
+                            @endauth
+                        </div>
+                    </div>
+                    <p class="text-muted small mb-0">{{ $com->comentario }}</p>
+                </div>
+
+                {{-- MODAL REPORTAR COMENTARIO --}}
+                @auth
+                    @if (in_array($usuarioRol, ['turista', 'admin_destinos']))
+                        <div class="modal fade" id="modalReportarComentario{{ $com->id_comentario }}" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content rounded-4 border-0 shadow">
+                                    <div class="modal-header border-0 pb-0">
+                                        <h5 class="modal-title fw-bold">
+                                            <i class="bi bi-flag-fill text-danger me-2"></i>Reportar comentario
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form action="{{ route('reportes.comentario', $com->id_comentario) }}" method="POST">
+                                        @csrf
+                                        <div class="modal-body pt-2">
+                                            <p class="text-muted small mb-1">Comentario:</p>
+                                            <blockquote class="rounded-3 p-3 mb-3 small fst-italic"
+                                                style="background:#f7f9f7; border-left:3px solid #dc3545;">
+                                                {{ Str::limit($com->comentario, 100) }}
+                                            </blockquote>
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold small">Motivo <span
+                                                        class="text-danger">*</span></label>
+                                                <select name="motivo" class="form-select rounded-3" required>
+                                                    <option value="" disabled selected>Selecciona un motivo</option>
+                                                    <option value="contenido_inapropiado">Contenido inapropiado</option>
+                                                    <option value="informacion_falsa">Información falsa</option>
+                                                    <option value="spam">Spam</option>
+                                                    <option value="lenguaje_ofensivo">Lenguaje ofensivo</option>
+                                                    <option value="derechos_autor">Derechos de autor</option>
+                                                    <option value="otro">Otro</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label fw-bold small">Descripción <span
+                                                        class="text-muted fw-normal">(opcional)</span></label>
+                                                <textarea name="descripcion" class="form-control rounded-3" rows="3"
+                                                    placeholder="Describe el problema..."></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer border-0 pt-0">
+                                            <button type="button" class="btn btn-light rounded-3"
+                                                data-bs-dismiss="modal">Cancelar</button>
+                                            <button type="submit" class="btn btn-danger rounded-3 px-4">
+                                                <i class="bi bi-flag me-1"></i>Enviar reporte
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                @endauth
+            @empty
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-chat fs-2 d-block mb-2"></i>
+                    Sé el primero en comentar este destino.
+                </div>
+            @endforelse
+        </div>
+
+        {{-- OTROS DESTINOS --}}
+        @if ($otrosDestinos->count() > 0)
+            <div class="mb-5">
+                <h5 class="fw-bold mb-4">Otros destinos que podrían interesarte</h5>
+                <div class="row g-4">
+                    @foreach ($otrosDestinos as $od)
+                        <div class="col-md-6 col-lg-4">
+                            @include('centros._card', ['d' => $od])
+                        </div>
+                    @endforeach
                 </div>
             </div>
         @endif
-    @endauth
+
+    </div>
+</section>
+
+{{-- MODAL REPORTAR DESTINO --}}
+@auth
+    @if ($usuarioRol === 'turista')
+        <div class="modal fade" id="modalReportarDestino" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content rounded-4 border-0 shadow">
+                    <div class="modal-header border-0 pb-0">
+                        <h5 class="modal-title fw-bold">
+                            <i class="bi bi-flag-fill text-danger me-2"></i>Reportar destino
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form action="{{ route('reportes.destino', $destino->id_destino) }}" method="POST">
+                        @csrf
+                        <div class="modal-body pt-2">
+                            <p class="text-muted small mb-3">
+                                Tu reporte será enviado al administrador para su revisión.
+                            </p>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small">Motivo <span class="text-danger">*</span></label>
+                                <select name="motivo" class="form-select rounded-3" required>
+                                    <option value="" disabled selected>Selecciona un motivo</option>
+                                    <option value="contenido_inapropiado">Contenido inapropiado</option>
+                                    <option value="informacion_falsa">Información falsa</option>
+                                    <option value="spam">Spam</option>
+                                    <option value="lenguaje_ofensivo">Lenguaje ofensivo</option>
+                                    <option value="derechos_autor">Derechos de autor</option>
+                                    <option value="otro">Otro</option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label fw-bold small">Descripción <span
+                                        class="text-muted fw-normal">(opcional)</span></label>
+                                <textarea name="descripcion" class="form-control rounded-3" rows="3" placeholder="Describe el problema..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0 pt-0">
+                            <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-danger rounded-3 px-4">
+                                <i class="bi bi-flag me-1"></i>Enviar reporte
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endif
+@endauth
 
 @endsection
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/destinos.css') }}">
 @endpush
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+    });
+</script>

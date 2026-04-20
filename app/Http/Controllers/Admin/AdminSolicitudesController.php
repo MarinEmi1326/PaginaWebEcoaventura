@@ -23,29 +23,43 @@ class AdminSolicitudesController extends Controller
      */
     public function dashboard()
     {
-        $usuariosBase = DB::table('usuario as u')
-            ->join('persona as p', 'p.id_usuario', '=', 'u.id_usuario')
-            ->join('persona_rol as pr', 'pr.id_persona', '=', 'p.id_persona')
-            ->join('rol as r', 'r.id_rol', '=', 'pr.id_rol')
-            ->select('u.*', 'p.nombre', 'p.apellidos', 'r.descripcion as rol')
-            ->where('r.descripcion', '!=', 'admin_general')
-            ->orderByDesc('u.fecha_solicitud')
-            ->get();
-
         $totalUsuarios = DB::table('usuario')->count();
         $pendientes    = DB::table('usuario')->where('estado', 'pendiente')->count();
         $publicados    = DB::table('usuario')->where('estado', 'aprobado')->count();
         $rechazados    = DB::table('usuario')->where('estado', 'rechazado')->count();
 
-        $colaAprobacion = $usuariosBase->where('estado', 'pendiente');
-        $actividadReciente = $usuariosBase->take(5);
+        // Cola de aprobación (usuarios pendientes)
+        $colaAprobacion = DB::table('usuario as u')
+            ->join('persona as p', 'p.id_usuario', '=', 'u.id_usuario')
+            ->join('persona_rol as pr', 'pr.id_persona', '=', 'p.id_persona')
+            ->join('rol as r', 'r.id_rol', '=', 'pr.id_rol')
+            ->select('u.*', 'p.nombre', 'p.apellidos', 'r.descripcion as rol')
+            ->where('r.descripcion', '!=', 'admin_general')
+            ->where('u.estado', 'pendiente')
+            ->orderByDesc('u.fecha_solicitud')
+            ->get();
+
+        // Actividad reciente: destinos creados en la última semana
+        $fechaHaceUnaSemana = Carbon::now()->subWeek();
+        $actividadReciente = DB::table('destino as d')
+            ->join('persona as p', 'p.id_persona', '=', 'd.creado_por')
+            ->select(
+                'd.id_destino',
+                'd.nombre as destino_nombre',
+                'd.fecha_creacion',
+                'p.nombre as creador_nombre',
+                'p.apellidos as creador_apellidos'
+            )
+            ->where('d.fecha_creacion', '>=', $fechaHaceUnaSemana)
+            ->orderByDesc('d.fecha_creacion')
+            ->get();
 
         return view('admin.index', compact(
-            'totalUsuarios', 
-            'pendientes', 
-            'publicados', 
-            'rechazados', 
-            'colaAprobacion', 
+            'totalUsuarios',
+            'pendientes',
+            'publicados',
+            'rechazados',
+            'colaAprobacion',
             'actividadReciente'
         ));
     }
@@ -77,9 +91,9 @@ class AdminSolicitudesController extends Controller
             ->join('persona_rol as pr', 'pr.id_persona', '=', 'p.id_persona')
             ->join('rol as r', 'r.id_rol', '=', 'pr.id_rol')
             ->select(
-                'u.*', 
-                'p.nombre', 
-                'p.apellidos', 
+                'u.*',
+                'p.nombre',
+                'p.apellidos',
                 'p.telefono',
                 'r.descripcion as rol'
             )
@@ -95,9 +109,9 @@ class AdminSolicitudesController extends Controller
         $reportesEnviados = collect();
 
         return view('admin.solicitudes.show', compact(
-            'solicitud', 
-            'reportes', 
-            'reportesRecibidos', 
+            'solicitud',
+            'reportes',
+            'reportesRecibidos',
             'reportesEnviados'
         ));
     }
@@ -210,8 +224,7 @@ class AdminSolicitudesController extends Controller
             'password' => 'required|min:8|confirmed',
             'rol'      => 'required|in:admin_destinos,gestor_rutas',
             'nombre'   => 'required|string|max:60',
-            'apaterno' => 'required|string|max:60',
-            'amaterno' => 'nullable|string|max:60',
+            'apellidos'=> 'required|string|max:120',
             'telefono' => 'required|digits:10',
         ]);
 
@@ -234,11 +247,10 @@ class AdminSolicitudesController extends Controller
                 'fecha_respuesta'    => now(),
             ]);
 
-            $apellidosCompleto = trim($validated['apaterno'] . ' ' . ($validated['amaterno'] ?? ''));
             $persona = Persona::create([
                 'id_usuario' => $usuario->id_usuario,
                 'nombre'     => $validated['nombre'],
-                'apellidos'  => $apellidosCompleto,
+                'apellidos'  => $validated['apellidos'],
                 'telefono'   => $validated['telefono'],
             ]);
 
@@ -308,7 +320,7 @@ class AdminSolicitudesController extends Controller
             Log::warning("Error al enviar correo de rechazo: " . $e->getMessage());
         }
 
-        return back()->with('ok', 'Solicitud rechazada. Se ha enviado un correo al usuario.');
+        return back()->with('ok', 'Solicitud rechazada.');
     }
 
     /**

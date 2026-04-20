@@ -16,54 +16,17 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    // Mostrar formulario de login
-    public function showLogin()
-    {
-        return view('auth.login');
+    public function showLogin() 
+    { 
+        return view('auth.login'); 
+    }
+    
+    // ========== REGISTRO ADMIN DESTINOS ==========
+    public function showRegistroDestinos() 
+    { 
+        return view('auth.registro-destinos'); 
     }
 
-    // Mostrar formulario registro admin destinos
-    public function showRegistroDestinos()
-    {
-        return view('auth.registro-destinos');
-    }
-
-    // Mostrar formulario registro gestor rutas
-    public function showRegistroRutas()
-    {
-        return view('auth.registro-rutas');
-    }
-
-    // Procesar login
-    public function login(Request $request)
-    {
-        $request->validate([
-            'correo' => 'required|email',
-            'password' => 'required'
-        ]);
-
-        $credentials = ['correo' => $request->correo, 'password' => $request->password];
-
-        if (Auth::attempt($credentials)) {
-            $user = Auth::user();
-            $rol = $user->persona?->roles->first()?->descripcion;
-
-            if ($rol === 'admin_general') {
-                return redirect()->route('admin.index');
-            }
-            if ($rol === 'admin_destinos') {
-                return redirect()->route('admin.index');
-            }
-            if ($rol === 'gestor_rutas') {
-                return redirect()->route('admin.index'); // o a su panel si tiene uno
-            }
-            return redirect('/');
-        }
-
-        return back()->withErrors(['error' => 'Credenciales incorrectas'])->withInput();
-    }
-
-    // Registro de admin destinos (con apaterno y amaterno)
     public function registroDestinos(Request $request)
     {
         $validated = $request->validate([
@@ -76,12 +39,9 @@ class AuthController extends Controller
 
         try {
             $rol = Rol::where('descripcion', 'admin_destinos')->first();
-            if (!$rol) {
-                throw new \Exception('El rol "admin_destinos" no está configurado en la base de datos.');
-            }
+            if (!$rol) throw new \Exception('Rol admin_destinos no encontrado.');
 
             DB::beginTransaction();
-
             $usuario = Usuario::create([
                 'correo'             => $validated['correo'],
                 'password'           => Hash::make($validated['password']),
@@ -91,37 +51,32 @@ class AuthController extends Controller
                 'token_verificacion' => Str::random(60),
                 'fecha_solicitud'    => now(),
             ]);
-
             $persona = Persona::create([
                 'id_usuario' => $usuario->id_usuario,
                 'nombre'     => $validated['nombre'],
                 'apellidos'  => $validated['apellidos'],
                 'telefono'   => $validated['telefono'],
             ]);
-
             $persona->roles()->attach($rol->id_rol);
-
             DB::commit();
 
             try {
                 Mail::to($usuario->correo)->send(new SolicitudPendienteMail($usuario));
-            } catch (\Exception $e) {
-                Log::warning("Error al enviar correo de solicitud pendiente: " . $e->getMessage());
-            }
+            } catch (\Exception $e) { Log::warning("Mail error: " . $e->getMessage()); }
 
             return redirect()->route('registro.destinos.exito');
-
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Error en registro de admin_destinos: " . $e->getMessage());
-            $errorMsg = str_contains($e->getMessage(), 'rol "admin_destinos"') 
-                ? $e->getMessage() 
-                : 'Ocurrió un error al procesar el registro. Intenta de nuevo más tarde.';
-            return back()->withInput()->with('error', $errorMsg);
+            return back()->withInput()->with('error', $e->getMessage());
         }
     }
 
-    // Registro de gestor rutas (con apellidos completo)
+    // ========== REGISTRO GESTOR RUTAS ==========
+    public function showRegistroRutas()
+    {
+        return view('auth.registro-rutas');
+    }
+
     public function registroRutas(Request $request)
     {
         $validated = $request->validate([
@@ -134,12 +89,9 @@ class AuthController extends Controller
 
         try {
             $rol = Rol::where('descripcion', 'gestor_rutas')->first();
-            if (!$rol) {
-                throw new \Exception('El rol "gestor_rutas" no está configurado en la base de datos.');
-            }
+            if (!$rol) throw new \Exception('Rol gestor_rutas no encontrado.');
 
             DB::beginTransaction();
-
             $usuario = Usuario::create([
                 'correo'             => $validated['correo'],
                 'password'           => Hash::make($validated['password']),
@@ -149,56 +101,105 @@ class AuthController extends Controller
                 'token_verificacion' => Str::random(60),
                 'fecha_solicitud'    => now(),
             ]);
-
             $persona = Persona::create([
                 'id_usuario' => $usuario->id_usuario,
                 'nombre'     => $validated['nombre'],
                 'apellidos'  => $validated['apellidos'],
                 'telefono'   => $validated['telefono'],
             ]);
-
             $persona->roles()->attach($rol->id_rol);
-
             DB::commit();
 
             try {
                 Mail::to($usuario->correo)->send(new SolicitudPendienteMail($usuario));
-            } catch (\Exception $e) {
-                Log::warning("Error al enviar correo de solicitud pendiente: " . $e->getMessage());
-            }
+            } catch (\Exception $e) { Log::warning("Mail error: " . $e->getMessage()); }
 
             return redirect()->route('registro.rutas.exito');
-
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Error en registro de gestor_rutas: " . $e->getMessage());
-
-            $errorMsg = str_contains($e->getMessage(), 'rol "gestor_rutas"')
-                ? $e->getMessage()
-                : 'Ocurrió un error al procesar el registro. Intenta de nuevo más tarde.';
-
-            return back()->withInput()->with('error', $errorMsg);
+            return back()->withInput()->with('error', $e->getMessage());
         }
     }
 
-    // Verificación de correo
+    // ========== REGISTRO TURISTA ==========
+    public function showRegistroTurista()
+    {
+        return view('auth.registro-turista');
+    }
+
+    public function registroTurista(Request $request)
+    {
+        $validated = $request->validate([
+            'nombre'    => ['required', 'string', 'max:60'],
+            'apellidos' => ['required', 'string', 'max:120'],
+            'telefono'  => ['required', 'digits:10'],
+            'correo'    => ['required', 'email', 'unique:usuario,correo'],
+            'password'  => ['required', 'min:8', 'confirmed'],
+        ]);
+
+        try {
+            $rol = Rol::where('descripcion', 'turista')->first();
+            if (!$rol) throw new \Exception('Rol turista no encontrado.');
+
+            DB::beginTransaction();
+            $usuario = Usuario::create([
+                'correo'             => $validated['correo'],
+                'password'           => Hash::make($validated['password']),
+                'activo'             => true,           // Turista activo automáticamente
+                'estado'             => 'aprobado',     // Aprobado sin revisión
+                'correo_verificado'  => 1,
+                'token_verificacion' => null,
+                'fecha_solicitud'    => now(),
+                'fecha_respuesta'    => now(),
+            ]);
+            $persona = Persona::create([
+                'id_usuario' => $usuario->id_usuario,
+                'nombre'     => $validated['nombre'],
+                'apellidos'  => $validated['apellidos'],
+                'telefono'   => $validated['telefono'],
+            ]);
+            $persona->roles()->attach($rol->id_rol);
+            DB::commit();
+
+            // Opcional: enviar correo de bienvenida
+            // Mail::to($usuario->correo)->send(new BienvenidaTuristaMail($usuario));
+
+            return redirect()->route('login')->with('ok', 'Cuenta creada exitosamente. Ahora puedes iniciar sesión.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withInput()->with('error', 'Error al registrar: ' . $e->getMessage());
+        }
+    }
+
+    // ========== LOGIN Y OTROS MÉTODOS ==========
+    public function login(Request $request)
+    {
+        $request->validate([
+            'correo' => 'required|email',
+            'password' => 'required'
+        ]);
+
+        if (Auth::attempt(['correo' => $request->correo, 'password' => $request->password])) {
+            $user = Auth::user();
+            $rol = $user->persona?->roles->first()?->descripcion;
+
+            if ($rol === 'admin_general') return redirect()->route('admin.index');
+            if ($rol === 'admin_destinos') return redirect()->route('misdestinos.index');
+            if ($rol === 'gestor_rutas') return redirect()->route('rutas.index');
+            return redirect('/');
+        }
+
+        return back()->withErrors(['error' => 'Credenciales incorrectas'])->withInput();
+    }
+
     public function verificarCorreo($token)
     {
         $usuario = Usuario::where('token_verificacion', $token)->first();
-
-        if (!$usuario) {
-            return redirect('/login')->with('error', 'El enlace de verificación no es válido.');
-        }
-
-        $usuario->update([
-            'correo_verificado'  => 1,
-            'token_verificacion' => null,
-        ]);
-
-        return redirect('/login')->with('ok', 'Correo verificado correctamente. Ahora un administrador revisará tu solicitud.');
+        if (!$usuario) return redirect('/login')->with('error', 'Enlace inválido.');
+        $usuario->update(['correo_verificado' => 1, 'token_verificacion' => null]);
+        return redirect('/login')->with('ok', 'Correo verificado. Ahora un administrador revisará tu solicitud.');
     }
 
-    // Cerrar sesión
     public function logout(Request $request)
     {
         Auth::logout();

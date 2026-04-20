@@ -27,6 +27,13 @@
             <span>Mis Destinos</span>
         </a>
 
+        {{-- Reportes PDF --}}
+        <a href="{{ route('reportes.destinos.index') }}"
+            class="ea-nav-pill {{ request()->routeIs('reportes.destinos.*') ? 'active' : '' }}">
+            <i class="bi bi-bar-chart-steps"></i>
+            <span>Reportes</span>
+        </a>
+
     </nav>
 
     {{-- Footer --}}

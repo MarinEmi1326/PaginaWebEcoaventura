@@ -106,7 +106,7 @@
                     </div>
                 </div>
 
-                {{-- BLOQUE 2: Información personal --}}
+                {{-- BLOQUE 2: Información personal (con apellidos unificado) --}}
                 <div class="ea-card p-0 overflow-hidden mb-4">
                     <div class="p-4 border-bottom"
                          style="border-color: var(--ea-line) !important; background: rgba(255,255,255,.25);">
@@ -131,27 +131,16 @@
                                 @enderror
                             </div>
 
-                            <div class="col-12 col-md-3">
-                                <label class="form-label fw-bold">Apellido paterno</label>
+                            {{-- Campo único para apellidos --}}
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-bold">Apellidos</label>
                                 <input type="text"
-                                       name="apaterno"
-                                       value="{{ old('apaterno') }}"
+                                       name="apellidos"
+                                       value="{{ old('apellidos') }}"
                                        required
-                                       placeholder="Apellido paterno"
-                                       class="form-control rounded-3 py-2 @error('apaterno') is-invalid @enderror">
-                                @error('apaterno')
-                                    <div class="small text-danger mt-1">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-12 col-md-3">
-                                <label class="form-label fw-bold">Apellido materno</label>
-                                <input type="text"
-                                       name="amaterno"
-                                       value="{{ old('amaterno') }}"
-                                       placeholder="Apellido materno"
-                                       class="form-control rounded-3 py-2 @error('amaterno') is-invalid @enderror">
-                                @error('amaterno')
+                                       placeholder="Ej. Pérez García"
+                                       class="form-control rounded-3 py-2 @error('apellidos') is-invalid @enderror">
+                                @error('apellidos')
                                     <div class="small text-danger mt-1">{{ $message }}</div>
                                 @enderror
                             </div>

@@ -1,113 +1,105 @@
 @extends('layouts.admin')
 
+@section('title', 'Dashboard - Admin General')
+
 @section('content')
-    {{-- Cards métricas --}}
-    <div class="row g-3 mb-4">
-        <div class="col-12 col-md-6 col-xl-3">
-            <div class="ea-card p-4 d-flex align-items-center gap-3">
-                <div class="rounded-circle d-flex align-items-center justify-content-center"
-                    style="width:40px;height:40px;background:rgba(15,90,58,.10);">
-                    <i class="bi bi-people" style="color: var(--ea-green);"></i>
-                </div>
-                <div>
-                    <div class="fs-4 fw-bold mb-0">{{ $totalUsuarios }}</div>
-                    <div class="small" style="color: var(--ea-muted);">Usuarios</div>
-                </div>
-            </div>
-        </div>
+<div class="mb-4">
+    <h1 class="ea-page-title mb-1">Dashboard</h1>
+    <p class="ea-subtitle mb-0">Bienvenido al panel de administración general.</p>
+</div>
 
-        <div class="col-12 col-md-6 col-xl-3">
-            <div class="ea-card p-4 d-flex align-items-center gap-3">
-                <div class="rounded-circle d-flex align-items-center justify-content-center"
-                    style="width:40px;height:40px;background:rgba(15,90,58,.10);">
-                    <i class="bi bi-check2-circle" style="color: var(--ea-green);"></i>
-                </div>
-                <div>
-                    <div class="fs-4 fw-bold mb-0">{{ $publicados }}</div>
-                    <div class="small" style="color: var(--ea-muted);">Publicados</div>
-                </div>
-            </div>
+{{-- Tarjetas de resumen --}}
+<div class="row g-3 mb-5">
+    <div class="col-12 col-md-3">
+        <div class="ea-card p-3 text-center">
+            <div class="ea-summary-number">{{ $totalUsuarios ?? 0 }}</div>
+            <div class="ea-summary-label">Total usuarios</div>
         </div>
-
-        <div class="col-12 col-md-6 col-xl-3">
-            <div class="ea-card p-4 d-flex align-items-center gap-3">
-                <div class="rounded-circle d-flex align-items-center justify-content-center"
-                    style="width:40px;height:40px;background:rgba(15,90,58,.10);">
-                    <i class="bi bi-clock" style="color:#1e88e5;"></i>
-                </div>
-                <div>
-                    <div class="fs-4 fw-bold mb-0">{{ $pendientes }}</div>
-                    <div class="small" style="color: var(--ea-muted);">Pendientes</div>
-                </div>
-            </div>
+    </div>
+    <div class="col-12 col-md-3">
+        <div class="ea-card p-3 text-center">
+            <div class="ea-summary-number is-pending">{{ $pendientes ?? 0 }}</div>
+            <div class="ea-summary-label">Pendientes</div>
         </div>
+    </div>
+    <div class="col-12 col-md-3">
+        <div class="ea-card p-3 text-center">
+            <div class="ea-summary-number is-approved">{{ $publicados ?? 0 }}</div>
+            <div class="ea-summary-label">Aprobados</div>
+        </div>
+    </div>
+    <div class="col-12 col-md-3">
+        <div class="ea-card p-3 text-center">
+            <div class="ea-summary-number is-rejected">{{ $rechazados ?? 0 }}</div>
+            <div class="ea-summary-label">Rechazados</div>
+        </div>
+    </div>
+</div>
 
-        <div class="col-12 col-md-6 col-xl-3">
-            <div class="ea-card p-4 d-flex align-items-center gap-3">
-                <div class="rounded-circle d-flex align-items-center justify-content-center"
-                    style="width:40px;height:40px;background:rgba(209,75,58,.12);">
-                    <i class="bi bi-exclamation-circle" style="color:#d14b3a;"></i>
-                </div>
-                <div>
-                    <div class="fs-4 fw-bold mb-0">{{ $rechazados }}</div>
-                    <div class="small" style="color: var(--ea-muted);">Rechazados</div>
-                </div>
+<div class="row g-4">
+    {{-- Cola de aprobación (usuarios pendientes) --}}
+    <div class="col-12 col-lg-6">
+        <div class="ea-card p-0 overflow-hidden">
+            <div class="p-3 border-bottom fw-semibold">📋 Cola de aprobación</div>
+            <div class="p-3">
+                @if($colaAprobacion->count() > 0)
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead>
+                                <tr><th>Usuario</th><th>Fecha solicitud</th><th></th></tr>
+                            </thead>
+                            <tbody>
+                                @foreach($colaAprobacion as $solicitud)
+                                <tr>
+                                    <td>
+                                        {{ $solicitud->nombre ?? '' }} {{ $solicitud->apellidos ?? '' }}<br>
+                                        <span class="small text-muted">{{ $solicitud->correo ?? '' }}</span>
+                                    </td>
+                                    <td>
+                                        {{ isset($solicitud->fecha_solicitud) && $solicitud->fecha_solicitud ? \Carbon\Carbon::parse($solicitud->fecha_solicitud)->format('d/m/Y') : 'Sin fecha' }}
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="{{ route('admin.solicitudes.show', $solicitud->id_usuario) }}" class="btn btn-sm btn-outline-success">Revisar</a>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <p class="text-muted text-center py-3 mb-0">No hay solicitudes pendientes.</p>
+                @endif
             </div>
         </div>
     </div>
 
-    {{-- Paneles --}}
-    <div class="row g-3">
-        {{-- Cola de aprobación --}}
-        <div class="col-12 col-lg-6">
-            <div class="ea-card p-4">
-                <h5 class="fw-semibold mb-3" style="font-family: Georgia, 'Times New Roman', serif;">Cola de aprobación</h5>
-                <div class="d-grid gap-3">
-                    @forelse($colaAprobacion as $sol)
-                        <div class="ea-soft-row d-flex align-items-center justify-content-between">
-                            <div>
-                                <div class="fw-semibold">{{ $sol->nombre }} {{ $sol->apellidos }}</div>
-                                <div class="small" style="color: var(--ea-muted);">
-                                    {{ $sol->rol === 'admin_destinos' ? 'Admin. de Destinos' : 'Gestor de Rutas' }}
-                                    @if ($sol->fecha_solicitud)
-                                        · {{ \Carbon\Carbon::parse($sol->fecha_solicitud)->format('Y-m-d') }}
-                                    @endif
-                                </div>
-                            </div>
-                            <a class="btn ea-btn-green btn-sm rounded-3 px-3"
-                                href="{{ route('admin.solicitudes.show', $sol->id_usuario) }}">
-                                Revisar
-                            </a>
-                        </div>
-                    @empty
-                        <p class="text-muted small text-center py-3">No hay solicitudes pendientes.</p>
-                    @endforelse
-                </div>
-            </div>
-        </div>
-
-        {{-- Actividad reciente --}}
-        <div class="col-12 col-lg-6">
-            <div class="ea-card p-4">
-                <h5 class="fw-semibold mb-3" style="font-family: Georgia, 'Times New Roman', serif;">Actividad reciente</h5>
-                <div class="d-grid gap-3">
-                    @forelse($actividadReciente as $act)
-                        <div class="ea-soft-row d-flex align-items-center justify-content-between">
-                            <div>
-                                <div class="fw-semibold">{{ $act->nombre }}</div>
-                                <div class="small" style="color: var(--ea-muted);">
-                                    Destino · {{ \Carbon\Carbon::parse($act->fecha_solicitud)->format('Y-m-d') }}
-                                </div>
-                            </div>
-                            <span class="ea-chip {{ $act->activo ? 'green' : 'red' }}">
-                                {{ $act->activo ? 'Activo' : 'Inactivo' }}
-                            </span>
-                        </div>
-                    @empty
-                        <p class="text-muted small text-center py-3">Sin actividad reciente.</p>
-                    @endforelse
-                </div>
+    {{-- Actividad reciente: destinos creados en la última semana --}}
+    <div class="col-12 col-lg-6">
+        <div class="ea-card p-0 overflow-hidden">
+            <div class="p-3 border-bottom fw-semibold">🕒 Destinos recientes (última semana)</div>
+            <div class="p-3">
+                @if($actividadReciente->count() > 0)
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead>
+                                <tr><th>Destino</th><th>Creado por</th><th>Fecha creación</th></tr>
+                            </thead>
+                            <tbody>
+                                @foreach($actividadReciente as $destino)
+                                <tr>
+                                    <td>{{ $destino->destino_nombre ?? 'Sin nombre' }}</td>
+                                    <td>{{ $destino->creador_nombre ?? '' }} {{ $destino->creador_apellidos ?? '' }}</td>
+                                    <td>{{ isset($destino->fecha_creacion) ? \Carbon\Carbon::parse($destino->fecha_creacion)->format('d/m/Y') : 'Sin fecha' }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <p class="text-muted text-center py-3 mb-0">No hay destinos creados en la última semana.</p>
+                @endif
             </div>
         </div>
     </div>
+</div>
 @endsection

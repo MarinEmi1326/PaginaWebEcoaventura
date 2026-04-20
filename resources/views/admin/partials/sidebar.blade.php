@@ -47,11 +47,25 @@
             <span>Reportes</span>
         </a>
 
-        {{-- Categorías (tuyo) --}}
+        {{-- Categorías --}}
         <a href="{{ route('admin.categorias.index') }}"
            class="ea-nav-pill {{ request()->routeIs('admin.categorias.*') ? 'active' : '' }}">
             <i class="bi bi-tag"></i>
             <span>Categorías</span>
+        </a>
+
+        {{-- Actividades (catálogo) --}}
+        <a href="{{ route('admin.actividades.index') }}"
+           class="ea-nav-pill {{ request()->routeIs('admin.actividades.*') ? 'active' : '' }}">
+            <i class="bi bi-run"></i>
+            <span>Actividades</span>
+        </a>
+
+        {{-- Recomendaciones (catálogo) --}}
+        <a href="{{ route('admin.recomendaciones.index') }}"
+           class="ea-nav-pill {{ request()->routeIs('admin.recomendaciones.*') ? 'active' : '' }}">
+            <i class="bi bi-chat-dots"></i>
+            <span>Recomendaciones</span>
         </a>
 
         <a href="{{ route('admin.respaldos') }}"

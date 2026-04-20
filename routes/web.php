@@ -8,6 +8,8 @@ use App\Http\Controllers\Admin\AdminSolicitudesController;
 use App\Http\Controllers\Admin\AdminCategoriaController;
 use App\Http\Controllers\AdminDestinoController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Admin\AdminDestinoReporteController;
+use App\Http\Controllers\PaqueteController;
 use App\Http\Controllers\ComentarioController;
 use App\Http\Controllers\DestinosController;
 use App\Http\Controllers\GoogleController;
@@ -16,6 +18,8 @@ use App\Http\Controllers\PagoController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\RutaController;
+use App\Http\Controllers\Admin\ActividadController;
+use App\Http\Controllers\Admin\RecomendacionController;
 use Illuminate\Support\Facades\Auth;
 
 /*
@@ -110,6 +114,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/comentarios/{id}/reportar', [ReporteController::class, 'reportarComentario'])->name('reportes.comentario');
     Route::post('/ruta/{id}/comentar', [ComentarioController::class, 'storeRuta'])->name('comentarios.ruta.store');
 
+    
+
     // PANEL ADMIN DESTINOS
     Route::get('/mis-destinos', [AdminDestinoController::class, 'index'])->name('misdestinos.index');
     Route::get('/destinos/crear', [AdminDestinoController::class, 'create'])->name('destinos.create');
@@ -120,9 +126,25 @@ Route::middleware('auth')->group(function () {
     Route::delete('/destinos/{id}', [AdminDestinoController::class, 'destroy'])->name('destinos.destroy');
     Route::post('/destinos/{id}/toggle-activo', [AdminDestinoController::class, 'toggleActivo'])->name('destinos.toggle');
 
+    // Paquetes (solo para admin de destinos)
+    Route::prefix('mis-destinos/{idDestino}/paquetes')->name('destinos.paquetes.')->group(function () {
+    Route::get('/', [PaqueteController::class, 'index'])->name('index');
+    Route::get('/crear', [PaqueteController::class, 'create'])->name('create');
+    Route::post('/', [PaqueteController::class, 'store'])->name('store');
+    Route::get('/{idPaquete}/editar', [PaqueteController::class, 'edit'])->name('edit');
+    Route::put('/{idPaquete}', [PaqueteController::class, 'update'])->name('update');
+    Route::delete('/{idPaquete}', [PaqueteController::class, 'destroy'])->name('destroy');
+});
+
     // Comentarios
     Route::post('/centros/{id}/comentar', [ComentarioController::class, 'storeDestino'])->name('comentarios.destino.store');
     Route::delete('/comentarios/{id}', [ComentarioController::class, 'destroy'])->name('comentarios.destroy');
+
+    // Reportes para admin de destinos (PDF)
+        Route::get('/reportes-destinos', [AdminDestinoReporteController::class, 'index'])->name('reportes.destinos.index');
+        Route::post('/reportes-destinos/data', [AdminDestinoReporteController::class, 'data'])->name('reportes.destinos.data');
+        Route::post('/reportes-destinos/pdf', [AdminDestinoReporteController::class, 'pdf'])->name('reportes.destinos.pdf');
+
 
     // Pagos
     Route::get('/paquetes/{id}/pagar', [PagoController::class, 'show'])->name('pagos.show');
@@ -140,6 +162,11 @@ Route::middleware('auth')->group(function () {
 
         Route::resource('categorias', AdminCategoriaController::class);
 
+        Route::resource('actividades', ActividadController::class)->except(['show']);
+        Route::resource('recomendaciones', RecomendacionController::class)->except(['show']);
+
+        
+        
         Route::get('/destino', [AdminCentroController::class, 'index'])->name('destino');
         Route::post('/destino/{id}/toggle', [AdminCentroController::class, 'toggleActivo'])->name('destino.toggle');
         Route::get('/respaldos', fn() => view('admin.respaldos'))->name('respaldos');

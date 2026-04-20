@@ -6,12 +6,7 @@
 
     @if (session('success'))
         <div class="alert alert-success rounded-3 mb-4" id="alerta-exito">{{ session('success') }}</div>
-        <script>
-            setTimeout(() => {
-                const alerta = document.getElementById('alerta-exito');
-                if (alerta) alerta.remove();
-            }, 3000);
-        </script>
+        <script> setTimeout(() => { const alerta = document.getElementById('alerta-exito'); if (alerta) alerta.remove(); }, 3000); </script>
     @endif
 
     @if (session('error'))
@@ -44,7 +39,6 @@
 
     {{-- Lista --}}
     <div class="d-grid gap-3">
-
         @forelse ($destinos as $destino)
             <div class="ea-destination-card">
                 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start gap-3">
@@ -68,30 +62,25 @@
                         <div class="ea-actions">
 
                             {{-- Botón suspender / reactivar --}}
-                            <form action="{{ route('destinos.toggle', $destino->id_destino) }}"
-                                  method="POST" class="d-inline"
-                                  onsubmit="return confirm(
-                                      '{{ $destino->activo === 'activo'
-                                          ? '¿Suspender este destino? Las rutas que lo contienen serán inhabilitadas automáticamente.'
-                                          : '¿Reactivar este destino? Las rutas afectadas serán revisadas automáticamente.' }}'
-                                  )">
+                            <form action="{{ route('destinos.toggle', $destino->id_destino) }}" method="POST" class="d-inline"
+                                  onsubmit="return confirm('{{ $destino->activo === 'activo' ? '¿Suspender este destino? Las rutas que lo contienen serán inhabilitadas automáticamente.' : '¿Reactivar este destino? Las rutas afectadas serán revisadas automáticamente.' }}')">
                                 @csrf
                                 @if ($destino->activo === 'activo')
-                                    {{-- Suspender --}}
-                                    <button type="submit"
-                                            class="btn btn-sm btn-outline-warning rounded-3"
-                                            title="Suspender destino">
+                                    <button type="submit" class="btn btn-sm btn-outline-warning rounded-3" title="Suspender destino">
                                         <i class="bi bi-pause-circle me-1"></i> Suspender
                                     </button>
                                 @else
-                                    {{-- Reactivar --}}
-                                    <button type="submit"
-                                            class="btn btn-sm btn-outline-success rounded-3"
-                                            title="Reactivar destino">
+                                    <button type="submit" class="btn btn-sm btn-outline-success rounded-3" title="Reactivar destino">
                                         <i class="bi bi-play-circle me-1"></i> Reactivar
                                     </button>
                                 @endif
                             </form>
+
+                            {{-- Paquetes (nuevo) --}}
+                            <a href="{{ route('destinos.paquetes.index', $destino->id_destino) }}"
+                               class="ea-action-btn" title="Paquetes">
+                                <i class="bi bi-backpack"></i>
+                            </a>
 
                             {{-- Editar --}}
                             <a href="{{ route('destinos.edit', $destino->id_destino) }}"
@@ -116,7 +105,6 @@
                     </div>
                 </div>
             </div>
-
         @empty
             <div class="ea-card text-center py-5">
                 <i class="bi bi-map text-muted" style="font-size: 2.5rem;"></i>
@@ -126,7 +114,5 @@
                 </a>
             </div>
         @endforelse
-
     </div>
-
 @endsection

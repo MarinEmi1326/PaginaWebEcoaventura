@@ -3,59 +3,80 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ComentarioController extends Controller
 {
-    public function storeDestino(Request $request, $id)
+    /**
+     * Guardar comentario en un destino (solo para turistas)
+     */
+    public function storeDestino(Request $request, $idDestino)
     {
-        $request->validate([
-            'comentario' => 'required|string|max:1000',
-        ]);
+        // Verificar que el usuario esté autenticado
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Debes iniciar sesión para comentar.');
+        }
 
-        $user = auth()->user();
+        $user = Auth::user();
         $persona = $user->persona;
 
+        // Verificar que la persona existe y tiene rol 'turista'
         if (!$persona) {
             return back()->with('error', 'No se encontró tu perfil de persona.');
         }
 
-        if (!$persona->tieneRol('turista')) {
-            return back()->with('error', 'Solo los turistas pueden comentar en destinos.');
+        // Obtener el rol del usuario a través de la relación persona->roles
+        $rol = $persona->roles->first()?->descripcion;
+        if ($rol !== 'turista') {
+            return back()->with('error', 'Solo los turistas pueden comentar destinos.');
         }
 
+        $request->validate([
+            'comentario' => 'required|string|max:1000',
+        ]);
+
+        // Insertar comentario
         DB::table('comentario')->insert([
-            'id_persona' => $persona->id_persona,
-            'entidad'    => 'destino',
-            'id_destino' => $id,
-            'comentario' => $request->comentario,
-            'fecha'      => now(),
+            'id_persona'   => $persona->id_persona,
+            'entidad'      => 'destino',
+            'id_destino'   => $idDestino,
+            'comentario'   => $request->comentario,
+            'fecha'        => now(),
         ]);
 
         return back()->with('success', 'Comentario publicado correctamente.');
     }
 
-    public function storeRuta(Request $request, $id)
+    /**
+     * Guardar comentario en una ruta (si aplica)
+     */
+    public function storeRuta(Request $request, $idRuta)
     {
-        $request->validate([
-            'comentario' => 'required|string|max:1000',
-        ]);
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Debes iniciar sesión para comentar.');
+        }
 
-        $user = auth()->user();
+        $user = Auth::user();
         $persona = $user->persona;
 
         if (!$persona) {
             return back()->with('error', 'No se encontró tu perfil de persona.');
         }
 
-        if (!$persona->tieneRol('turista')) {
-            return back()->with('error', 'Solo los turistas pueden comentar en rutas.');
+        $rol = $persona->roles->first()?->descripcion;
+        if ($rol !== 'turista') {
+            return back()->with('error', 'Solo los turistas pueden comentar rutas.');
         }
+
+        $request->validate([
+            'comentario' => 'required|string|max:1000',
+        ]);
 
         DB::table('comentario')->insert([
             'id_persona' => $persona->id_persona,
             'entidad'    => 'ruta',
-            'id_ruta'    => $id,
+            'id_ruta'    => $idRuta,
             'comentario' => $request->comentario,
             'fecha'      => now(),
         ]);
@@ -63,19 +84,25 @@ class ComentarioController extends Controller
         return back()->with('success', 'Comentario publicado correctamente.');
     }
 
-    public function destroy($id)
+    /**
+     * Eliminar comentario (solo para admin_general)
+     */
+    public function destroy($idComentario)
     {
-        $user = auth()->user();
-        $persona = $user->persona;
-
-        if (!$persona || !$persona->tieneRol('admin_general')) {
-            abort(403, 'No tienes permiso para eliminar comentarios.');
+        if (!Auth::check()) {
+            return redirect()->route('login');
         }
 
-        DB::table('comentario')
-            ->where('id_comentario', $id)
-            ->delete();
+        $user = Auth::user();
+        $persona = $user->persona;
+        $rol = $persona->roles->first()?->descripcion;
 
-        return back()->with('success', 'Comentario eliminado correctamente.');
+        if ($rol !== 'admin_general') {
+            abort(403, 'No autorizado.');
+        }
+
+        DB::table('comentario')->where('id_comentario', $idComentario)->delete();
+
+        return back()->with('success', 'Comentario eliminado.');
     }
 }

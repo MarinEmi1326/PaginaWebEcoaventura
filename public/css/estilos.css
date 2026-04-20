@@ -359,8 +359,8 @@ body {
    ======================================================= */
 
 :root {
-  --ea-bg: #F7F6EF;
-  --ea-card: #F6F6F2;
+   --ea-bg: #F7F6EF;
+  --ea-card: #EAEFE8;   /* ← más oscuro que antes */
   --ea-line: #D9DDD6;
   --ea-pill: #DFE6DE;
   --ea-pill-active: #CFD9CF;

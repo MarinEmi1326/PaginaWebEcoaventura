@@ -9,24 +9,27 @@ class DestinosController extends Controller
 {
     public function index()
     {
-        $destinos = DB::table('destino')
-            ->where('activo', 'activo')
-            ->orderBy('fecha_creacion', 'desc')
-            ->get();
+        $categorias = DB::table('categoria')->orderBy('nombre')->get();
+        $destinosRaw = DB::table('destino')->where('activo', 'activo')->orderBy('nombre')->get();
 
-        foreach ($destinos as $d) {
-            $d->imagen = DB::table('imagen')
-                ->where('id_destino', $d->id_destino)
+        $destinos = collect();
+        foreach ($destinosRaw as $d) {
+            $categoriasDestino = DB::table('destino_categoria')
+                ->join('categoria', 'destino_categoria.id_categoria', '=', 'categoria.id_categoria')
+                ->where('destino_categoria.id_destino', $d->id_destino)
+                ->pluck('categoria.nombre')
+                ->toArray();
+
+            $imagen = DB::table('imagen')
                 ->where('entidad', 'destino')
+                ->where('id_destino', $d->id_destino)
+                ->orderBy('id_imagen')
                 ->first();
 
-            $d->categorias = DB::table('categoria')
-                ->join('destino_categoria', 'categoria.id_categoria', '=', 'destino_categoria.id_categoria')
-                ->where('destino_categoria.id_destino', $d->id_destino)
-                ->pluck('categoria.nombre');
+            $d->categorias = collect($categoriasDestino);
+            $d->imagen = $imagen;
+            $destinos->push($d);
         }
-
-        $categorias = DB::table('categoria')->orderBy('nombre')->get();
 
         return view('centros.index', compact('destinos', 'categorias'));
     }
@@ -38,66 +41,99 @@ class DestinosController extends Controller
             ->where('activo', 'activo')
             ->first();
 
-        if (!$destino) abort(404);
+        if (!$destino) {
+            abort(404);
+        }
 
-        $imagenes = DB::table('imagen')
-            ->where('id_destino', $id)
-            ->where('entidad', 'destino')
-            ->get();
+        // Creador
+        $creador = DB::table('persona')
+            ->where('id_persona', $destino->creado_por)
+            ->first();
 
-        $categorias = DB::table('categoria')
-            ->join('destino_categoria', 'categoria.id_categoria', '=', 'destino_categoria.id_categoria')
+        // Categorías
+        $categorias = DB::table('destino_categoria')
+            ->join('categoria', 'destino_categoria.id_categoria', '=', 'categoria.id_categoria')
             ->where('destino_categoria.id_destino', $id)
-            ->pluck('categoria.nombre');
+            ->pluck('categoria.nombre')
+            ->toArray();
 
-        $actividades = DB::table('actividad')
-            ->join('destino_actividad', 'actividad.id_actividad', '=', 'destino_actividad.id_actividad')
+        // Actividades (solo nombre)
+        $actividades = DB::table('destino_actividad')
+            ->join('actividad', 'destino_actividad.id_actividad', '=', 'actividad.id_actividad')
             ->where('destino_actividad.id_destino', $id)
+            ->select('actividad.nombre', 'actividad.id_actividad')
             ->get();
 
+        // Recomendaciones
+        $recomendaciones = DB::table('destino_recomendacion')
+            ->join('recomendacion', 'destino_recomendacion.id_recomendacion', '=', 'recomendacion.id_recomendacion')
+            ->where('destino_recomendacion.id_destino', $id)
+            ->where('recomendacion.activo', 1)
+            ->pluck('recomendacion.descripcion')
+            ->toArray();
+
+        // Imágenes
+        $imagenes = DB::table('imagen')
+            ->where('entidad', 'destino')
+            ->where('id_destino', $id)
+            ->orderBy('id_imagen')
+            ->get();
+
+        // Paquetes
         $paquetes = DB::table('paquete')
             ->where('id_destino', $id)
             ->where('activo', 'activo')
+            ->orderBy('id_paquete')
             ->get();
 
-        // Comentarios con nombre del turista
+        foreach ($paquetes as $paquete) {
+            $actividadesPaquete = DB::table('paquete_actividad')
+                ->join('actividad', 'paquete_actividad.id_actividad', '=', 'actividad.id_actividad')
+                ->where('paquete_actividad.id_paquete', $paquete->id_paquete)
+                ->orderBy('paquete_actividad.orden')
+                ->select('actividad.nombre', 'paquete_actividad.minimo_personas', 'paquete_actividad.maximo_personas')
+                ->get();
+            $paquete->actividades = $actividadesPaquete;
+        }
+
+        // Comentarios
         $comentarios = DB::table('comentario')
-            ->join('turista', 'comentario.id_turista', '=', 'turista.id_turista')
+            ->join('persona', 'comentario.id_persona', '=', 'persona.id_persona')
             ->where('comentario.id_destino', $id)
             ->where('comentario.entidad', 'destino')
-            ->orderBy('comentario.fecha', 'desc')
-            ->select('comentario.*', 'turista.nombre', 'turista.apaterno')
+            ->select('comentario.*', 'persona.nombre', 'persona.apellidos')
+            ->orderByDesc('comentario.fecha')
             ->get();
 
-        // Otros destinos relacionados
+        // Otros destinos
         $otrosDestinos = DB::table('destino')
-            ->join('destino_categoria', 'destino.id_destino', '=', 'destino_categoria.id_destino')
-            ->whereIn('destino_categoria.id_categoria', function($q) use ($id) {
-                $q->select('id_categoria')
-                  ->from('destino_categoria')
-                  ->where('id_destino', $id);
-            })
-            ->where('destino.id_destino', '!=', $id)
-            ->where('destino.activo', 'activo')
-            ->select('destino.*')
-            ->distinct()
+            ->where('activo', 'activo')
+            ->where('id_destino', '!=', $id)
+            ->orderByRaw('RAND()')
             ->limit(3)
             ->get();
 
         foreach ($otrosDestinos as $od) {
-            $od->imagen = DB::table('imagen')
-                ->where('id_destino', $od->id_destino)
+            $imagenOd = DB::table('imagen')
                 ->where('entidad', 'destino')
+                ->where('id_destino', $od->id_destino)
+                ->orderBy('id_imagen')
                 ->first();
-            $od->categorias = DB::table('categoria')
-                ->join('destino_categoria', 'categoria.id_categoria', '=', 'destino_categoria.id_categoria')
+            $od->imagen = $imagenOd;
+            $categoriasOd = DB::table('destino_categoria')
+                ->join('categoria', 'destino_categoria.id_categoria', '=', 'categoria.id_categoria')
                 ->where('destino_categoria.id_destino', $od->id_destino)
-                ->pluck('categoria.nombre');
+                ->pluck('categoria.nombre')
+                ->toArray();
+            $od->categorias = collect($categoriasOd);
         }
 
-        return view('centros.show', compact(
-            'destino', 'imagenes', 'categorias',
-            'actividades', 'paquetes', 'comentarios', 'otrosDestinos'
-        ));
+        // Obtener el rol del usuario autenticado (si está logueado)
+        $usuarioRol = null;
+        if (auth()->check()) {
+            $usuarioRol = auth()->user()->persona?->roles->first()?->descripcion;
+        }
+
+        return view('centros.show', compact('destino', 'categorias', 'actividades', 'recomendaciones', 'imagenes', 'paquetes', 'comentarios', 'otrosDestinos', 'creador', 'usuarioRol'));
     }
 }
