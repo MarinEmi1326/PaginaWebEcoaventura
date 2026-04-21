@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\RecomendacionController;
 use App\Http\Controllers\Admin\AdminRespaldosController;
 use App\Http\Controllers\Admin\AdminVentasController;
 use App\Http\Controllers\TuristaViajesController;
+use App\Http\Controllers\Admin\AdminUsuarioReporteController;
 use Illuminate\Support\Facades\Auth;
 
 /*
@@ -178,6 +179,11 @@ Route::middleware('auth')->group(function () {
         Route::resource('recomendaciones', RecomendacionController::class)->except(['show']);
 
 
+
+        // Reportes de usuarios (admin general)
+        Route::get('/reportes-usuarios', [AdminUsuarioReporteController::class, 'index'])->name('reportes.usuarios.index');
+        Route::post('/reportes-usuarios/data', [AdminUsuarioReporteController::class, 'data'])->name('reportes.usuarios.data');
+        Route::get('/reportes-usuarios/pdf', [AdminUsuarioReporteController::class, 'pdf'])->name('reportes.usuarios.pdf');
 
         Route::get('/destino', [AdminCentroController::class, 'index'])->name('destino');
         Route::post('/destino/{id}/toggle', [AdminCentroController::class, 'toggleActivo'])->name('destino.toggle');
