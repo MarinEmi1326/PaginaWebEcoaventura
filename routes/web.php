@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\AdminRespaldosController;
 use App\Http\Controllers\Admin\AdminVentasController;
 use App\Http\Controllers\TuristaViajesController;
 use App\Http\Controllers\Admin\AdminUsuarioReporteController;
+use App\Http\Controllers\Admin\AdminRutaReporteController;
 use Illuminate\Support\Facades\Auth;
 
 /*
@@ -150,6 +151,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/reportes-destinos/pdf', [AdminDestinoReporteController::class, 'pdf'])->name('reportes.destinos.pdf');
 
 
+
+
+
     // Pagos
     Route::get('/paquetes/{id}/pagar', [PagoController::class, 'show'])->name('pagos.show');
     Route::post('/paquetes/{id}/pagar', [PagoController::class, 'procesar'])->name('pagos.procesar');
@@ -188,6 +192,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/destino', [AdminCentroController::class, 'index'])->name('destino');
         Route::post('/destino/{id}/toggle', [AdminCentroController::class, 'toggleActivo'])->name('destino.toggle');
 
+        Route::get('/reportes-rutas', [AdminRutaReporteController::class, 'index'])->name('reportes.rutas.index');
+        Route::post('/reportes-rutas/data', [AdminRutaReporteController::class, 'data'])->name('reportes.rutas.data');
+        Route::get('/reportes-rutas/pdf', [AdminRutaReporteController::class, 'pdf'])->name('reportes.rutas.pdf');
 
         Route::patch('/reportes/{id}/estado', [AdminReportesController::class, 'cambiarEstado'])->name('reportes.cambiarEstado');
 

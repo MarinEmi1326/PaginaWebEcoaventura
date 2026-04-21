@@ -946,4 +946,13 @@ body {
     font-size: 0.7rem;
     font-weight: 500;
 }
+/* Badge más pequeño para tablas de reportes */
+.table .badge-sm,
+.table .badge.bg-success,
+.table .badge.bg-secondary {
+    font-size: 0.65rem !important;
+    padding: 0.2rem 0.45rem !important;
+    font-weight: 500 !important;
+    line-height: 1.2 !important;
+}
 }
