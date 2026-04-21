@@ -909,4 +909,41 @@ body {
   .eco-footer-title {
     margin-top: 1rem;
   }
+
+  /* ===== BADGES PARA RUTAS (necesarias para que funcionen) ===== */
+.badge-facil {
+    background-color: #d1fae5 !important;
+    color: #065f46 !important;
+    padding: 6px 12px;
+    border-radius: 30px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.badge-moderada {
+    background-color: #fed7aa !important;
+    color: #9a3412 !important;
+    padding: 6px 12px;
+    border-radius: 30px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.badge-alta {
+    background-color: #fee2e2 !important;
+    color: #dc2626 !important;
+    padding: 6px 12px;
+    border-radius: 30px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.badge-eco {
+    background-color: #e2ece9 !important;
+    color: #1F6B4B !important;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 500;
+}
 }

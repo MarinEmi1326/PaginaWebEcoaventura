@@ -2,7 +2,7 @@
 
 @section('content')
 
-{{-- ===================== HERO ===================== --}}
+{{-- HERO --}}
 <section class="py-5 bg-light text-center">
     <div class="container">
         <span class="text-success fw-bold text-uppercase small">Explora Ocosingo</span>
@@ -12,7 +12,6 @@
             Planifica tu aventura con rutas detalladas y guías paso a paso.
         </p>
 
-        {{-- Buscador --}}
         <div class="row justify-content-center mt-4">
             <div class="col-md-6">
                 <div class="input-group input-group-lg shadow-sm">
@@ -21,7 +20,7 @@
                         <i class="bi bi-search text-muted"></i>
                     </span>
                     <input type="text" id="buscador" class="form-control border-start-0"
-                           placeholder="Buscar rutas, actividades..."
+                           placeholder="Buscar rutas..."
                            style="border-radius: 0 50rem 50rem 0;"
                            onkeyup="filtrarRutas()">
                 </div>
@@ -30,7 +29,7 @@
     </div>
 </section>
 
-{{-- ===================== FILTROS ===================== --}}
+{{-- FILTROS --}}
 <section class="py-3 border-bottom bg-white sticky-top" style="top: 75px; z-index: 100;">
     <div class="container">
         <div class="d-flex flex-wrap gap-2 align-items-center">
@@ -42,12 +41,12 @@
             <button class="btn btn-outline-success btn-sm rounded-pill filtro-dificultad"
                     onclick="filtrarDificultad('media', this)">Moderada</button>
             <button class="btn btn-outline-success btn-sm rounded-pill filtro-dificultad"
-                    onclick="filtrarDificultad('alta', this)">Alta</button>
+                    onclick="filtrarDificultad('alta', this)">Difícil</button>
         </div>
     </div>
 </section>
 
-{{-- ===================== LISTA DE RUTAS ===================== --}}
+{{-- LISTA DE RUTAS --}}
 <section class="py-5">
     <div class="container">
 
@@ -59,25 +58,30 @@
 
             @forelse ($rutas as $ruta)
 
+                {{-- Obtener creador --}}
+                @php
+                    $creador = DB::table('persona')
+                        ->join('ruta', 'persona.id_persona', '=', 'ruta.creado_por')
+                        ->where('ruta.id_ruta', $ruta->id_ruta)
+                        ->select('persona.nombre', 'persona.apellidos')
+                        ->first();
+                @endphp
+
                 <div class="col-md-6 col-lg-4 card-ruta"
                      data-dificultad="{{ $ruta->dificultad }}"
                      data-nombre="{{ strtolower($ruta->nombre) }}"
                      data-descripcion="{{ strtolower($ruta->descripcion) }}">
 
-                    {{-- ↓ Enlace al detalle de la ruta --}}
                     <a href="{{ route('rutas.show', $ruta->id_ruta) }}" class="text-decoration-none">
-
                         <div class="card border-0 shadow-sm rounded-4 h-100 card-hover">
 
-                            {{-- Imagen superior --}}
-                            <div class="rounded-top-4 position-relative overflow-hidden"
-                                style="height: 200px;">
-
+                            {{-- Imagen --}}
+                            <div class="rounded-top-4 position-relative overflow-hidden" style="height: 200px;">
                                 @if ($ruta->imagen)
                                     <img src="{{ Storage::url($ruta->imagen) }}"
-                                        class="w-100 h-100"
-                                        style="object-fit: cover;"
-                                        alt="{{ $ruta->nombre }}">
+                                         class="w-100 h-100"
+                                         style="object-fit: cover;"
+                                         alt="{{ $ruta->nombre }}">
                                 @else
                                     <div class="w-100 h-100 bg-success bg-opacity-10
                                                 d-flex align-items-center justify-content-center">
@@ -85,47 +89,58 @@
                                     </div>
                                 @endif
 
-                                {{-- Badge dificultad encima de la imagen --}}
+                                {{-- Badge dificultad --}}
                                 <div class="position-absolute top-0 end-0 m-3">
                                     @if ($ruta->dificultad === 'baja')
                                         <span class="badge badge-facil">Fácil</span>
                                     @elseif ($ruta->dificultad === 'media')
                                         <span class="badge badge-moderada">Moderada</span>
                                     @else
-                                        <span class="badge badge-alta">Alta</span>
+                                        <span class="badge badge-alta">Difícil</span>
                                     @endif
                                 </div>
-
                             </div>
 
                             <div class="card-body d-flex flex-column">
-                                <h5 class="card-title fw-bold text-dark">{{ $ruta->nombre }}</h5>
+                                <h5 class="card-title fw-bold text-dark mb-1">{{ $ruta->nombre }}</h5>
+
+                                {{-- Creador --}}
+                                @if ($creador)
+                                    <div class="small text-muted mb-2">
+                                        <i class="bi bi-person-circle me-1"></i>
+                                        Creado por {{ $creador->nombre }} {{ $creador->apellidos }}
+                                    </div>
+                                @endif
+
                                 <p class="card-text text-muted small">
                                     {{ Str::limit($ruta->descripcion, 100) }}
                                 </p>
 
-                                {{-- Datos de la ruta --}}
-                                <div class="d-flex gap-3 small text-muted mb-3 flex-wrap">
+                                {{-- Datos claros --}}
+                                <div class="d-flex flex-wrap gap-2 small mb-3">
 
                                     @if ($ruta->duracion_estimada)
-                                        <span>
-                                            <i class="bi bi-clock me-1"></i>
-                                            {{ $ruta->duracion_estimada }}
+                                        <span class="d-flex align-items-center gap-1 px-2 py-1 rounded-3"
+                                              style="background:#f0f7f4; color:#1F6B4B;">
+                                            <i class="bi bi-clock"></i>
+                                            Duración: {{ $ruta->duracion_estimada }}
                                         </span>
                                     @endif
 
                                     @if ($ruta->distancia_km)
-                                        <span>
-                                            <i class="bi bi-geo-alt me-1"></i>
-                                            {{ $ruta->distancia_km }} km
+                                        <span class="d-flex align-items-center gap-1 px-2 py-1 rounded-3"
+                                              style="background:#f0f7f4; color:#1F6B4B;">
+                                            <i class="bi bi-signpost-2"></i>
+                                            {{ $ruta->distancia_km }} km de recorrido
                                         </span>
                                     @endif
 
                                 </div>
 
-                                {{-- Fechas de operación si las tiene --}}
+                                {{-- Fechas de operación --}}
                                 @if ($ruta->fecha_inicio_operacion && $ruta->fecha_fin_operacion)
-                                    <div class="small text-muted mb-3">
+                                    <div class="small mb-3 px-2 py-1 rounded-3"
+                                         style="background:#fff8e1; color:#795548;">
                                         <i class="bi bi-calendar-range me-1"></i>
                                         Disponible del
                                         {{ \Carbon\Carbon::parse($ruta->fecha_inicio_operacion)->format('d/m/Y') }}
@@ -134,7 +149,7 @@
                                     </div>
                                 @endif
 
-                                {{-- Pie de la card --}}
+                                {{-- Pie --}}
                                 <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top">
                                     <span class="small text-muted">
                                         <i class="bi bi-geo-alt me-1"></i>
@@ -147,28 +162,21 @@
                             </div>
 
                         </div>
-
-                    {{-- ↓ Cierre del enlace --}}
                     </a>
-
                 </div>
 
             @empty
-
                 <div class="col-12 text-center py-5">
                     <i class="bi bi-signpost-2 text-muted" style="font-size: 3rem;"></i>
-                    <div class="mt-3 fw-semibold text-muted">
-                        Aún no hay rutas disponibles.
-                    </div>
+                    <div class="mt-3 fw-semibold text-muted">Aún no hay rutas disponibles.</div>
                 </div>
-
             @endforelse
 
         </div>
     </div>
 </section>
 
-{{-- ===================== TEMPORADAS ===================== --}}
+{{-- TEMPORADAS --}}
 <section class="py-5 bg-light">
     <div class="container text-center">
 
@@ -220,7 +228,7 @@
                         </div>
                         <p class="text-muted small mb-3">
                             La selva en su máximo esplendor verde. Menos visitantes,
-                            precios accesibles. Algunas rutas más difíciles.
+                            precios accesibles. Algunas rutas pueden estar más difíciles de transitar.
                         </p>
                         <div class="d-flex flex-wrap gap-2">
                             <span class="badge badge-eco">Observación de aves</span>
@@ -235,7 +243,6 @@
     </div>
 </section>
 
-{{-- ===================== JAVASCRIPT PARA FILTROS ===================== --}}
 <script>
 function filtrarDificultad(dificultad, boton) {
     document.querySelectorAll('.filtro-dificultad').forEach(b => {
@@ -272,5 +279,3 @@ function filtrarRutas() {
     document.getElementById('contador-rutas').textContent = visibles + ' ruta(s) encontrada(s)';
 }
 </script>
-
-@endsection
