@@ -26,8 +26,8 @@ class RutaController extends Controller
         }
 
         $rutas = Ruta::where('creado_por', $personaId)
-                    ->orderByDesc('fecha_creacion')
-                    ->get();
+            ->orderByDesc('fecha_creacion')
+            ->get();
         $total = $rutas->count();
         return view('admin.gestor_rutas.index', compact('rutas', 'total'));
     }
@@ -35,25 +35,40 @@ class RutaController extends Controller
     // ── Vista pública de rutas para turistas ──
     public function publicIndex()
     {
+        // Obtener rutas con el nombre del creador en una sola consulta
         $rutas = DB::table('ruta')
-            ->where('activo', 'activo')
-            ->orderByDesc('fecha_creacion')
+            ->leftJoin('persona', 'ruta.creado_por', '=', 'persona.id_persona')
+            ->where('ruta.activo', 'activo')
+            ->select(
+                'ruta.*',
+                'persona.nombre as creador_nombre',
+                'persona.apellidos as creador_apellidos'
+            )
+            ->orderByDesc('ruta.fecha_creacion')
             ->get();
 
+        $idsRutas = $rutas->pluck('id_ruta')->toArray();
+
+        // Contar paradas
+        $paradas = DB::table('ruta_destino')
+            ->whereIn('id_ruta', $idsRutas)
+            ->select('id_ruta', DB::raw('COUNT(*) as total'))
+            ->groupBy('id_ruta')
+            ->get()
+            ->keyBy('id_ruta');
+
+        // Primeras imágenes
+        $imagenes = DB::table('imagen')
+            ->where('entidad', 'ruta')
+            ->whereIn('id_ruta', $idsRutas)
+            ->orderBy('id_imagen')
+            ->get()
+            ->groupBy('id_ruta')
+            ->map(fn($g) => $g->first());
+
         foreach ($rutas as $ruta) {
-            // Contar paradas
-            $ruta->total_paradas = DB::table('ruta_destino')
-                ->where('id_ruta', $ruta->id_ruta)
-                ->count();
-
-            // Traer la primera imagen de la ruta si existe
-            $imagen = DB::table('imagen')
-                ->where('entidad', 'ruta')
-                ->where('id_ruta', $ruta->id_ruta)
-                ->orderBy('id_imagen')
-                ->first();
-
-            $ruta->imagen = $imagen ? $imagen->ruta_archivo : null;
+            $ruta->total_paradas = $paradas[$ruta->id_ruta]->total ?? 0;
+            $ruta->imagen = $imagenes[$ruta->id_ruta]->ruta_archivo ?? null;
         }
 
         return view('rutas.ruta', compact('rutas'));
@@ -62,8 +77,8 @@ class RutaController extends Controller
     public function create()
     {
         $destinos = Destino::where('activo', 'activo')
-                            ->orderBy('nombre')
-                            ->get();
+            ->orderBy('nombre')
+            ->get();
 
         return view('admin.gestor_rutas.create', compact('destinos'));
     }
@@ -163,71 +178,71 @@ class RutaController extends Controller
         });
 
         return redirect()->route('rutas.index')
-                         ->with('success', 'Ruta guardada correctamente.');
+            ->with('success', 'Ruta guardada correctamente.');
     }
 
-public function show($id)
-{
-    // 1. Traer la ruta
-    $ruta = DB::table('ruta')->where('id_ruta', $id)->where('activo', 'activo')->first();
-    abort_if(!$ruta, 404);
+    public function show($id)
+    {
+        // 1. Traer la ruta
+        $ruta = DB::table('ruta')->where('id_ruta', $id)->where('activo', 'activo')->first();
+        abort_if(!$ruta, 404);
 
-    // 2. Traer los destinos de la ruta en orden
-    $destinos = DB::table('ruta_destino')
-        ->join('destino', 'ruta_destino.id_destino', '=', 'destino.id_destino')
-        ->where('ruta_destino.id_ruta', $id)
-        ->orderBy('ruta_destino.orden')
-        ->select(
-            'destino.id_destino',
-            'destino.nombre',
-            'destino.descripcion',
-            'destino.lat',
-            'destino.lng',
-            'ruta_destino.orden'
-        )
-        ->get();
-
-    // 3. Para cada destino traer sus actividades en esta ruta
-    foreach ($destinos as $destino) {
-        $destino->actividades = DB::table('actividad')
-            ->join('ruta_destino_actividad', 'actividad.id_actividad', '=', 'ruta_destino_actividad.id_actividad')
-            ->where('ruta_destino_actividad.id_ruta', $id)
-            ->where('ruta_destino_actividad.id_destino', $destino->id_destino)
-            ->select('actividad.nombre')
+        // 2. Traer los destinos de la ruta en orden
+        $destinos = DB::table('ruta_destino')
+            ->join('destino', 'ruta_destino.id_destino', '=', 'destino.id_destino')
+            ->where('ruta_destino.id_ruta', $id)
+            ->orderBy('ruta_destino.orden')
+            ->select(
+                'destino.id_destino',
+                'destino.nombre',
+                'destino.descripcion',
+                'destino.lat',
+                'destino.lng',
+                'ruta_destino.orden'
+            )
             ->get();
+
+        // 3. Para cada destino traer sus actividades en esta ruta
+        foreach ($destinos as $destino) {
+            $destino->actividades = DB::table('actividad')
+                ->join('ruta_destino_actividad', 'actividad.id_actividad', '=', 'ruta_destino_actividad.id_actividad')
+                ->where('ruta_destino_actividad.id_ruta', $id)
+                ->where('ruta_destino_actividad.id_destino', $destino->id_destino)
+                ->select('actividad.nombre')
+                ->get();
+        }
+
+        // 4. Comentarios
+        $comentarios = DB::table('comentario')
+            ->join('persona', 'comentario.id_persona', '=', 'persona.id_persona')
+            ->where('comentario.entidad', 'ruta')
+            ->where('comentario.id_ruta', $id)
+            ->orderByDesc('comentario.fecha')
+            ->select('comentario.id_comentario', 'comentario.comentario', 'comentario.fecha', 'persona.nombre', 'persona.apellidos')
+            ->get();
+
+        // 5. Recomendaciones
+        $recomendaciones = DB::table('ruta_recomendacion')
+            ->join('recomendacion', 'ruta_recomendacion.id_recomendacion', '=', 'recomendacion.id_recomendacion')
+            ->where('ruta_recomendacion.id_ruta', $id)
+            ->where('recomendacion.activo', 1)
+            ->pluck('recomendacion.descripcion')
+            ->toArray();
+
+        // 6. JSON para el mapa (solo destinos con coordenadas válidas)
+        $destinosJson = $destinos->filter(function ($d) {
+            return !is_null($d->lat) && !is_null($d->lng) && is_numeric($d->lat) && is_numeric($d->lng);
+        })->map(function ($d) {
+            return [
+                'orden'  => $d->orden,
+                'nombre' => $d->nombre,
+                'lat'    => (float) $d->lat,
+                'lng'    => (float) $d->lng,
+            ];
+        })->values()->toJson(); // values() reindexa el array
+
+        return view('rutas.show', compact('ruta', 'destinos', 'comentarios', 'recomendaciones', 'destinosJson'));
     }
-
-    // 4. Comentarios
-    $comentarios = DB::table('comentario')
-        ->join('persona', 'comentario.id_persona', '=', 'persona.id_persona')
-        ->where('comentario.entidad', 'ruta')
-        ->where('comentario.id_ruta', $id)
-        ->orderByDesc('comentario.fecha')
-        ->select('comentario.id_comentario', 'comentario.comentario', 'comentario.fecha', 'persona.nombre', 'persona.apellidos')
-        ->get();
-
-    // 5. Recomendaciones
-    $recomendaciones = DB::table('ruta_recomendacion')
-        ->join('recomendacion', 'ruta_recomendacion.id_recomendacion', '=', 'recomendacion.id_recomendacion')
-        ->where('ruta_recomendacion.id_ruta', $id)
-        ->where('recomendacion.activo', 1)
-        ->pluck('recomendacion.descripcion')
-        ->toArray();
-
-    // 6. JSON para el mapa (solo destinos con coordenadas válidas)
-    $destinosJson = $destinos->filter(function($d) {
-        return !is_null($d->lat) && !is_null($d->lng) && is_numeric($d->lat) && is_numeric($d->lng);
-    })->map(function($d) {
-        return [
-            'orden'  => $d->orden,
-            'nombre' => $d->nombre,
-            'lat'    => (float) $d->lat,
-            'lng'    => (float) $d->lng,
-        ];
-    })->values()->toJson(); // values() reindexa el array
-
-    return view('rutas.show', compact('ruta', 'destinos', 'comentarios', 'recomendaciones', 'destinosJson'));
-}
 
     // ── EDIT: mostrar formulario de edición ──
     public function edit($id)
@@ -238,8 +253,8 @@ public function show($id)
         }
 
         $ruta = Ruta::where('id_ruta', $id)
-                    ->where('creado_por', $personaId)
-                    ->first();
+            ->where('creado_por', $personaId)
+            ->first();
 
         abort_if(!$ruta, 404);
 
@@ -267,8 +282,8 @@ public function show($id)
         }
 
         $ruta = Ruta::where('id_ruta', $id)
-                    ->where('creado_por', $personaId)
-                    ->first();
+            ->where('creado_por', $personaId)
+            ->first();
 
         abort_if(!$ruta, 404);
 
@@ -303,7 +318,7 @@ public function show($id)
         }
 
         return redirect()->route('rutas.index')
-                        ->with('success', 'Ruta actualizada correctamente.');
+            ->with('success', 'Ruta actualizada correctamente.');
     }
 
     public function destroyImagen($id)
@@ -317,8 +332,8 @@ public function show($id)
         abort_if(!$imagen, 404);
 
         $ruta = Ruta::where('id_ruta', $imagen->id_ruta)
-                    ->where('creado_por', $personaId)
-                    ->first();
+            ->where('creado_por', $personaId)
+            ->first();
         abort_if(!$ruta, 403);
 
         Storage::disk('public')->delete($imagen->ruta_archivo);
@@ -335,8 +350,8 @@ public function show($id)
         }
 
         $ruta = Ruta::where('id_ruta', $id)
-                    ->where('creado_por', $personaId)
-                    ->first();
+            ->where('creado_por', $personaId)
+            ->first();
 
         abort_if(!$ruta, 404);
 
@@ -356,6 +371,6 @@ public function show($id)
         $ruta->delete();
 
         return redirect()->route('rutas.index')
-                        ->with('success', 'Ruta eliminada correctamente.');
+            ->with('success', 'Ruta eliminada correctamente.');
     }
 }
