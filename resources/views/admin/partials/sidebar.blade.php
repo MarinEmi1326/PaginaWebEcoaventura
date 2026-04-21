@@ -23,30 +23,35 @@
     {{-- Menú --}}
     <nav class="px-3 py-3 d-grid gap-2">
 
+        {{-- Dashboard --}}
         <a href="{{ route('admin.index') }}"
             class="ea-nav-pill {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
             <i class="bi bi-bar-chart-line"></i>
             <span>Dashboard</span>
         </a>
 
+        {{-- Destinos --}}
         <a href="{{ route('admin.destino') }}"
             class="ea-nav-pill {{ request()->routeIs('admin.aprobacion') ? 'active' : '' }}">
             <i class="bi bi-geo-alt"></i>
             <span>Destinos</span>
         </a>
 
+        {{-- Usuarios --}}
         <a href="{{ route('admin.solicitudes.index') }}"
             class="ea-nav-pill {{ request()->routeIs('admin.solicitudes.*') ? 'active' : '' }}">
             <i class="bi bi-people"></i>
             <span>Usuarios</span>
         </a>
 
+        {{-- Reportes --}}
         <a href="{{ route('admin.reportes') }}"
             class="ea-nav-pill {{ request()->routeIs('admin.reportes') ? 'active' : '' }}">
             <i class="bi bi-clipboard-data"></i>
             <span>Reportes</span>
         </a>
-        
+
+        {{-- Reportes de Usuarios --}}
         <a href="{{ route('admin.reportes.usuarios.index') }}"
             class="ea-nav-pill {{ request()->routeIs('admin.reportes.usuarios.*') ? 'active' : '' }}">
             <i class="bi bi-file-earmark-bar-graph"></i>
@@ -60,20 +65,21 @@
             <span>Categorías</span>
         </a>
 
-        {{-- Actividades (catálogo) --}}
+        {{-- Actividades (catálogo) ✅ ya tiene icono --}}
         <a href="{{ route('admin.actividades.index') }}"
             class="ea-nav-pill {{ request()->routeIs('admin.actividades.*') ? 'active' : '' }}">
-            <i class="bi bi-run"></i>
+            <i class="bi bi-activity"></i>
             <span>Actividades</span>
         </a>
 
-        {{-- Recomendaciones (catálogo) --}}
+        {{-- Recomendaciones (catálogo) ✅ ya tiene icono --}}
         <a href="{{ route('admin.recomendaciones.index') }}"
             class="ea-nav-pill {{ request()->routeIs('admin.recomendaciones.*') ? 'active' : '' }}">
             <i class="bi bi-chat-dots"></i>
             <span>Recomendaciones</span>
         </a>
 
+        {{-- Respaldos --}}
         <a href="{{ route('admin.respaldos') }}"
             class="ea-nav-pill {{ request()->routeIs('admin.respaldos') ? 'active' : '' }}">
             <i class="bi bi-database"></i>
