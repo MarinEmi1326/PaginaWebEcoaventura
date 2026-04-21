@@ -57,6 +57,11 @@
             <i class="bi bi-file-earmark-bar-graph"></i>
             <span>Reportes de Usuarios</span>
         </a>
+         <a href="{{ route('admin.reportes.rutas.index') }}"
+            class="ea-nav-pill {{ request()->routeIs('admin.reportes-rutas.*') ? 'active' : '' }}">
+            <i class="bi bi-signpost-2"></i>
+            <span>Reportes de Rutas</span>
+        </a>
 
         {{-- Categorías --}}
         <a href="{{ route('admin.categorias.index') }}"
