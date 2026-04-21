@@ -25,11 +25,6 @@
                     <span class="text-muted">Total a pagar</span>
                     <span class="fw-bold fs-4 text-success">${{ number_format($paquete->precio, 2) }} MXN</span>
                 </div>
-                @if ($paquete->minimo_personas)
-                    <p class="text-muted small mt-1 mb-0">
-                        <i class="bi bi-people me-1"></i>Mínimo {{ $paquete->minimo_personas }} personas
-                    </p>
-                @endif
             </div>
 
             {{-- Formulario de pago --}}
@@ -49,7 +44,7 @@
                         <label class="form-label fw-bold small">
                             <i class="bi bi-calendar3 me-1 text-success"></i>Fecha de visita
                         </label>
-                        <input type="date" name="fecha_visita"
+                        <input type="date" name="fecha_visita" id="fecha_visita"
                             class="form-control rounded-3 py-2 @error('fecha_visita') is-invalid @enderror"
                             min="{{ date('Y-m-d', strtotime('+1 day')) }}" value="{{ old('fecha_visita') }}" required>
                         @error('fecha_visita')
@@ -63,16 +58,11 @@
                             <i class="bi bi-people me-1 text-success"></i>Número de personas
                         </label>
                         <input type="number" name="personas"
-                            class="form-control rounded-3 py-2 @error('personas') is-invalid @enderror"
-                            min="{{ $paquete->minimo_personas ?? 1 }}"
-                            value="{{ old('personas', $paquete->minimo_personas ?? 1) }}"
-                            placeholder="Cantidad de personas" required>
+                            class="form-control rounded-3 py-2 @error('personas') is-invalid @enderror" min="1"
+                            value="{{ old('personas', 1) }}" placeholder="Cantidad de personas" required>
                         @error('personas')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
-                        @if ($paquete->minimo_personas)
-                            <div class="form-text text-muted">Mínimo {{ $paquete->minimo_personas }} personas</div>
-                        @endif
                     </div>
 
                     {{-- Horario --}}
@@ -80,8 +70,8 @@
                         <label class="form-label fw-bold small">
                             <i class="bi bi-clock me-1 text-success"></i>Horario preferido
                         </label>
-                        <select name="horario" class="form-select rounded-3 py-2 @error('horario') is-invalid @enderror"
-                            required>
+                        <select name="horario" id="horario_select"
+                            class="form-select rounded-3 py-2 @error('horario') is-invalid @enderror" required>
                             <option value="" disabled {{ old('horario') ? '' : 'selected' }}>Selecciona un horario
                             </option>
                             <option value="08:00" {{ old('horario') == '08:00' ? 'selected' : '' }}>8:00 AM</option>
@@ -94,6 +84,7 @@
                             <option value="15:00" {{ old('horario') == '15:00' ? 'selected' : '' }}>3:00 PM</option>
                             <option value="16:00" {{ old('horario') == '16:00' ? 'selected' : '' }}>4:00 PM</option>
                         </select>
+                        <div id="horario-aviso" class="small text-muted mt-1"></div>
                         @error('horario')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -128,6 +119,61 @@
 
     <script src="https://js.stripe.com/v3/"></script>
     <script>
+        // ============================================
+        // VALIDACIÓN DE HORARIOS OCUPADOS
+        // ============================================
+        const horariosOcupados = @json($horariosOcupados ?? []);
+
+        function actualizarHorarios() {
+            const fecha = document.getElementById('fecha_visita').value;
+            const select = document.getElementById('horario_select');
+            const aviso = document.getElementById('horario-aviso');
+
+            if (!fecha) {
+                aviso.innerHTML = '';
+                return;
+            }
+
+            const ocupados = horariosOcupados[fecha] || [];
+
+            let opcionSeleccionada = false;
+            Array.from(select.options).forEach(option => {
+                if (option.value === '') return;
+
+                if (ocupados.includes(option.value)) {
+                    option.disabled = true;
+                    option.style.backgroundColor = '#f8f9fa';
+                    option.style.color = '#adb5bd';
+                } else {
+                    option.disabled = false;
+                    option.style.backgroundColor = '';
+                    option.style.color = '';
+                    if (!opcionSeleccionada && !select.value) {
+                        option.selected = true;
+                        opcionSeleccionada = true;
+                    }
+                }
+            });
+
+            if (ocupados.length > 0) {
+                aviso.innerHTML = `<i class="bi bi-info-circle me-1"></i>Horarios ocupados: ${ocupados.join(', ')}`;
+                aviso.style.color = '#dc3545';
+            } else {
+                aviso.innerHTML = `<i class="bi bi-check-circle me-1"></i>Hay disponibilidad para esta fecha`;
+                aviso.style.color = '#198754';
+            }
+        }
+
+        document.getElementById('fecha_visita').addEventListener('change', actualizarHorarios);
+
+        // Ejecutar al cargar si ya hay una fecha seleccionada
+        if (document.getElementById('fecha_visita').value) {
+            actualizarHorarios();
+        }
+
+        // ============================================
+        // STRIPE
+        // ============================================
         const stripe = Stripe('{{ config('services.stripe.key') }}');
         const elements = stripe.elements({
             appearance: {

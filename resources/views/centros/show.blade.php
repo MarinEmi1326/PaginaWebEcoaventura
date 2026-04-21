@@ -189,11 +189,10 @@
                                                     <span class="text-muted small ms-1">(por persona)</span>
                                                 </div>
                                                 @if ($paq->tipo_publico == 'especifico')
-                                                    <span class="badge bg-info text-dark">
-                                                        Edad {{ $paq->edad_minima }} - {{ $paq->edad_maxima }} años
-                                                    </span>
+                                                    <span class="ea-chip blue">Edad {{ $paq->edad_minima }} -
+                                                        {{ $paq->edad_maxima }} años</span>
                                                 @else
-                                                    <span class="badge bg-success">Todo público</span>
+                                                    <span class="ea-chip green">Todo público</span>
                                                 @endif
                                             </div>
                                             @if ($paq->actividades->count() > 0)
@@ -312,72 +311,84 @@
 
                     @auth
                         @if ($usuarioRol === 'turista')
-                            <div class="rounded-3 p-4 mb-4" style="background:#f1f5f2;">
-                                <form action="{{ route('comentarios.destino.store', $destino->id_destino) }}" method="POST">
-                                    @csrf
-                                    <label class="form-label fw-bold small">Tu comentario</label>
-                                    <textarea name="comentario" rows="3"
-                                        class="form-control rounded-3 mb-3 @error('comentario') is-invalid @enderror"
-                                        placeholder="Comparte tu experiencia en este destino...">{{ old('comentario') }}</textarea>
-                                    @error('comentario')
-                                        <div class="invalid-feedback mb-2">{{ $message }}</div>
-                                    @enderror
-                                    <button type="submit" class="btn btn-success rounded-3 px-4">
-                                        <i class="bi bi-send me-1"></i> Publicar comentario
-                                    </button>
-                                </form>
+                            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                                <div class="card-body p-4">
+                                    <h6 class="fw-bold mb-3">
+                                        <i class="bi bi-chat-dots me-2 text-success"></i>Tu comentario
+                                    </h6>
+                                    <form action="{{ route('comentarios.destino.store', $destino->id_destino) }}"
+                                        method="POST">
+                                        @csrf
+                                        <textarea name="comentario" rows="3"
+                                            class="form-control rounded-3 mb-3 @error('comentario') is-invalid @enderror"
+                                            placeholder="Comparte tu experiencia en este destino...">{{ old('comentario') }}</textarea>
+                                        @error('comentario')
+                                            <div class="invalid-feedback mb-2">{{ $message }}</div>
+                                        @enderror
+                                        <button type="submit" class="btn btn-success rounded-3 px-4">
+                                            <i class="bi bi-send me-1"></i> Publicar comentario
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         @endif
                     @else
-                        <div class="rounded-3 p-4 mb-4 text-center" style="background:#f1f5f2;">
-                            <p class="text-muted small mb-2">Inicia sesión como Turista para comentar</p>
-                            <a href="{{ route('login') }}" class="btn btn-outline-success btn-sm rounded-pill px-4">
-                                <i class="bi bi-person me-1"></i>Iniciar Sesión
-                            </a>
+                        <div class="card border-0 shadow-sm rounded-4 mb-4 text-center">
+                            <div class="card-body p-4">
+                                <i class="bi bi-chat fs-1 text-muted mb-2 d-block"></i>
+                                <p class="text-muted small mb-2">Inicia sesión como Turista para comentar</p>
+                                <a href="{{ route('login') }}" class="btn btn-outline-success btn-sm rounded-pill px-4">
+                                    <i class="bi bi-person me-1"></i>Iniciar Sesión
+                                </a>
+                            </div>
                         </div>
                     @endauth
 
                     @forelse ($comentarios as $com)
-                        <div class="rounded-3 p-4 mb-3" style="background:#f1f5f2;">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold"
-                                        style="width:36px; height:36px; background:#d1d9d4; color:#1F6B4B; font-size:0.85rem;">
-                                        {{ strtoupper(substr($com->nombre, 0, 1)) }}
+                        {{-- TARJETA DE COMENTARIO --}}
+                        <div class="card border-0 shadow-sm rounded-4 mb-3">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold"
+                                            style="width:40px; height:40px; background:#1F6B4B; color:white;">
+                                            {{ strtoupper(substr($com->nombre, 0, 1)) }}
+                                        </div>
+                                        <div>
+                                            <p class="fw-semibold mb-0 small">{{ $com->nombre }} {{ $com->apellidos }}
+                                            </p>
+                                            <p class="text-muted mb-0" style="font-size:0.7rem;">
+                                                {{ \Carbon\Carbon::parse($com->fecha)->format('d/m/Y H:i') }}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p class="fw-semibold mb-0 small">{{ $com->nombre }} {{ $com->apellidos }}
-                                        </p>
-                                        <p class="text-muted mb-0" style="font-size:0.75rem;">
-                                            {{ \Carbon\Carbon::parse($com->fecha)->format('d/m/Y H:i') }}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="d-flex align-items-center gap-2">
-                                    @auth
-                                        @if (in_array($usuarioRol, ['turista', 'admin_destinos']))
-                                            <button type="button" class="btn btn-sm btn-outline-danger rounded-3"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#modalReportarComentario{{ $com->id_comentario }}">
-                                                <i class="bi bi-flag"></i>
-                                            </button>
-                                        @endif
-                                        @if ($usuarioRol === 'admin_general')
-                                            <form action="{{ route('comentarios.destroy', $com->id_comentario) }}"
-                                                method="POST" onsubmit="return confirm('¿Eliminar este comentario?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-3">
-                                                    <i class="bi bi-trash"></i>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @auth
+                                            @if (in_array($usuarioRol, ['turista', 'admin_destinos']))
+                                                <button type="button" class="btn btn-sm btn-outline-danger rounded-3"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modalReportarComentario{{ $com->id_comentario }}">
+                                                    <i class="bi bi-flag"></i>
                                                 </button>
-                                            </form>
-                                        @endif
-                                    @endauth
+                                            @endif
+                                            @if ($usuarioRol === 'admin_general')
+                                                <form action="{{ route('comentarios.destroy', $com->id_comentario) }}"
+                                                    method="POST" onsubmit="return confirm('¿Eliminar este comentario?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-3">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        @endauth
+                                    </div>
                                 </div>
+                                <p class="text-muted small mb-0 mt-2">{{ $com->comentario }}</p>
                             </div>
-                            <p class="text-muted small mb-0">{{ $com->comentario }}</p>
                         </div>
 
+                        {{-- MODAL REPORTAR COMENTARIO --}}
                         @auth
                             @if (in_array($usuarioRol, ['turista', 'admin_destinos']))
                                 <div class="modal fade" id="modalReportarComentario{{ $com->id_comentario }}"
@@ -386,8 +397,7 @@
                                         <div class="modal-content rounded-4 border-0 shadow">
                                             <div class="modal-header border-0 pb-0">
                                                 <h5 class="modal-title fw-bold"><i
-                                                        class="bi bi-flag-fill text-danger me-2"></i>Reportar comentario
-                                                </h5>
+                                                        class="bi bi-flag-fill text-danger me-2"></i>Reportar comentario</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
                                             <form action="{{ route('reportes.comentario', $com->id_comentario) }}"

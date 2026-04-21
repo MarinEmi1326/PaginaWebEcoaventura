@@ -33,7 +33,18 @@ class PagoController extends Controller
             ->where('id_destino', $paquete->id_destino)
             ->first();
 
-        return view('pagos.checkout', compact('paquete', 'destino'));
+        // Obtener horarios ocupados para este paquete
+        $horariosOcupados = DB::table('pago')
+            ->where('id_paquete', $id_paquete)
+            ->where('estado', 'completado')
+            ->select('fecha_visita', 'horario')
+            ->get()
+            ->groupBy('fecha_visita')
+            ->map(function ($items) {
+                return $items->pluck('horario')->toArray();
+            });
+
+        return view('pagos.checkout', compact('paquete', 'destino', 'horariosOcupados'));
     }
 
     // POST /paquetes/{id}/pagar
@@ -48,15 +59,33 @@ class PagoController extends Controller
 
         $request->validate([
             'fecha_visita' => 'required|date|after:today',
-            'personas'     => 'required|integer|min:' . ($paquete->minimo_personas ?? 1),
+            'personas'     => 'required|integer|min:1',
             'horario'      => 'required|string',
         ], [
             'fecha_visita.required' => 'La fecha de visita es obligatoria.',
             'fecha_visita.after'    => 'La fecha de visita debe ser a partir de mañana.',
             'personas.required'     => 'El número de personas es obligatorio.',
-            'personas.min'          => 'El mínimo de personas es ' . ($paquete->minimo_personas ?? 1) . '.',
+            'personas.min'          => 'El mínimo de personas es 1.',
             'horario.required'      => 'El horario es obligatorio.',
         ]);
+
+        // ============================================
+        // VALIDAR DISPONIBILIDAD DE FECHA Y HORARIO
+        // ============================================
+        $fecha_visita = $request->fecha_visita;
+        $horario = $request->horario;
+
+        $reservaExistente = DB::table('pago')
+            ->where('id_paquete', $id_paquete)
+            ->where('fecha_visita', $fecha_visita)
+            ->where('horario', $horario)
+            ->where('estado', 'completado')
+            ->exists();
+
+        if ($reservaExistente) {
+            return back()->with('error', 'Lo sentimos, este horario ya está reservado. Por favor, elige otra fecha u horario.')
+                ->withInput();
+        }
 
         $user    = auth()->user();
         $persona = DB::table('persona')->where('id_usuario', $user->id_usuario)->first();
@@ -86,8 +115,8 @@ class PagoController extends Controller
                 'id_paquete'            => $paquete->id_paquete,
                 'id_destino'            => $paquete->id_destino,
                 'personas'              => $request->personas,
-                'fecha_visita'          => $request->fecha_visita,
-                'horario'               => $request->horario,
+                'fecha_visita'          => $fecha_visita,
+                'horario'               => $horario,
                 'stripe_payment_intent' => $intent->id,
                 'monto'                 => $paquete->precio,
                 'moneda'                => 'mxn',
@@ -127,7 +156,7 @@ class PagoController extends Controller
                             $this->enviarNotificacionFCM(
                                 $usuarioAdmin->fcm_token,
                                 '💰 Nuevo pago recibido',
-                                "{$persona->nombre} {$persona->apellidos} adquirió el paquete {$paquete->nombre} de {$destino->nombre} para el {$request->fecha_visita} a las {$request->horario}",
+                                "{$persona->nombre} {$persona->apellidos} adquirió el paquete {$paquete->nombre} de {$destino->nombre} para el {$fecha_visita} a las {$horario}",
                                 [
                                     'id_pago'    => (string) $id_pago,
                                     'id_destino' => (string) $destino->id_destino,
@@ -143,7 +172,6 @@ class PagoController extends Controller
             }
 
             return back()->with('error', 'El pago no pudo procesarse. Intenta de nuevo.');
-
         } catch (\Stripe\Exception\CardException $e) {
             return back()->with('error', 'Tarjeta rechazada: ' . $e->getError()->message);
         } catch (\Exception $e) {

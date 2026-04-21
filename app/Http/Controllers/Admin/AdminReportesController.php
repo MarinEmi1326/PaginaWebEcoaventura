@@ -8,6 +8,12 @@ use Illuminate\Support\Facades\DB;
 
 class AdminReportesController extends Controller
 {
+    // Helper para obtener la persona del usuario
+    private function getPersona($userId)
+    {
+        return DB::table('persona')->where('id_usuario', $userId)->first();
+    }
+
     // GET /admin/reportes
     public function index()
     {
@@ -15,7 +21,9 @@ class AdminReportesController extends Controller
         $pendientes = DB::table('reporte')->where('estado', 'pendiente')->count();
         $revisados  = DB::table('reporte')->whereIn('estado', ['resuelto', 'rechazado', 'en_revision'])->count();
 
-        // Reportes por destino
+        // ============================================
+        // REPORTES POR DESTINO (CORREGIDO)
+        // ============================================
         $porDestino = DB::table('reporte')
             ->join('destino', 'reporte.id_destino', '=', 'destino.id_destino')
             ->select(
@@ -30,20 +38,19 @@ class AdminReportesController extends Controller
             ->limit(10)
             ->get();
 
-        // Reportes por usuario
+        // ============================================
+        // REPORTES POR USUARIO (CORREGIDO - usando persona)
+        // ============================================
         $porUsuario = DB::table('reporte')
-            ->join('usuario', 'reporte.reportado_por', '=', 'usuario.id_usuario')
-            ->leftJoin('turista', 'usuario.id_usuario', '=', 'turista.id_usuario')
-            ->leftJoin('admin_destinos', 'usuario.id_usuario', '=', 'admin_destinos.id_usuario')
-            ->leftJoin('gestor_rutas', 'usuario.id_usuario', '=', 'gestor_rutas.id_usuario')
+            ->join('persona', 'reporte.reportado_por', '=', 'persona.id_persona')
+            ->join('usuario', 'persona.id_usuario', '=', 'usuario.id_usuario')
             ->select(
                 'usuario.id_usuario',
-                'usuario.rol',
-                DB::raw('COALESCE(turista.nombre, admin_destinos.nombre, gestor_rutas.nombre) as nombre'),
-                DB::raw('COALESCE(turista.apaterno, admin_destinos.apaterno, gestor_rutas.apaterno) as apaterno'),
+                'persona.nombre',
+                'persona.apellidos',
                 DB::raw('COUNT(*) as total')
             )
-            ->groupBy('usuario.id_usuario', 'usuario.rol', 'nombre', 'apaterno')
+            ->groupBy('usuario.id_usuario', 'persona.nombre', 'persona.apellidos')
             ->orderByDesc('total')
             ->limit(10)
             ->get();
@@ -61,17 +68,18 @@ class AdminReportesController extends Controller
         $pendientes = DB::table('reporte')->where('id_destino', $id_destino)->where('estado', 'pendiente')->count();
         $revisados  = DB::table('reporte')->where('id_destino', $id_destino)->whereIn('estado', ['resuelto', 'rechazado'])->count();
 
+        // ============================================
+        // REPORTES DEL DESTINO (CORREGIDO - usando persona)
+        // ============================================
         $reportes = DB::table('reporte')
-            ->join('usuario', 'reporte.reportado_por', '=', 'usuario.id_usuario')
-            ->leftJoin('turista', 'usuario.id_usuario', '=', 'turista.id_usuario')
-            ->leftJoin('admin_destinos', 'usuario.id_usuario', '=', 'admin_destinos.id_usuario')
+            ->join('persona', 'reporte.reportado_por', '=', 'persona.id_persona')
+            ->join('usuario', 'persona.id_usuario', '=', 'usuario.id_usuario')
             ->leftJoin('comentario', 'reporte.id_comentario', '=', 'comentario.id_comentario')
             ->where('reporte.id_destino', $id_destino)
             ->select(
                 'reporte.*',
-                'usuario.rol',
-                DB::raw('COALESCE(turista.nombre, admin_destinos.nombre) as nombre_reporter'),
-                DB::raw('COALESCE(turista.apaterno, admin_destinos.apaterno) as apaterno_reporter'),
+                'persona.nombre as nombre_reporter',
+                'persona.apellidos as apellidos_reporter',
                 'comentario.comentario as texto_comentario'
             )
             ->orderByDesc('reporte.fecha')
@@ -106,5 +114,17 @@ class AdminReportesController extends Controller
         DB::table('comentario')->where('id_comentario', $id_comentario)->delete();
 
         return back()->with('success', 'Comentario eliminado y reportes resueltos.');
+    }
+    public function cambiarEstado(Request $request, $id)
+    {
+        $request->validate([
+            'estado' => 'required|in:pendiente,resuelto,rechazado'
+        ]);
+
+        DB::table('reporte')
+            ->where('id_reporte', $id)
+            ->update(['estado' => $request->estado]);
+
+        return back()->with('success', 'Estado del reporte actualizado correctamente.');
     }
 }

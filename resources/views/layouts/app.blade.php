@@ -134,6 +134,16 @@
                                     </a>
                                 </li>
 
+                                {{-- Mis Viajes (solo para turistas) --}}
+                                @if ($esTurista)
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('turista.viajes') }}">
+                                            <i class="bi bi-suitcase me-1"></i>
+                                            Mis Viajes
+                                        </a>
+                                    </li>
+                                @endif
+
                                 {{-- Mostrar "Ir a mi panel" solo para admins y gestores (NO para turistas) --}}
                                 @if (!$esTurista && !empty($roles))
                                     <li>

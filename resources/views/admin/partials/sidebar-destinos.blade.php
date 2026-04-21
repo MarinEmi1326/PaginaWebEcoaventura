@@ -21,10 +21,18 @@
     {{-- Menú --}}
     <nav class="px-3 py-3 d-grid gap-2">
 
+        {{-- Mis Destinos --}}
         <a href="{{ route('misdestinos.index') }}"
             class="ea-nav-pill {{ request()->routeIs('misdestinos.*') ? 'active' : '' }}">
             <i class="bi bi-geo-alt"></i>
             <span>Mis Destinos</span>
+        </a>
+
+        {{-- Ventas (NUEVO) --}}
+        <a href="{{ route('admin.ventas.index') }}"
+            class="ea-nav-pill {{ request()->routeIs('admin.ventas') ? 'active' : '' }}">
+            <i class="bi bi-graph-up"></i>
+            <span>Ventas</span>
         </a>
 
         {{-- Reportes PDF --}}
