@@ -224,7 +224,7 @@ public function show($id)
             'lat'    => (float) $d->lat,
             'lng'    => (float) $d->lng,
         ];
-    })->values()->toJson();
+    })->values()->toJson(); // values() reindexa el array
 
     return view('rutas.show', compact('ruta', 'destinos', 'comentarios', 'recomendaciones', 'destinosJson'));
 }

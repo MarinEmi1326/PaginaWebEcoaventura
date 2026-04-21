@@ -210,68 +210,139 @@
     @endforelse
 </div>
 
+@endsection
 
-{{-- ══════════════════════════════════════
-     GOOGLE MAPS (SIN DIRECTIONS, SOLO MARCADORES)
-══════════════════════════════════════ --}}
+@push('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const mapaContainer = document.getElementById('mapa-detalle');
-        if (!mapaContainer) return;
+    (g => {
+        var h, a, k, p = "The Google Maps JavaScript API",
+            c = "google",
+            l = "importLibrary",
+            q = "__ib__",
+            m = document,
+            b = window;
+        b = b[c] || (b[c] = {});
+        var d = b.maps || (b.maps = {}),
+            r = new Set,
+            e = new URLSearchParams,
+            u = () => h || (h = new Promise(async (f, n) => {
+                await (a = m.createElement("script"));
+                e.set("libraries", [...r] + "");
+                for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
+                e.set("callback", c + ".maps." + q);
+                a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+                d[q] = f;
+                a.onerror = () => h = n(Error(p + " could not load."));
+                a.nonce = m.querySelector("script[nonce]")?.nonce || "";
+                m.head.append(a)
+            }));
+        d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() =>
+            d[l](f, ...n))
+    })({
+        key: "{{ config('services.google_maps.key') }}",
+        v: "weekly",
+    });
 
-        const destinosRuta = {!! $destinosJson !!};
-        console.log('Destinos para mapa:', destinosRuta);
+    let mapaRuta, directionsService, directionsRenderer, infoWindow;
 
-        if (!destinosRuta || destinosRuta.length === 0) {
-            mapaContainer.innerHTML = '<div class="alert alert-warning">No hay coordenadas disponibles para los puntos de esta ruta.</div>';
+    async function initMapaRuta() {
+        const destinos = {!! $destinosJson !!};
+        const contenedor = document.getElementById('mapa-detalle');
+        if (!contenedor) return;
+
+        if (!destinos || destinos.length === 0) {
+            contenedor.innerHTML = '<div class="alert alert-warning">No hay coordenadas disponibles para esta ruta.</div>';
             return;
         }
 
-        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
-            mapaContainer.innerHTML = '<div class="alert alert-danger">Google Maps no se cargó. Verifica tu conexión o la clave de API.</div>';
-            return;
-        }
+        const { Map } = await google.maps.importLibrary("maps");
+        const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
-        async function initMap() {
-            const { Map } = await google.maps.importLibrary("maps");
-            const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
-
-            const bounds = new google.maps.LatLngBounds();
-            const markers = [];
-
-            destinosRuta.forEach(destino => {
-                const pos = { lat: destino.lat, lng: destino.lng };
-                bounds.extend(pos);
-                const marker = new AdvancedMarkerElement({
-                    position: pos,
-                    map: null,  // lo añadiremos después de ajustar el zoom
-                    title: destino.nombre,
-                });
-                markers.push(marker);
-            });
-
-            const mapa = new Map(mapaContainer, {
-                center: bounds.getCenter(),
-                zoom: 10,
-                mapId: "DEMO_MAP_ID",
-            });
-
-            // Ajustar zoom para que quepan todos los marcadores
-            mapa.fitBounds(bounds);
-            // Si solo hay un punto, zoom más cercano
-            if (destinosRuta.length === 1) {
-                mapa.setZoom(13);
-            }
-
-            // Colocar marcadores después de ajustar el mapa
-            markers.forEach(marker => marker.map = mapa);
-        }
-
-        initMap().catch(err => {
-            console.error('Error en el mapa:', err);
-            mapaContainer.innerHTML = '<div class="alert alert-danger">Error al cargar el mapa: ' + err.message + '</div>';
+        const primerDestino = destinos[0];
+        mapaRuta = new Map(contenedor, {
+            zoom: 12,
+            center: { lat: primerDestino.lat, lng: primerDestino.lng },
+            mapId: "DEMO_MAP_ID",
         });
+
+        infoWindow = new google.maps.InfoWindow();
+
+        // Colocar marcadores numerados
+        destinos.forEach(destino => {
+            const pin = document.createElement('div');
+            pin.style.cssText = 'position:relative; display:flex; flex-direction:column; align-items:center;';
+            const circulo = document.createElement('div');
+            circulo.style.cssText = `
+                background:#1F6B4B; color:white; border-radius:50%;
+                width:34px; height:34px; display:flex; align-items:center;
+                justify-content:center; font-weight:bold; font-size:13px;
+                border:2px solid white; box-shadow:0 2px 6px rgba(0,0,0,.4);
+            `;
+            circulo.textContent = String(destino.orden);
+            const flecha = document.createElement('div');
+            flecha.style.cssText = `
+                width:0; height:0;
+                border-left:7px solid transparent; border-right:7px solid transparent;
+                border-top:10px solid #1F6B4B; margin-top:-2px;
+            `;
+            pin.appendChild(circulo);
+            pin.appendChild(flecha);
+
+            const marker = new AdvancedMarkerElement({
+                position: { lat: destino.lat, lng: destino.lng },
+                map: mapaRuta,
+                title: destino.nombre,
+                content: pin,
+            });
+
+            marker.addListener("click", () => {
+                infoWindow.setContent(`
+                    <div style="padding:6px;">
+                        <strong style="color:#1F6B4B;">${destino.nombre}</strong><br>
+                        <span style="font-size:11px;">Parada ${destino.orden}</span><br>
+                        <span style="font-size:10px; color:#888;">📍 ${destino.lat.toFixed(5)}, ${destino.lng.toFixed(5)}</span><br>
+                        <a href="https://www.google.com/maps/search/?api=1&query=${destino.lat},${destino.lng}" target="_blank" style="font-size:10px;">Ver en Google Maps →</a>
+                    </div>
+                `);
+                infoWindow.open({ anchor: marker, map: mapaRuta });
+            });
+        });
+
+        // Trazar ruta si hay más de un destino
+        if (destinos.length > 1) {
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer({
+                suppressMarkers: true,
+                polylineOptions: { strokeColor: '#4285F4', strokeOpacity: 1, strokeWeight: 6 }
+            });
+            directionsRenderer.setMap(mapaRuta);
+
+            const origen = destinos[0];
+            const destinoFinal = destinos[destinos.length - 1];
+            const waypoints = destinos.slice(1, -1).map(p => ({
+                location: new google.maps.LatLng(p.lat, p.lng),
+                stopover: true,
+            }));
+
+            directionsService.route({
+                origin: new google.maps.LatLng(origen.lat, origen.lng),
+                destination: new google.maps.LatLng(destinoFinal.lat, destinoFinal.lng),
+                waypoints: waypoints,
+                travelMode: google.maps.TravelMode.DRIVING,
+                optimizeWaypoints: false,
+            }, (result, status) => {
+                if (status === google.maps.DirectionsStatus.OK) {
+                    directionsRenderer.setDirections(result);
+                } else {
+                    console.warn('No se pudo trazar la ruta:', status);
+                }
+            });
+        }
+    }
+
+    // Inicializar cuando el DOM esté listo (el mapa ya está visible)
+    document.addEventListener('DOMContentLoaded', function() {
+        initMapaRuta();
     });
 </script>
-
-@endsection
+@endpush
