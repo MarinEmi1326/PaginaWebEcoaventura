@@ -186,10 +186,55 @@ class ApiAuthController extends Controller
     public function eliminarCuenta(Request $request)
     {
         $user = $request->user();
+        $persona = $user->persona;
 
-        $user->tokens()->delete();
-        $user->delete(); // cascade elimina persona
+        try {
+            // Verificar si tiene destinos creados (para admin_destinos)
+            $tieneDestinos = DB::table('destino')->where('creado_por', $persona->id_persona)->exists();
 
-        return response()->json(['success' => true]);
+            if ($tieneDestinos) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No puedes eliminar tu cuenta porque tienes destinos creados. Elimina o transfiere tus destinos primero.'
+                ], 400);
+            }
+
+            // Verificar si tiene comentarios (para turistas)
+            $tieneComentarios = DB::table('comentario')->where('id_persona', $persona->id_persona)->exists();
+
+            if ($tieneComentarios) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No puedes eliminar tu cuenta porque tienes comentarios publicados. Elimina tus comentarios primero.'
+                ], 400);
+            }
+
+            // Verificar si tiene pagos (para turistas)
+            $tienePagos = DB::table('pago')->where('id_persona', $persona->id_persona)->exists();
+
+            if ($tienePagos) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No puedes eliminar tu cuenta porque tienes pagos registrados. Contacta con soporte.'
+                ], 400);
+            }
+
+            // Verificar si tiene favoritos (opcional, estos sí se pueden eliminar automáticamente)
+            DB::table('favorito')->where('id_persona', $persona->id_persona)->delete();
+
+            // Eliminar cuenta
+            $user->tokens()->delete();
+            $user->delete(); // cascade elimina persona
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cuenta eliminada correctamente.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se pudo eliminar la cuenta. Tienes información asociada que debe eliminarse primero.'
+            ], 400);
+        }
     }
 }
