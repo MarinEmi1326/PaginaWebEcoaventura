@@ -28,149 +28,82 @@
 
         {{-- BLOQUE 1: Información general --}}
         <div class="ea-card p-0 overflow-hidden mb-4">
-            <div class="p-4 border-bottom"
-                style="border-color: var(--ea-line) !important; background: rgba(255,255,255,.25);">
-                <div class="fw-semibold" style="color: var(--ea-text);">
-                    <i class="bi bi-signpost-2 me-2"></i>Información General
-                </div>
+            <div class="p-4 border-bottom" style="background: rgba(255,255,255,.25);">
+                <div class="fw-semibold"><i class="bi bi-signpost-2 me-2"></i>Información General</div>
             </div>
             <div class="p-4">
                 <div class="row g-3">
-
                     <div class="col-12">
                         <label class="form-label fw-bold">Nombre de la ruta <span class="text-danger">*</span></label>
-                        <input type="text" name="nombre" value="{{ old('nombre') }}" class="form-control rounded-3 py-2"
-                            placeholder="Ej. Ruta de los Altos de Chiapas" required maxlength="120">
-                        @error('nombre')
-                            <div class="small text-danger mt-1">{{ $message }}</div>
-                        @enderror
+                        <input type="text" name="nombre" value="{{ old('nombre') }}" class="form-control rounded-3 py-2" required maxlength="120">
                     </div>
-
                     <div class="col-12">
                         <label class="form-label fw-bold">Descripción <span class="text-danger">*</span></label>
-                        <textarea name="descripcion" rows="4" class="form-control rounded-3 py-2"
-                            placeholder="Describe el recorrido, paisajes, experiencia general..." required>{{ old('descripcion') }}</textarea>
-                        @error('descripcion')
-                            <div class="small text-danger mt-1">{{ $message }}</div>
-                        @enderror
+                        <textarea name="descripcion" rows="4" class="form-control rounded-3 py-2" required>{{ old('descripcion') }}</textarea>
                     </div>
-
-                    <div class="col-12 col-md-4">
+                    <div class="col-md-4">
                         <label class="form-label fw-bold">Dificultad <span class="text-danger">*</span></label>
-                        <select name="dificultad" class="form-select rounded-3 py-2" required>
+                        <select name="dificultad" class="form-select" required>
                             <option value="baja" {{ old('dificultad') == 'baja' ? 'selected' : '' }}>Baja</option>
                             <option value="media" {{ old('dificultad') == 'media' ? 'selected' : '' }}>Media</option>
                             <option value="alta" {{ old('dificultad') == 'alta' ? 'selected' : '' }}>Alta</option>
                         </select>
                     </div>
-
-                    {{-- BLOQUE: Recomendaciones del catálogo --}}
-                    <div class="ea-card p-0 overflow-hidden mb-4">
-                        <div class="p-4 border-bottom"
-                            style="border-color: var(--ea-line) !important; background: rgba(255,255,255,.25);">
-                            <div class="fw-semibold" style="color: var(--ea-text);">
-                                <i class="bi bi-lightbulb me-2"></i>Recomendaciones
-                            </div>
-                        </div>
-                        <div class="p-4">
-                            @if ($recomendaciones->count() > 0)
-                                <p class="text-muted small mb-3">
-                                    Selecciona las recomendaciones que aplican para esta ruta.
-                                </p>
-                                <div class="row g-2">
-                                    @foreach ($recomendaciones as $rec)
-                                        <div class="col-12 col-md-4">
-                                            <label class="d-flex align-items-center gap-2 p-3 rounded-3 border"
-                                                style="cursor:pointer; background:#f7f9f7;">
-                                                <input type="checkbox" name="recomendaciones[]"
-                                                    value="{{ $rec->id_recomendacion }}"
-                                                    class="form-check-input flex-shrink-0"
-                                                    {{ in_array($rec->id_recomendacion, old('recomendaciones', [])) ? 'checked' : '' }}>
-                                                <div>
-                                                    <span class="fw-semibold small">{{ $rec->descripcion }}</span>
-                                                    <div>
-                                                        <span class="badge bg-light text-dark border"
-                                                            style="font-size:.7rem;">
-                                                            {{ ucfirst($rec->tipo) }}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </label>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            @else
-                                <div class="text-muted small text-center py-3">
-                                    Aún no hay recomendaciones registradas. El administrador general debe crearlas primero.
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
-        {{-- BLOQUE 2: Resumen --}}
-        <div class="ea-card p-0 overflow-hidden mb-4">
-            <div class="p-4 border-bottom"
-                style="border-color: var(--ea-line) !important; background: rgba(255,255,255,.25);">
-                <div class="fw-semibold" style="color: var(--ea-text);">
-                    <i class="bi bi-calendar3 me-2"></i>Resumen de la Ruta
-                </div>
-            </div>
-            <div class="p-4">
-                <div class="row g-3">
-
-                    <div class="col-12 col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label fw-bold">Duración estimada</label>
-                        <input type="text" name="duracion_estimada" value="{{ old('duracion_estimada') }}"
-                            class="form-control rounded-3 py-2" placeholder="Ej. 1 día, 6 horas" maxlength="50">
+                        <input type="text" name="duracion_estimada" value="{{ old('duracion_estimada') }}" class="form-control rounded-3 py-2" placeholder="Ej. 1 día, 6 horas">
                     </div>
-
-                    <div class="col-12 col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label fw-bold">Distancia (km)</label>
-                        <input type="number" name="distancia_km" value="{{ old('distancia_km') }}"
-                            class="form-control rounded-3 py-2 font-monospace" step="0.01" min="0"
-                            placeholder="Ej. 45.5">
+                        <input type="number" step="0.01" name="distancia_km" value="{{ old('distancia_km') }}" class="form-control rounded-3 py-2" placeholder="Ej. 45.5">
                     </div>
-
-                    <div class="col-12 col-md-6">
-                        <label class="form-label fw-bold">
-                            Fecha de inicio de operación
-                            <span class="text-muted small fw-normal">(opcional)</span>
-                        </label>
-                        <input type="date" name="fecha_inicio_operacion" value="{{ old('fecha_inicio_operacion') }}"
-                            class="form-control rounded-3 py-2">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Fecha inicio operación</label>
+                        <input type="date" name="fecha_inicio_operacion" value="{{ old('fecha_inicio_operacion') }}" class="form-control rounded-3 py-2">
                     </div>
-
-                    <div class="col-12 col-md-6">
-                        <label class="form-label fw-bold">
-                            Fecha de fin de operación
-                            <span class="text-muted small fw-normal">(opcional)</span>
-                        </label>
-                        <input type="date" name="fecha_fin_operacion" value="{{ old('fecha_fin_operacion') }}"
-                            class="form-control rounded-3 py-2">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Fecha fin operación</label>
+                        <input type="date" name="fecha_fin_operacion" value="{{ old('fecha_fin_operacion') }}" class="form-control rounded-3 py-2">
                     </div>
-
                 </div>
             </div>
         </div>
 
-        {{-- BLOQUE 3: Destinos --}}
+        {{-- BLOQUE 2: Recomendaciones (catálogo) --}}
         <div class="ea-card p-0 overflow-hidden mb-4">
-            <div class="p-4 border-bottom"
-                style="border-color: var(--ea-line) !important; background: rgba(255,255,255,.25);">
-                <div class="fw-semibold" style="color: var(--ea-text);">
-                    <i class="bi bi-geo-alt me-2"></i>Destinos de la Ruta
-                </div>
+            <div class="p-4 border-bottom">
+                <div class="fw-semibold"><i class="bi bi-lightbulb me-2"></i>Recomendaciones</div>
             </div>
             <div class="p-4">
+                @if ($recomendacionesDisponibles->count() > 0)
+                    <div class="row g-2">
+                        @foreach ($recomendacionesDisponibles as $rec)
+                            <div class="col-12 col-md-4">
+                                <label class="d-flex align-items-center gap-2 p-3 rounded-3 border" style="cursor:pointer; background:#f7f9f7;">
+                                    <input type="checkbox" name="recomendaciones[]" value="{{ $rec->id_recomendacion }}"
+                                        class="form-check-input flex-shrink-0">
+                                    <div>
+                                        <span class="fw-semibold small">{{ $rec->descripcion }}</span>
+                                        <div><span class="badge bg-light text-dark border" style="font-size:.7rem;">{{ ucfirst($rec->tipo) }}</span></div>
+                                    </div>
+                                </label>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="text-muted small text-center py-3">Aún no hay recomendaciones registradas.</div>
+                @endif
+            </div>
+        </div>
 
-                <label class="form-label fw-bold">Destinos de la ruta <span class="text-danger">*</span></label>
+        {{-- BLOQUE 3: Destinos de la ruta (dinámico) --}}
+        <div class="ea-card p-0 overflow-hidden mb-4">
+            <div class="p-4 border-bottom">
+                <div class="fw-semibold"><i class="bi bi-geo-alt me-2"></i>Destinos de la ruta</div>
+            </div>
+            <div class="p-4">
                 <div class="d-flex align-items-center gap-3 mb-4">
-                    <div class="p-2 px-3 rounded-3 fw-semibold small"
-                        style="background:#f0f7f4; border: 1px solid var(--ea-green); color: var(--ea-green); min-width: 120px;">
+                    <div class="p-2 px-3 rounded-3 fw-semibold small" style="background:#f0f7f4; border:1px solid var(--ea-green);">
                         <i class="bi bi-geo-alt me-1"></i>
                         <span id="contador-paradas">0</span> Destino(s)
                     </div>
@@ -178,50 +111,36 @@
                         <i class="bi bi-plus-lg me-1"></i> Agregar Destino
                     </button>
                 </div>
-
                 <div id="contenedor-paradas"></div>
-
-                @error('destinos')
-                    <div class="small text-danger mt-2">{{ $message }}</div>
-                @enderror
-
+                <div id="sin-paradas" class="text-muted small text-center py-2">
+                    <i class="bi bi-info-circle me-1"></i> Haz clic en "Agregar Destino" para comenzar.
+                </div>
             </div>
         </div>
 
-        {{-- BLOQUE 4: Mapa --}}
+        {{-- BLOQUE 4: Mapa de la ruta --}}
         <div class="ea-card p-0 overflow-hidden mb-4">
-            <div class="p-4 border-bottom"
-                style="border-color: var(--ea-line) !important; background: rgba(255,255,255,.25);">
-                <div class="fw-semibold" style="color: var(--ea-text);">
-                    <i class="bi bi-map me-2"></i>Mapa de la Ruta
-                </div>
+            <div class="p-4 border-bottom">
+                <div class="fw-semibold"><i class="bi bi-map me-2"></i>Mapa de la ruta</div>
             </div>
             <div class="p-4">
-                <p class="text-muted small mb-3">
+                <div id="mapa-creacion" class="rounded-3" style="height: 400px; width: 100%; background: #f0f0f0;"></div>
+                <p class="text-muted small mt-2">
                     <i class="bi bi-info-circle me-1"></i>
-                    Los destinos aparecerán en el mapa conforme los vayas seleccionando.
+                    Los marcadores muestran el orden de las paradas. La ruta se traza automáticamente.
                 </p>
-                <div id="mapa-ruta" class="rounded-3" style="height: 400px; width: 100%;"></div>
             </div>
         </div>
 
         {{-- BLOQUE 5: Imágenes --}}
         <div class="ea-card p-0 overflow-hidden mb-4">
-            <div class="p-4 border-bottom"
-                style="border-color: var(--ea-line) !important; background: rgba(255,255,255,.25);">
-                <div class="fw-semibold" style="color: var(--ea-text);">
-                    <i class="bi bi-images me-2"></i>Imágenes de la Ruta
-                </div>
+            <div class="p-4 border-bottom">
+                <div class="fw-semibold"><i class="bi bi-images me-2"></i>Imágenes de la Ruta</div>
             </div>
             <div class="p-4">
-                <p class="text-muted small mb-3">Puedes subir varias imágenes (JPG/PNG, máx. 5MB c/u).</p>
-                <input type="file" id="fotosInput" name="fotos[]" accept="image/png,image/jpeg" class="d-none"
-                    multiple>
-                <div id="dropzone" class="rounded-3 border border-2 border-dashed p-5 text-center"
-                    style="border-color: #cdd8cd !important; background: #f7f9f7; cursor:pointer;"
-                    onclick="document.getElementById('fotosInput').click()">
-                    <div class="mx-auto mb-3 rounded-3 d-inline-flex align-items-center justify-content-center"
-                        style="width:48px;height:48px;background:#e2ece9;">
+                <input type="file" id="fotosInput" name="fotos[]" accept="image/png,image/jpeg" class="d-none" multiple>
+                <div id="dropzone" class="rounded-3 border border-2 border-dashed p-5 text-center" style="border-color: #cdd8cd !important; background: #f7f9f7; cursor:pointer;" onclick="document.getElementById('fotosInput').click()">
+                    <div class="mx-auto mb-3 rounded-3 d-inline-flex align-items-center justify-content-center" style="width:48px;height:48px;background:#e2ece9;">
                         <i class="bi bi-cloud-arrow-up text-success fs-4"></i>
                     </div>
                     <div class="fw-semibold text-dark">Haz clic para subir o arrastra imágenes</div>
@@ -231,370 +150,272 @@
             </div>
         </div>
 
-        <div class="d-flex flex-column flex-md-row justify-content-end gap-2 mt-2 pt-4 border-top"
-            style="border-color: rgba(15,42,36,.10) !important;">
-            <a href="{{ route('rutas.index') }}"
-                class="btn btn-light border rounded-3 px-4 py-2 fw-semibold">Cancelar</a>
+        <div class="d-flex justify-content-end gap-2 mt-4 pt-4 border-top">
+            <a href="{{ route('rutas.index') }}" class="btn btn-light border rounded-3 px-4 py-2 fw-semibold">Cancelar</a>
             <button type="submit" class="btn ea-btn-green rounded-3 px-4 py-2 fw-semibold">
                 <i class="bi bi-send me-1"></i> Guardar Ruta
             </button>
         </div>
-
     </form>
 
+    @push('scripts')
     <script>
-        (g => {
-            var h, a, k, p = "The Google Maps JavaScript API",
-                c = "google",
-                l = "importLibrary",
-                q = "__ib__",
-                m = document,
-                b = window;
-            b = b[c] || (b[c] = {});
-            var d = b.maps || (b.maps = {}),
-                r = new Set,
-                e = new URLSearchParams,
-                u = () => h || (h = new Promise(async (f, n) => {
-                    await (a = m.createElement("script"));
-                    e.set("libraries", [...r] + "");
-                    for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
-                    e.set("callback", c + ".maps." + q);
-                    a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
-                    d[q] = f;
-                    a.onerror = () => h = n(Error(p + " could not load."));
-                    a.nonce = m.querySelector("script[nonce]")?.nonce || "";
-                    m.head.append(a)
-                }));
-            d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() =>
-                d[l](f, ...n))
-        })({
-            key: "{{ config('services.google_maps.key') }}",
-            v: "weekly",
-        });
-
-        let mapaRuta;
-        let marcadores = [];
-        let lineaRuta = null;
-        let puntosRuta = {};
-        let directionsService = null;
-        let directionsRenderer = null;
+        // ==================================================
+        // VARIABLES GLOBALES
+        // ==================================================
         let contadorParadas = 0;
+        let opcionesDestinos = @json($destinos->map(fn($d) => ['id' => $d->id_destino, 'nombre' => $d->nombre]));
+        let mapaRuta, directionsService, directionsRenderer, marcadores = [], infoWindow;
 
-        const opcionesDestinos = @json($destinos->map(fn($d) => ['id' => $d->id_destino, 'nombre' => $d->nombre]));
-
+        // ==================================================
+        // FUNCIONES PARA DESTINOS
+        // ==================================================
         function agregarParada() {
             contadorParadas++;
             const id = contadorParadas;
-
             let options = '<option value="">-- Selecciona un destino --</option>';
             opcionesDestinos.forEach(d => {
                 options += `<option value="${d.id}">${d.nombre}</option>`;
             });
-
-            document.getElementById('contenedor-paradas').insertAdjacentHTML('beforeend', `
-        <div class="ea-card p-0 overflow-hidden mb-3 border" id="bloque-${id}">
-            <div class="p-3 border-bottom d-flex align-items-center justify-content-between"
-                 style="border-color: var(--ea-line) !important; background: rgba(255,255,255,.15);">
-                <div class="d-flex align-items-center gap-2">
-                    <span class="badge rounded-pill text-white fw-semibold num-parada"
-                          style="background: var(--ea-green); min-width: 28px;">?</span>
-                    <span class="fw-semibold small etiqueta-parada" style="color: var(--ea-text);">Parada</span>
-                </div>
-                <button type="button"
-                        class="btn btn-sm btn-outline-danger rounded-3"
-                        onclick="eliminarParada(${id})"
-                        title="Eliminar esta parada">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </div>
-            <div class="p-3">
-                <label class="form-label fw-bold small">Destino <span class="text-danger">*</span></label>
-                <select name="destinos[]"
-                        data-bloque="${id}"
-                        class="form-select rounded-3 py-2 mb-2"
-                        onchange="cargarInfoDestino(this)">
-                    ${options}
-                </select>
-                <div id="info-parada-${id}" style="display:none;">
-                    <div id="desc-parada-${id}"
-                         class="p-3 rounded-3 small mb-3"
-                         style="background:#f0f7f4; border-left: 3px solid var(--ea-green); color: #333;">
+            const html = `
+            <div class="ea-card p-0 overflow-hidden mb-3 border" id="bloque-${id}">
+                <div class="p-3 border-bottom d-flex align-items-center justify-content-between" style="background: rgba(255,255,255,.15);">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge rounded-pill text-white fw-semibold num-parada" style="background: var(--ea-green); min-width: 28px;">${id}</span>
+                        <span class="fw-semibold small">Parada ${id}</span>
                     </div>
-                    <label class="form-label fw-bold small mb-2">
-                        Actividades disponibles
-                        <span class="text-muted fw-normal">(selecciona las que se realizarán en esta parada)</span>
-                    </label>
-                    <div id="actividades-parada-${id}" class="row g-2"></div>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-3 me-2" onclick="moverArriba(${id})"><i class="bi bi-arrow-up-short"></i></button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-3 me-2" onclick="moverAbajo(${id})"><i class="bi bi-arrow-down-short"></i></button>
+                        <button type="button" class="btn btn-sm btn-outline-danger rounded-3" onclick="eliminarParada(${id})"><i class="bi bi-trash"></i></button>
+                    </div>
                 </div>
-            </div>
-        </div>
-    `);
-
-            recalcularNumeros();
+                <div class="p-3">
+                    <label class="form-label fw-bold small">Destino <span class="text-danger">*</span></label>
+                    <select name="destinos[]" data-bloque="${id}" class="form-select rounded-3 py-2 mb-2" onchange="cargarInfoDestino(this)">
+                        ${options}
+                    </select>
+                    <div id="info-parada-${id}" style="display:none;">
+                        <div id="desc-parada-${id}" class="p-3 rounded-3 small mb-3" style="background:#f0f7f4; border-left:3px solid var(--ea-green);"></div>
+                        <label class="form-label fw-bold small mb-2">Actividades disponibles</label>
+                        <div id="actividades-parada-${id}" class="row g-2"></div>
+                    </div>
+                </div>
+            </div>`;
+            document.getElementById('contenedor-paradas').insertAdjacentHTML('beforeend', html);
+            document.getElementById('sin-paradas').style.display = 'none';
+            actualizarNumeros();
         }
 
         function eliminarParada(id) {
-            const bloque = document.getElementById(`bloque-${id}`);
-            if (!bloque) return;
-            const ordenActual = obtenerOrdenDeBloque(id);
-            if (ordenActual !== null) delete puntosRuta[ordenActual];
-            bloque.remove();
-            recalcularNumeros();
-            recalcularPuntosRuta();
+            document.getElementById(`bloque-${id}`).remove();
+            actualizarNumeros();
             actualizarMapa();
+            if (document.querySelectorAll('#contenedor-paradas > div').length === 0) {
+                document.getElementById('sin-paradas').style.display = 'block';
+            }
         }
 
-        function recalcularNumeros() {
+        function moverArriba(id) {
+            const bloque = document.getElementById(`bloque-${id}`);
+            const anterior = bloque.previousElementSibling;
+            if (anterior) {
+                bloque.parentNode.insertBefore(bloque, anterior);
+                actualizarNumeros();
+                actualizarMapa();
+            }
+        }
+
+        function moverAbajo(id) {
+            const bloque = document.getElementById(`bloque-${id}`);
+            const siguiente = bloque.nextElementSibling;
+            if (siguiente) {
+                bloque.parentNode.insertBefore(siguiente, bloque);
+                actualizarNumeros();
+                actualizarMapa();
+            }
+        }
+
+        function actualizarNumeros() {
             const bloques = document.querySelectorAll('#contenedor-paradas > div[id^="bloque-"]');
-            bloques.forEach((bloque, index) => {
-                const numero = index + 1;
-                const badge = bloque.querySelector('.num-parada');
-                const etiqueta = bloque.querySelector('.etiqueta-parada');
-                if (badge) badge.textContent = numero;
-                if (etiqueta) etiqueta.textContent = numero === 1 ? 'Parada 1 — Lugar de encuentro' :
-                    `Parada ${numero}`;
+            bloques.forEach((bloque, idx) => {
+                const numero = idx + 1;
+                bloque.querySelector('.num-parada').textContent = numero;
+                const select = bloque.querySelector('select');
+                if (select) select.dataset.bloque = numero;
             });
             document.getElementById('contador-paradas').textContent = bloques.length;
         }
 
-        function obtenerOrdenDeBloque(id) {
-            const bloques = document.querySelectorAll('#contenedor-paradas > div[id^="bloque-"]');
-            let orden = null;
-            bloques.forEach((bloque, index) => {
-                if (bloque.id === `bloque-${id}`) orden = index + 1;
-            });
-            return orden;
-        }
-
-        function recalcularPuntosRuta() {
-            const nuevosPuntos = {};
-            const bloques = document.querySelectorAll('#contenedor-paradas > div[id^="bloque-"]');
-            bloques.forEach((bloque, index) => {
-                const orden = index + 1;
-                const select = bloque.querySelector('select[data-bloque]');
-                const idDestino = select ? select.value : null;
-                if (idDestino) {
-                    for (const punto of Object.values(puntosRuta)) {
-                        if (punto.idDestino == idDestino) {
-                            nuevosPuntos[orden] = punto;
-                            break;
-                        }
-                    }
-                }
-            });
-            puntosRuta = nuevosPuntos;
-        }
-
-        function cargarInfoDestino(selectElement) {
+        // ==================================================
+        // CARGAR INFO DESTINO
+        // ==================================================
+        async function cargarInfoDestino(selectElement) {
             const idDestino = selectElement.value;
             const idBloque = selectElement.dataset.bloque;
-
             const infoDiv = document.getElementById(`info-parada-${idBloque}`);
             const descDiv = document.getElementById(`desc-parada-${idBloque}`);
             const actividadesDiv = document.getElementById(`actividades-parada-${idBloque}`);
 
             if (!idDestino) {
-                infoDiv.style.display = 'none';
-                recalcularPuntosRuta();
-                actualizarMapa();
+                if (infoDiv) infoDiv.style.display = 'none';
                 return;
             }
 
-            fetch(`/api/destino-info/${idDestino}`)
-                .then(res => res.json())
-                .then(data => {
+            infoDiv.style.display = 'block';
+            const response = await fetch(`/api/destino-info/${idDestino}`);
+            const data = await response.json();
+            descDiv.innerHTML = data.descripcion;
 
-                    descDiv.textContent = data.descripcion;
+            if (data.actividades && data.actividades.length) {
+                actividadesDiv.innerHTML = '';
+                data.actividades.forEach(act => {
+                    const label = document.createElement('label');
+                    label.className = 'col-12 col-md-4 d-flex align-items-center gap-2 p-3 rounded-3 border';
+                    label.style.cssText = 'cursor:pointer; background:#f7f9f7;';
+                    label.innerHTML = `
+                        <input type="checkbox" name="actividades_${idDestino}[]" value="${act.id_actividad}" class="form-check-input flex-shrink-0">
+                        <span class="fw-semibold small">${act.nombre}</span>
+                    `;
+                    actividadesDiv.appendChild(label);
+                });
+            } else {
+                actividadesDiv.innerHTML = '<div class="col-12 text-muted small">Este destino no tiene actividades registradas.</div>';
+            }
+            actualizarMapa();
+        }
 
-                    if (data.actividades.length === 0) {
-                        actividadesDiv.innerHTML = `
-                    <div class="col-12">
-                        <p class="text-muted small mb-0">
-                            <i class="bi bi-info-circle me-1"></i>
-                            Este destino no tiene actividades registradas.
-                        </p>
-                    </div>`;
-                    } else {
-                        actividadesDiv.innerHTML = data.actividades.map(a => `
-                    <div class="col-12 col-md-4">
-                        <label class="d-flex align-items-center gap-2 p-3 rounded-3 border"
-                               style="cursor:pointer; background:#f7f9f7;"
-                               onmouseover="this.style.borderColor='var(--ea-green)'"
-                               onmouseout="this.style.borderColor=''">
-                            <input type="checkbox"
-                                   name="actividades_${idDestino}[]"
-                                   value="${a.id_actividad}"
-                                   class="form-check-input flex-shrink-0">
-                            <span class="fw-semibold small">${a.nombre}</span>
-                        </label>
-                    </div>
-                `).join('');
-                    }
+        // ==================================================
+        // MAPA (Directions API + marcadores numerados)
+        // ==================================================
+        async function actualizarMapa() {
+            if (!mapaRuta) return;
 
-                    infoDiv.style.display = 'block';
-
-                    const bloques = document.querySelectorAll('#contenedor-paradas > div[id^="bloque-"]');
-                    let ordenReal = 1;
-                    bloques.forEach((bloque, index) => {
-                        if (bloque.id === `bloque-${idBloque}`) ordenReal = index + 1;
-                    });
-
+            const bloques = document.querySelectorAll('#contenedor-paradas > div[id^="bloque-"]');
+            const destinosMapa = [];
+            for (let bloque of bloques) {
+                const select = bloque.querySelector('select');
+                const idDestino = select ? select.value : null;
+                if (!idDestino) continue;
+                const nombre = select.options[select.selectedIndex].text;
+                try {
+                    const res = await fetch(`/api/destino-info/${idDestino}`);
+                    const data = await res.json();
                     if (data.lat && data.lng) {
-                        puntosRuta[ordenReal] = {
+                        destinosMapa.push({
+                            id: idDestino,
+                            nombre: nombre,
                             lat: parseFloat(data.lat),
                             lng: parseFloat(data.lng),
-                            nombre: selectElement.options[selectElement.selectedIndex].text,
-                            idDestino: idDestino,
-                        };
-                    } else {
-                        delete puntosRuta[ordenReal];
+                            orden: destinosMapa.length + 1
+                        });
                     }
+                } catch (err) { console.error(err); }
+            }
 
-                    actualizarMapa();
-                });
-        }
+            if (directionsRenderer) directionsRenderer.setMap(null);
+            marcadores.forEach(m => m.map = null);
+            marcadores = [];
 
-        async function actualizarMapa() {
-            const {
-                AdvancedMarkerElement
-            } = await google.maps.importLibrary("marker");
+            if (destinosMapa.length === 0) return;
 
-            if (!directionsService) directionsService = new google.maps.DirectionsService();
-            if (!directionsRenderer) {
+            const bounds = new google.maps.LatLngBounds();
+            destinosMapa.forEach(d => {
+                const pos = { lat: d.lat, lng: d.lng };
+                bounds.extend(pos);
+                const marker = crearMarcadorNumerado(d.orden, pos, d.nombre);
+                marcadores.push(marker);
+            });
+            mapaRuta.fitBounds(bounds);
+            if (destinosMapa.length === 1) mapaRuta.setZoom(13);
+
+            if (destinosMapa.length > 1) {
+                directionsService = new google.maps.DirectionsService();
                 directionsRenderer = new google.maps.DirectionsRenderer({
                     suppressMarkers: true,
-                    polylineOptions: {
-                        strokeColor: '#4285F4',
-                        strokeOpacity: 1,
-                        strokeWeight: 6
-                    }
+                    polylineOptions: { strokeColor: '#4285F4', strokeOpacity: 1, strokeWeight: 6 }
                 });
                 directionsRenderer.setMap(mapaRuta);
-            }
-
-            limpiarMarcadores();
-
-            const ordenes = Object.keys(puntosRuta).map(Number).sort((a, b) => a - b);
-
-            if (ordenes.length === 0) {
-                directionsRenderer.set('directions', null);
-                return;
-            }
-
-            if (ordenes.length === 1) {
-                directionsRenderer.set('directions', null);
-                const punto = puntosRuta[ordenes[0]];
-                agregarMarcador(ordenes[0], punto, AdvancedMarkerElement);
-                mapaRuta.setCenter({
-                    lat: punto.lat,
-                    lng: punto.lng
+                const origen = destinosMapa[0];
+                const destino = destinosMapa[destinosMapa.length - 1];
+                const waypoints = destinosMapa.slice(1, -1).map(p => ({
+                    location: new google.maps.LatLng(p.lat, p.lng),
+                    stopover: true,
+                }));
+                directionsService.route({
+                    origin: new google.maps.LatLng(origen.lat, origen.lng),
+                    destination: new google.maps.LatLng(destino.lat, destino.lng),
+                    waypoints: waypoints,
+                    travelMode: google.maps.TravelMode.DRIVING,
+                    optimizeWaypoints: false,
+                }, (result, status) => {
+                    if (status === google.maps.DirectionsStatus.OK) {
+                        directionsRenderer.setDirections(result);
+                    } else {
+                        console.warn('No se pudo trazar la ruta:', status);
+                    }
                 });
-                mapaRuta.setZoom(13);
-                return;
             }
-
-            const origen = puntosRuta[ordenes[0]];
-            const destino = puntosRuta[ordenes[ordenes.length - 1]];
-            const waypoints = ordenes.slice(1, -1).map(orden => ({
-                location: new google.maps.LatLng(puntosRuta[orden].lat, puntosRuta[orden].lng),
-                stopover: true,
-            }));
-
-            directionsService.route({
-                origin: new google.maps.LatLng(origen.lat, origen.lng),
-                destination: new google.maps.LatLng(destino.lat, destino.lng),
-                waypoints: waypoints,
-                travelMode: google.maps.TravelMode.DRIVING,
-                optimizeWaypoints: false,
-            }, (resultado, estado) => {
-                if (estado === google.maps.DirectionsStatus.OK) {
-                    directionsRenderer.setDirections(resultado);
-                    ordenes.forEach(orden => agregarMarcador(orden, puntosRuta[orden], AdvancedMarkerElement));
-                } else {
-                    dibujarLineaRecta(ordenes);
-                }
-            });
         }
 
-        function agregarMarcador(orden, punto, AdvancedMarkerElement) {
+        function crearMarcadorNumerado(orden, posicion, titulo) {
             const pin = document.createElement('div');
             pin.style.cssText = 'position:relative; display:flex; flex-direction:column; align-items:center;';
             const circulo = document.createElement('div');
             circulo.style.cssText = `
-        background:#1F6B4B; color:white; border-radius:50%;
-        width:34px; height:34px; display:flex; align-items:center;
-        justify-content:center; font-weight:bold; font-size:13px;
-        border:2px solid white; box-shadow:0 2px 6px rgba(0,0,0,.4);`;
-            circulo.textContent = String(orden);
+                background:#1F6B4B; color:white; border-radius:50%;
+                width:34px; height:34px; display:flex; align-items:center;
+                justify-content:center; font-weight:bold; font-size:13px;
+                border:2px solid white; box-shadow:0 2px 6px rgba(0,0,0,.4);
+            `;
+            circulo.textContent = orden.toString();
             const flecha = document.createElement('div');
             flecha.style.cssText = `
-        width:0; height:0;
-        border-left:7px solid transparent; border-right:7px solid transparent;
-        border-top:10px solid #1F6B4B; margin-top:-2px;`;
+                width:0; height:0;
+                border-left:7px solid transparent; border-right:7px solid transparent;
+                border-top:10px solid #1F6B4B; margin-top:-2px;
+            `;
             pin.appendChild(circulo);
             pin.appendChild(flecha);
-            const marcador = new AdvancedMarkerElement({
-                position: {
-                    lat: punto.lat,
-                    lng: punto.lng
-                },
+            const marker = new google.maps.marker.AdvancedMarkerElement({
+                position: posicion,
                 map: mapaRuta,
-                title: punto.nombre,
+                title: titulo,
                 content: pin,
             });
-            marcadores.push(marcador);
-        }
-
-        async function dibujarLineaRecta(ordenes) {
-            const {
-                AdvancedMarkerElement
-            } = await google.maps.importLibrary("marker");
-            const coords = [];
-            ordenes.forEach(orden => {
-                const punto = puntosRuta[orden];
-                coords.push({
-                    lat: punto.lat,
-                    lng: punto.lng
-                });
-                agregarMarcador(orden, punto, AdvancedMarkerElement);
+            marker.addListener('click', () => {
+                infoWindow.setContent(`
+                    <div style="padding:6px;">
+                        <strong style="color:#1F6B4B;">${titulo}</strong><br>
+                        <span style="font-size:11px;">Parada ${orden}</span><br>
+                        <a href="https://www.google.com/maps/search/?api=1&query=${posicion.lat},${posicion.lng}" target="_blank">Ver en Google Maps →</a>
+                    </div>
+                `);
+                infoWindow.open({ anchor: marker, map: mapaRuta });
             });
-            lineaRuta = new google.maps.Polyline({
-                path: coords,
-                strokeColor: '#1F6B4B',
-                strokeOpacity: 0.85,
-                strokeWeight: 4,
-                map: mapaRuta,
-            });
-            const bounds = new google.maps.LatLngBounds();
-            coords.forEach(c => bounds.extend(c));
-            mapaRuta.fitBounds(bounds);
+            return marker;
         }
 
-        function limpiarMarcadores() {
-            marcadores.forEach(m => m.map = null);
-            marcadores = [];
-        }
-
-        async function initMapa() {
-            const {
-                Map
-            } = await google.maps.importLibrary("maps");
-            mapaRuta = new Map(document.getElementById('mapa-ruta'), {
-                center: {
-                    lat: 16.75,
-                    lng: -92.64
-                },
+        async function initMapaCreacion() {
+            const contenedor = document.getElementById('mapa-creacion');
+            if (!contenedor) return;
+            const { Map } = await google.maps.importLibrary("maps");
+            const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+            mapaRuta = new Map(contenedor, {
+                center: { lat: 16.75, lng: -92.64 },
                 zoom: 8,
                 mapId: "DEMO_MAP_ID",
             });
+            infoWindow = new google.maps.InfoWindow();
+            actualizarMapa();
         }
-        initMapa();
 
-        // Imágenes
+        // ==================================================
+        // IMÁGENES
+        // ==================================================
         const fotosInput = document.getElementById('fotosInput');
         const dropzone = document.getElementById('dropzone');
         const previews = document.getElementById('previews');
-
         function mostrarPreviews(files) {
             previews.innerHTML = '';
             Array.from(files).forEach(file => {
@@ -606,19 +427,34 @@
             });
         }
         fotosInput.addEventListener('change', e => mostrarPreviews(e.target.files));
-        dropzone.addEventListener('dragover', e => {
-            e.preventDefault();
-            dropzone.style.borderColor = '#1F6B4B';
-        });
-        dropzone.addEventListener('dragleave', () => {
-            dropzone.style.borderColor = '#cdd8cd';
-        });
+        dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.style.borderColor = '#1F6B4B'; });
+        dropzone.addEventListener('dragleave', () => dropzone.style.borderColor = '#cdd8cd');
         dropzone.addEventListener('drop', e => {
             e.preventDefault();
             dropzone.style.borderColor = '#cdd8cd';
             fotosInput.files = e.dataTransfer.files;
             mostrarPreviews(e.dataTransfer.files);
         });
-    </script>
 
+        // ==================================================
+        // INICIALIZACIÓN
+        // ==================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof google !== 'undefined' && google.maps) {
+                initMapaCreacion();
+            } else {
+                window.initMapaCreacion = initMapaCreacion;
+                const script = document.createElement('script');
+                script.src = `https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.key') }}&callback=initMapaCreacion`;
+                script.async = true;
+                script.defer = true;
+                document.head.appendChild(script);
+            }
+            // Observar cambios en selects para actualizar el mapa
+            document.getElementById('contenedor-paradas').addEventListener('change', (e) => {
+                if (e.target && e.target.tagName === 'SELECT') actualizarMapa();
+            });
+        });
+    </script>
+    @endpush
 @endsection

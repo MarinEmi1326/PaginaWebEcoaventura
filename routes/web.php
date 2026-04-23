@@ -191,6 +191,7 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/destino', [AdminCentroController::class, 'index'])->name('destino');
         Route::post('/destino/{id}/toggle', [AdminCentroController::class, 'toggleActivo'])->name('destino.toggle');
+        Route::get('/destino/{id}', [AdminCentroController::class, 'showDestino'])->name('destino.show');
 
         Route::get('/reportes-rutas', [AdminRutaReporteController::class, 'index'])->name('reportes.rutas.index');
         Route::post('/reportes-rutas/data', [AdminRutaReporteController::class, 'data'])->name('reportes.rutas.data');

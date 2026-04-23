@@ -37,69 +37,111 @@
 </div>
 
 <div class="row g-4">
-    {{-- Cola de aprobación (usuarios pendientes) --}}
+
+    {{-- Cola de aprobación --}}
     <div class="col-12 col-lg-6">
-        <div class="ea-card p-0 overflow-hidden">
-            <div class="p-3 border-bottom fw-semibold">📋 Cola de aprobación</div>
-            <div class="p-3">
-                @if($colaAprobacion->count() > 0)
-                    <div class="table-responsive">
-                        <table class="table table-sm align-middle mb-0">
-                            <thead>
-                                <tr><th>Usuario</th><th>Fecha solicitud</th><th></th></tr>
-                            </thead>
-                            <tbody>
-                                @foreach($colaAprobacion as $solicitud)
-                                <tr>
-                                    <td>
-                                        {{ $solicitud->nombre ?? '' }} {{ $solicitud->apellidos ?? '' }}<br>
-                                        <span class="small text-muted">{{ $solicitud->correo ?? '' }}</span>
-                                    </td>
-                                    <td>
-                                        {{ isset($solicitud->fecha_solicitud) && $solicitud->fecha_solicitud ? \Carbon\Carbon::parse($solicitud->fecha_solicitud)->format('d/m/Y') : 'Sin fecha' }}
-                                    </td>
-                                    <td class="text-end">
-                                        <a href="{{ route('admin.solicitudes.show', $solicitud->id_usuario) }}" class="btn btn-sm btn-outline-success">Revisar</a>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+        <div class="ea-card p-0 overflow-hidden h-100">
+            <div class="p-4 border-bottom fw-semibold"
+                 style="border-color: var(--ea-line) !important;">
+                Cola de aprobación
+            </div>
+
+            <div class="p-4">
+                @if(isset($colaAprobacion) && $colaAprobacion->count() > 0)
+                    <div class="d-grid gap-3">
+                        @foreach($colaAprobacion as $solicitud)
+                            <div class="rounded-4 px-3 py-3 d-flex justify-content-between align-items-center flex-wrap gap-3"
+                                 style="background: rgba(245,248,245,0.95); border: 1px solid rgba(15,42,36,.05);">
+
+                                <div>
+                                    <div class="fw-semibold" style="font-size: 1.1rem;">
+                                        {{ trim(($solicitud->nombre ?? '') . ' ' . ($solicitud->apellidos ?? '')) ?: 'Usuario sin nombre' }}
+                                    </div>
+
+                                    <div class="small" style="color: var(--ea-muted);">
+                                        {{ ucfirst(str_replace('_', ' ', $solicitud->rol ?? 'usuario')) }}
+                                        ·
+                                        {{ $solicitud->correo ?? 'Sin correo' }}
+                                    </div>
+
+                                    <div class="small" style="color: var(--ea-muted);">
+                                        Solicitud:
+                                        {{ !empty($solicitud->fecha_solicitud) ? \Carbon\Carbon::parse($solicitud->fecha_solicitud)->format('d/m/Y') : 'Sin fecha' }}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <a href="{{ route('admin.solicitudes.show', $solicitud->id_usuario) }}"
+                                       class="btn px-4 py-2 fw-semibold rounded-4"
+                                       style="background: #0f5a3a; color: white; border: none;">
+                                        Revisar
+                                    </a>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 @else
-                    <p class="text-muted text-center py-3 mb-0">No hay solicitudes pendientes.</p>
+                    <p class="text-muted text-center py-4 mb-0">No hay solicitudes pendientes.</p>
                 @endif
             </div>
         </div>
     </div>
 
-    {{-- Actividad reciente: destinos creados en la última semana --}}
+    {{-- Destinos nuevos de las últimas 2 semanas --}}
     <div class="col-12 col-lg-6">
-        <div class="ea-card p-0 overflow-hidden">
-            <div class="p-3 border-bottom fw-semibold">🕒 Destinos recientes (última semana)</div>
-            <div class="p-3">
-                @if($actividadReciente->count() > 0)
-                    <div class="table-responsive">
-                        <table class="table table-sm align-middle mb-0">
-                            <thead>
-                                <tr><th>Destino</th><th>Creado por</th><th>Fecha creación</th></tr>
-                            </thead>
-                            <tbody>
-                                @foreach($actividadReciente as $destino)
-                                <tr>
-                                    <td>{{ $destino->destino_nombre ?? 'Sin nombre' }}</td>
-                                    <td>{{ $destino->creador_nombre ?? '' }} {{ $destino->creador_apellidos ?? '' }}</td>
-                                    <td>{{ isset($destino->fecha_creacion) ? \Carbon\Carbon::parse($destino->fecha_creacion)->format('d/m/Y') : 'Sin fecha' }}</td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+        <div class="ea-card p-0 overflow-hidden h-100">
+            <div class="p-4 border-bottom fw-semibold"
+                 style="border-color: var(--ea-line) !important;">
+                Destinos nuevos (últimas 2 semanas)
+            </div>
+
+            <div class="p-4">
+                @if(isset($actividadReciente) && $actividadReciente->count() > 0)
+                    <div class="d-grid gap-3">
+                        @foreach($actividadReciente as $destino)
+                            <div class="rounded-4 px-3 py-3 d-flex justify-content-between align-items-center flex-wrap gap-3"
+                                 style="background: rgba(245,248,245,0.95); border: 1px solid rgba(15,42,36,.05);">
+
+                                <div>
+                                    <div class="fw-semibold" style="font-size: 1.1rem;">
+                                        {{ $destino->destino_nombre ?? 'Sin nombre' }}
+                                    </div>
+
+                                    <div class="small" style="color: var(--ea-muted);">
+                                        {{ $destino->categoria ?? 'Sin categoría' }}
+                                    </div>
+
+                                    <div class="small" style="color: var(--ea-muted);">
+                                        Creado por:
+                                        {{ trim(($destino->creador_nombre ?? '') . ' ' . ($destino->creador_apellidos ?? '')) ?: 'Sin autor' }}
+                                    </div>
+
+                                    <div class="small" style="color: var(--ea-muted);">
+                                        Fecha:
+                                        {{ !empty($destino->fecha_creacion) ? \Carbon\Carbon::parse($destino->fecha_creacion)->format('d/m/Y') : 'Sin fecha' }}
+                                    </div>
+                                </div>
+
+                                <div class="d-flex align-items-center gap-3">
+                                    <span class="ea-chip blue">
+                                        Nuevo
+                                    </span>
+
+                                    <a href="#"
+                                       class="text-decoration-none"
+                                       style="color: var(--ea-text); font-size: 1.1rem;">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 @else
-                    <p class="text-muted text-center py-3 mb-0">No hay destinos creados en la última semana.</p>
+                    <p class="text-muted text-center py-4 mb-0">No hay destinos nuevos en las últimas 2 semanas.</p>
                 @endif
             </div>
         </div>
     </div>
+
 </div>
 @endsection

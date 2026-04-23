@@ -1,246 +1,141 @@
-{{-- @extends('layouts.admin')
+@extends('layouts.admin')
 
-@section('title', 'Detalle de Reportes')
+@section('title', 'Detalle del Destino')
 
 @section('content')
 
 <div class="mb-4">
-
     <a href="{{ route('admin.destino') }}"
        class="text-decoration-none fw-semibold"
        style="color: var(--ea-green);">
         ← Volver al listado
     </a>
-
+    <h1 class="ea-page-title mt-3 mb-1">{{ $destino->nombre }}</h1>
+    <p class="ea-subtitle">Información general del destino y sus reportes.</p>
 </div>
 
 
-<div class="ea-card p-0 overflow-hidden">
 
-    {{-- Encabezado destino --}}
+{{-- Info general --}}
+<div class="ea-card p-0 overflow-hidden mb-4">
     <div class="p-4 border-bottom"
-         style="border-color: var(--ea-line) !important;">
-
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-
-            <div>
-                <h4 class="fw-semibold mb-1">
-                    Cascadas de Misol-Ha
-                </h4>
-
-                <div class="small" style="color: var(--ea-muted);">
-                    Ecoturismo · Ocosingo, Chiapas
-                </div>
-            </div>
-
-            <div class="d-flex align-items-center gap-2">
-
-                <span class="ea-chip green">
-                    Activo
-                </span>
-
-                <button class="btn btn-sm"
-                        style="background:#e4572e;color:white;">
-                    <i class="bi bi-slash-circle me-1"></i>
-                    Suspender
-                </button>
-
-            </div>
-
-        </div>
-
+         style="border-color: var(--ea-line) !important; background: rgba(255,255,255,.25);">
+        <div class="fw-semibold">Información del Destino</div>
     </div>
-
-
-    {{-- Estadísticas --}}
-    <div class="p-4 border-bottom"
-         style="border-color: var(--ea-line) !important;">
-
-        <div class="row g-3">
-
-            <div class="col-md-4">
-                <div class="ea-stat-card text-center p-3">
-                    <h3 class="fw-bold mb-0">5</h3>
-                    <small style="color:var(--ea-muted)">
-                        Reportes totales
-                    </small>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="ea-stat-card text-center p-3">
-                    <h3 class="fw-bold text-danger mb-0">3</h3>
-                    <small style="color:var(--ea-muted)">
-                        Pendientes
-                    </small>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="ea-stat-card text-center p-3">
-                    <h3 class="fw-bold text-success mb-0">2</h3>
-                    <small style="color:var(--ea-muted)">
-                        Revisados
-                    </small>
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-
-
-    {{-- Tabla reportes --}}
     <div class="p-4">
-
-        <h6 class="fw-semibold mb-3">
-            Detalle de Reportes
-        </h6>
-
-        <div class="table-responsive">
-
-            <table class="table ea-table align-middle">
-
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Motivo</th>
-                        <th>Reportado por</th>
-                        <th>Fecha</th>
-                        <th>Estado</th>
-                        <th class="text-end">Acciones</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    <tr>
-                        <td>1</td>
-                        <td>Información incorrecta</td>
-                        <td>Usuario 1</td>
-                        <td>2026-01-10</td>
-
-                        <td>
-                            <span class="ea-chip green">
-                                Revisado
-                            </span>
-                        </td>
-
-                        <td class="text-end">
-
-                            <a href="#"
-                               class="text-decoration-none">
-                               <i class="bi bi-eye"></i>
-                               Ver
-                            </a>
-
-                        </td>
-                    </tr>
-
-
-                    <tr>
-                        <td>2</td>
-                        <td>Contenido ofensivo</td>
-                        <td>Ana López</td>
-                        <td>2026-01-11</td>
-
-                        <td>
-                            <span class="ea-chip gray">
-                                Pendiente
-                            </span>
-                        </td>
-
-                        <td class="text-end">
-
-                            <a href="#"
-                               class="text-decoration-none">
-                               <i class="bi bi-eye"></i>
-                               Ver
-                            </a>
-
-                        </td>
-                    </tr>
-
-
-                    <tr>
-                        <td>3</td>
-                        <td>Fotos inapropiadas</td>
-                        <td>Roberto Sánchez</td>
-                        <td>2026-01-12</td>
-
-                        <td>
-                            <span class="ea-chip gray">
-                                Pendiente
-                            </span>
-                        </td>
-
-                        <td class="text-end">
-
-                            <a href="#"
-                               class="text-decoration-none">
-                               <i class="bi bi-eye"></i>
-                               Ver
-                            </a>
-
-                        </td>
-                    </tr>
-
-
-                    <tr>
-                        <td>4</td>
-                        <td>Spam o publicidad</td>
-                        <td>Marta Cruz</td>
-                        <td>2026-02-13</td>
-
-                        <td>
-                            <span class="ea-chip green">
-                                Revisado
-                            </span>
-                        </td>
-
-                        <td class="text-end">
-
-                            <a href="#"
-                               class="text-decoration-none">
-                               <i class="bi bi-eye"></i>
-                               Ver
-                            </a>
-
-                        </td>
-                    </tr>
-
-
-                    <tr>
-                        <td>5</td>
-                        <td>Ubicación errónea</td>
-                        <td>Jorge Díaz</td>
-                        <td>2026-02-14</td>
-
-                        <td>
-                            <span class="ea-chip gray">
-                                Pendiente
-                            </span>
-                        </td>
-
-                        <td class="text-end">
-
-                            <a href="#"
-                               class="text-decoration-none">
-                               <i class="bi bi-eye"></i>
-                               Ver
-                            </a>
-
-                        </td>
-                    </tr>
-
-                </tbody>
-
-            </table>
-
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="small text-muted mb-1">Nombre</div>
+                <div class="fw-semibold">{{ $destino->nombre }}</div>
+            </div>
+            <div class="col-md-6">
+                <div class="small text-muted mb-1">Creado por</div>
+                <div class="fw-semibold">{{ $destino->creador }}</div>
+            </div>
+            <div class="col-md-6">
+                <div class="small text-muted mb-1">Fecha de creación</div>
+                <div>{{ \Carbon\Carbon::parse($destino->fecha_creacion)->format('d/m/Y') }}</div>
+            </div>
+            <div class="col-md-6">
+                <div class="small text-muted mb-1">Estado</div>
+                <span class="ea-chip {{ $destino->activo === 'activo' ? 'green' : 'red' }}">
+                    {{ $destino->activo === 'activo' ? 'Activo' : 'Suspendido' }}
+                </span>
+            </div>
+            <div class="col-md-6">
+                <div class="small text-muted mb-1">Categorías</div>
+                <div>{{ $destino->categorias ?? '—' }}</div>
+            </div>
+            @if ($destino->telefono)
+                <div class="col-md-6">
+                    <div class="small text-muted mb-1">Teléfono</div>
+                    <div>{{ $destino->telefono }}</div>
+                </div>
+            @endif
+            @if ($destino->descripcion)
+                <div class="col-12">
+                    <div class="small text-muted mb-1">Descripción</div>
+                    <div class="small">{{ $destino->descripcion }}</div>
+                </div>
+            @endif
         </div>
-
     </div>
-
 </div>
 
-@endsection --}}
+{{-- Resumen reportes --}}
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="ea-card text-center p-4">
+            <div class="fw-bold" style="font-size:2rem;">{{ $totalReportes }}</div>
+            <div class="small text-muted">Reportes totales</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="ea-card text-center p-4">
+            <div class="fw-bold text-danger" style="font-size:2rem;">{{ $reportesPendientes }}</div>
+            <div class="small text-muted">Pendientes</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="ea-card text-center p-4">
+            <div class="fw-bold text-success" style="font-size:2rem;">{{ $reportesResueltos }}</div>
+            <div class="small text-muted">Resueltos / Rechazados</div>
+        </div>
+    </div>
+</div>
+
+{{-- Tabla reportes --}}
+<div class="ea-card p-0 overflow-hidden">
+    <div class="p-4 border-bottom"
+         style="border-color: var(--ea-line) !important; background: rgba(255,255,255,.25);">
+        <div class="fw-semibold">Reportes del destino</div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table ea-table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Motivo</th>
+                    <th>Descripción</th>
+                    <th>Reportado por</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($reportes as $i => $rep)
+                    <tr>
+                        <td>{{ $i + 1 }}</td>
+                        <td>{{ ucfirst(str_replace('_', ' ', $rep->motivo)) }}</td>
+                        <td class="small text-muted">{{ $rep->descripcion ?? '—' }}</td>
+                        <td>{{ $rep->reportado_por_nombre }}</td>
+                        <td class="small">
+                            {{ \Carbon\Carbon::parse($rep->fecha)->format('d/m/Y') }}
+                        </td>
+                        <td>
+                            @php
+                                $chip = match($rep->estado) {
+                                    'pendiente'   => 'blue',
+                                    'resuelto'    => 'green',
+                                    'rechazado'   => 'red',
+                                    'en_revision' => 'gray',
+                                    default       => 'gray'
+                                };
+                            @endphp
+                            <span class="ea-chip {{ $chip }}">{{ ucfirst($rep->estado) }}</span>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            Este destino no tiene reportes.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@endsection
