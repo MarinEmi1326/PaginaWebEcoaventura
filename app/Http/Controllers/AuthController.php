@@ -145,8 +145,8 @@ class AuthController extends Controller
             $usuario = Usuario::create([
                 'correo'             => $validated['correo'],
                 'password'           => Hash::make($validated['password']),
-                'activo'             => true,           // Turista activo automáticamente
-                'estado'             => 'aprobado',     // Aprobado sin revisión
+                'activo'             => true,
+                'estado'             => 'aprobado',
                 'correo_verificado'  => 1,
                 'token_verificacion' => null,
                 'fecha_solicitud'    => now(),
@@ -161,9 +161,6 @@ class AuthController extends Controller
             $persona->roles()->attach($rol->id_rol);
             DB::commit();
 
-            // Opcional: enviar correo de bienvenida
-            // Mail::to($usuario->correo)->send(new BienvenidaTuristaMail($usuario));
-
             return redirect()->route('login')->with('ok', 'Cuenta creada exitosamente. Ahora puedes iniciar sesión.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -171,7 +168,7 @@ class AuthController extends Controller
         }
     }
 
-    // ========== LOGIN Y OTROS MÉTODOS ==========
+    // ========== LOGIN CORREGIDO ==========
     public function login(Request $request)
     {
         $request->validate([
@@ -181,6 +178,13 @@ class AuthController extends Controller
 
         if (Auth::attempt(['correo' => $request->correo, 'password' => $request->password])) {
             $user = Auth::user();
+            
+            // 🔒 Verificar si el usuario está activo
+            if (!$user->activo) {
+                Auth::logout();
+                return back()->withErrors(['error' => 'Tu cuenta ha sido suspendida. No puedes iniciar sesión.']);
+            }
+
             $rol = $user->persona?->roles->first()?->descripcion;
 
             if ($rol === 'admin_general') return redirect()->route('admin.index');

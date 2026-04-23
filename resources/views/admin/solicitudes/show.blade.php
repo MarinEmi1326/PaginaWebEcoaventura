@@ -47,11 +47,7 @@
                 @endif
 
                 @php
-                    $nombreCompleto = trim(
-                        ($solicitud->nombre ?? '') .
-                            ' ' .
-                            ($solicitud->apellidos ?? '')
-                    );
+                    $nombreCompleto = trim(($solicitud->nombre ?? '') . ' ' . ($solicitud->apellidos ?? ''));
                     $estado = strtolower($solicitud->estado ?? 'pendiente');
 
                     $chipEstado = match ($estado) {
@@ -106,24 +102,23 @@
 
                                 <span class="ea-chip gray">{{ $rolLabel }}</span>
 
-                                {{-- Botón suspender/habilitar solo para no-turistas --}}
-                                @if (!$esTurista)
-                                    <form action="{{ route('admin.solicitudes.toggle', $solicitud->id_usuario) }}"
-                                        method="POST" class="mt-2">
-                                        @csrf
-                                        <button type="submit" class="btn rounded-3 px-3 py-2 fw-semibold"
-                                            style="font-size:.85rem;
-                                            {{ $solicitud->activo ?? 0
-                                                ? 'background:#e4572e; border-color:#e4572e; color:#fff;'
-                                                : 'background: rgba(63,125,59,.10); border:1px solid rgba(63,125,59,.30); color:#2f6b2c;' }}">
-                                            @if ($solicitud->activo ?? 0)
-                                                <i class="bi bi-slash-circle me-1"></i> Suspender
-                                            @else
-                                                <i class="bi bi-check2-circle me-1"></i> Habilitar
-                                            @endif
-                                        </button>
-                                    </form>
-                                @endif
+                                
+                                {{-- Botón suspender/habilitar para todos los usuarios (incluyendo turistas) --}}
+                                <form action="{{ route('admin.solicitudes.toggle', $solicitud->id_usuario) }}"
+                                    method="POST" class="mt-2">
+                                    @csrf
+                                    <button type="submit" class="btn rounded-3 px-3 py-2 fw-semibold"
+                                        style="font-size:.85rem;
+        {{ $solicitud->activo ?? 0
+            ? 'background:#e4572e; border-color:#e4572e; color:#fff;'
+            : 'background: rgba(63,125,59,.10); border:1px solid rgba(63,125,59,.30); color:#2f6b2c;' }}">
+                                        @if ($solicitud->activo ?? 0)
+                                            <i class="bi bi-slash-circle me-1"></i> Suspender
+                                        @else
+                                            <i class="bi bi-check2-circle me-1"></i> Habilitar
+                                        @endif
+                                    </button>
+                                </form>
                             </div>
                         </div>
 

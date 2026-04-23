@@ -8,6 +8,8 @@ use App\Models\Rol;
 use App\Models\Usuario;
 use App\Mail\SolicitudAprobadaMail;
 use App\Mail\RechazoSolicitudMail;
+use App\Mail\UsuarioSuspendidoMail;
+use App\Mail\UsuarioHabilitadoMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -28,7 +30,6 @@ class AdminSolicitudesController extends Controller
         $publicados    = DB::table('usuario')->where('estado', 'aprobado')->count();
         $rechazados    = DB::table('usuario')->where('estado', 'rechazado')->count();
 
-        // Cola de aprobación (usuarios pendientes)
         $colaAprobacion = DB::table('usuario as u')
             ->join('persona as p', 'p.id_usuario', '=', 'u.id_usuario')
             ->join('persona_rol as pr', 'pr.id_persona', '=', 'p.id_persona')
@@ -39,7 +40,6 @@ class AdminSolicitudesController extends Controller
             ->orderByDesc('u.fecha_solicitud')
             ->get();
 
-        // Actividad reciente: destinos creados en la última semana
         $fechaHaceUnaSemana = Carbon::now()->subWeek();
         $actividadReciente = DB::table('destino as d')
             ->join('persona as p', 'p.id_persona', '=', 'd.creado_por')
@@ -55,11 +55,11 @@ class AdminSolicitudesController extends Controller
             ->get();
 
         return view('admin.index', compact(
-            'totalUsuarios',
-            'pendientes',
-            'publicados',
-            'rechazados',
-            'colaAprobacion',
+            'totalUsuarios', 
+            'pendientes', 
+            'publicados', 
+            'rechazados', 
+            'colaAprobacion', 
             'actividadReciente'
         ));
     }
@@ -91,9 +91,9 @@ class AdminSolicitudesController extends Controller
             ->join('persona_rol as pr', 'pr.id_persona', '=', 'p.id_persona')
             ->join('rol as r', 'r.id_rol', '=', 'pr.id_rol')
             ->select(
-                'u.*',
-                'p.nombre',
-                'p.apellidos',
+                'u.*', 
+                'p.nombre', 
+                'p.apellidos', 
                 'p.telefono',
                 'r.descripcion as rol'
             )
@@ -109,9 +109,9 @@ class AdminSolicitudesController extends Controller
         $reportesEnviados = collect();
 
         return view('admin.solicitudes.show', compact(
-            'solicitud',
-            'reportes',
-            'reportesRecibidos',
+            'solicitud', 
+            'reportes', 
+            'reportesRecibidos', 
             'reportesEnviados'
         ));
     }
@@ -324,7 +324,7 @@ class AdminSolicitudesController extends Controller
     }
 
     /**
-     * SUSPENDER / HABILITAR
+     * SUSPENDER / HABILITAR usuario (toggle activo)
      */
     public function toggle($id)
     {
@@ -338,7 +338,43 @@ class AdminSolicitudesController extends Controller
         $nuevoEstado = !$usuario->activo;
         $usuario->update(['activo' => $nuevoEstado]);
 
+        if ($nuevoEstado === false) {
+            $rol = $usuario->persona?->roles->first()?->descripcion;
+            if ($rol === 'admin_destinos') {
+                $this->suspenderDestinosYRutasDeUsuario($usuario);
+            }
+            Mail::to($usuario->correo)->send(new UsuarioSuspendidoMail($usuario));
+        } elseif ($nuevoEstado === true) {
+            // Opcional: correo de habilitación
+            Mail::to($usuario->correo)->send(new UsuarioHabilitadoMail($usuario));
+        }
+
         $mensaje = $nuevoEstado ? 'Usuario habilitado correctamente.' : 'Usuario suspendido correctamente.';
         return back()->with('ok', $mensaje);
+    }
+
+    /**
+     * Suspender todos los destinos de un usuario y las rutas que los contienen
+     */
+    private function suspenderDestinosYRutasDeUsuario($usuario)
+    {
+        $persona = $usuario->persona;
+        if (!$persona) return;
+
+        $destinos = DB::table('destino')->where('creado_por', $persona->id_persona)->get();
+
+        foreach ($destinos as $destino) {
+            if ($destino->activo === 'activo') {
+                DB::table('destino')->where('id_destino', $destino->id_destino)->update(['activo' => 'inactivo']);
+
+                $idsRutas = DB::table('ruta_destino')->where('id_destino', $destino->id_destino)->pluck('id_ruta');
+                foreach ($idsRutas as $idRuta) {
+                    DB::table('ruta')->where('id_ruta', $idRuta)->update([
+                        'activo' => 'inactivo',
+                        'motivo_inactivo' => 'La ruta fue inhabilitada porque contiene el destino "' . $destino->nombre . '", cuyo creador (admin de destinos) fue suspendido.'
+                    ]);
+                }
+            }
+        }
     }
 }
