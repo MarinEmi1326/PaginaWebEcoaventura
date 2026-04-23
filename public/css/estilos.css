@@ -77,6 +77,107 @@ body {
   font-weight: 600;
   background-color: green;
   color: white;
+} 
+/* Estilos para el botón de login en la página principal */
+.btn-login-main {
+  background-color: #1f6b4b; /* tu verde */
+  color: #fff;
+  border: none;
+
+  border-radius: 12px; /* redondeado pero no píldora */
+  padding: 8px 16px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.btn-login-main:hover {
+  background-color: #174d37; /* verde más oscuro */
+  color: #fff;
+}
+
+/* BOTÓN USUARIO LOGUEADO*/
+.btn-user {
+  background-color: #174d37;
+  color: #fff;
+  border: none;
+
+  border-radius: 10px;
+  padding: 8px 16px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.btn-user:hover {
+  background-color: #146c43;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.btn-user:active {
+  transform: scale(0.96);
+} 
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background-color: #d1fae5 !important; /* verde claro */
+  color: #1F6B4B !important;
+}
+
+.btn-user:focus,
+.btn-user:active,
+.btn-user.show {
+  background-color: #174d37 !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Versión compacta del botón usuario (para panel) */
+.btn-user-sm {
+  padding: 6px 12px !important;
+  font-size: 0.85rem;
+  border-radius: 8px;
+}
+
+.btn-user-sm .ea-avatar {
+  width: 26px;
+  height: 26px;
+  font-size: 0.75rem;
+}
+
+.btn-user-sm .dropdown-toggle::after {
+  margin-left: 6px;
+}
+
+.ea-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ea-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ea-avatar i {
+  font-size: 18px;
 }
 
 /* ===== ESTILOS BASE (de Turismo Responsable) ===== */

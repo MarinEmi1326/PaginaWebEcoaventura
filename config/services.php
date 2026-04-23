@@ -44,9 +44,8 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
     'firebase' => [
-        'credentials' => storage_path('app/firebase-credentials.json'),
+        'credentials' => env('FIREBASE_CREDENTIALS', storage_path('app/firebase-credentials.json')),
     ],
-
 
     'stripe' => [
         'key'    => env('STRIPE_KEY'),

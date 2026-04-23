@@ -1,7 +1,5 @@
 @extends('layouts.app')
 
-
-
 @section('content')
     <section class="min-vh-100 d-flex align-items-center justify-content-center">
         <div class="container">
@@ -34,7 +32,7 @@
                             </div>
                         @endif
 
-                        @if(session('error'))
+                        @if (session('error'))
                             <div class="alert alert-danger rounded-3">
                                 {{ session('error') }}
                             </div>
@@ -44,18 +42,49 @@
                         <form method="POST" action="{{ route('login.post') }}">
                             @csrf
 
+                            {{-- CORREO --}}
                             <div class="mb-3">
                                 <label class="form-label small fw-semibold">Correo electrónico</label>
                                 <input type="email" name="correo" value="{{ old('correo') }}"
-                                    class="form-control form-control-lg bg-white border-0 rounded-3"
-                                    placeholder="usuario@ecoaventura.mx" required>
+                                    class="form-control form-control-lg bg-white border-0 rounded-3
+                                    {{ session('error_tipo') == 'correo' ? 'is-invalid border border-danger' : '' }}"
+                                    placeholder="usuario@ecoaventura.mx"
+                                    required
+                                    oninput="validarCorreo(this)">
+
+                                @if(session('error_tipo') == 'correo')
+                                    <div class="text-danger small mt-1">
+                                        Correo no registrado
+                                    </div>
+                                @endif
+
+                                <small id="correoError" class="text-danger d-none">Correo inválido</small>
                             </div>
 
+                            {{-- CONTRASEÑA --}}
                             <div class="mb-3">
                                 <label class="form-label small fw-semibold">Contraseña</label>
-                                <input type="password" name="password"
-                                    class="form-control form-control-lg bg-white border-0 rounded-3" placeholder="••••••••"
-                                    required>
+
+                                <div class="position-relative">
+                                    <input type="password" name="password" id="password"
+                                        class="form-control form-control-lg bg-white border-0 rounded-3 pe-5
+                                        {{ session('error_tipo') == 'password' ? 'is-invalid border border-danger' : '' }}"
+                                        placeholder="••••••••"
+                                        required
+                                        oninput="toggleEyeVisibility()">
+
+                                    <button type="button" id="btnTogglePassword"
+                                        class="btn position-absolute top-50 end-0 translate-middle-y me-2 p-0 border-0 bg-transparent d-none"
+                                        onclick="togglePassword()">
+                                        <i id="iconPassword" class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+
+                                @if(session('error_tipo') == 'password')
+                                    <div class="text-danger small mt-1">
+                                        Contraseña incorrecta
+                                    </div>
+                                @endif
                             </div>
 
                             <div class="d-flex justify-content-between align-items-center mb-4">
@@ -71,6 +100,7 @@
                                 style="background:#1F6B4B;">
                                 Iniciar sesión
                             </button>
+
                             <p class="text-center small mt-3">
                                 ¿No tienes cuenta?
                                 <a href="{{ route('registro.turista') }}" class="text-decoration-none fw-semibold">
@@ -78,8 +108,7 @@
                                 </a>
                             </p>
 
-
-                            {{-- Google --}}
+                            {{-- GOOGLE (100% intacto como lo tenías) --}}
                             <a href="{{ route('google.login') }}"
                                 class="btn btn-lg w-100 border d-flex align-items-center justify-content-center gap-2">
                                 <svg width="20" height="20" viewBox="0 0 48 48">
@@ -112,4 +141,42 @@
             </div>
         </div>
     </section>
+
+    {{-- SCRIPT --}}
+    <script>
+        function togglePassword() {
+            const input = document.getElementById("password");
+            const icon = document.getElementById("iconPassword");
+
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.replace("bi-eye", "bi-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.replace("bi-eye-slash", "bi-eye");
+            }
+        }
+
+        function toggleEyeVisibility() {
+            const input = document.getElementById("password");
+            const btn = document.getElementById("btnTogglePassword");
+
+            if (input.value.length > 0) {
+                btn.classList.remove("d-none");
+            } else {
+                btn.classList.add("d-none");
+            }
+        }
+
+        function validarCorreo(input) {
+            const error = document.getElementById("correoError");
+            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!regex.test(input.value)) {
+                error.classList.remove("d-none");
+            } else {
+                error.classList.add("d-none");
+            }
+        }
+    </script>
 @endsection

@@ -16,7 +16,6 @@ class ApiAuthController extends Controller
         $request->validate([
             'correo'   => 'required|email',
             'password' => 'required',
-            'fcm_token' => 'nullable|string',
         ]);
 
         $usuario = Usuario::with('persona.roles')->where('correo', $request->correo)->first();
@@ -56,10 +55,6 @@ class ApiAuthController extends Controller
 
         $usuario->tokens()->delete();
         $token = $usuario->createToken('api-token')->plainTextToken;
-
-        if ($request->filled('fcm_token')) {
-            $usuario->update(['fcm_token' => $request->fcm_token]);
-        }
 
         return response()->json([
             'success' => true,
@@ -114,6 +109,44 @@ class ApiAuthController extends Controller
         ], 201);
     }
 
+    // ==================== NUEVOS ENDPOINTS PARA TOKENS FCM ====================
+
+    // POST /api/actualizar-token
+    public function actualizarToken(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Usuario no autenticado'], 401);
+        }
+
+        $request->validate([
+            'fcm_token' => 'required|string',
+        ]);
+
+        $user->fcm_token = $request->fcm_token;
+        $user->save();
+
+        return response()->json(['success' => true, 'message' => 'Token actualizado']);
+    }
+
+    // POST /api/eliminar-token
+    public function eliminarToken(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Usuario no autenticado'], 401);
+        }
+
+        $user->fcm_token = null;
+        $user->save();
+
+        return response()->json(['success' => true, 'message' => 'Token eliminado']);
+    }
+
+    // ==================== FIN NUEVOS ENDPOINTS ====================
+
     // POST /api/logout
     public function logout(Request $request)
     {
@@ -156,7 +189,6 @@ class ApiAuthController extends Controller
         return response()->json(['success' => true]);
     }
 
-
     // GET /api/turista/pagos
     public function misPagos(Request $request)
     {
@@ -182,6 +214,7 @@ class ApiAuthController extends Controller
             'data' => $pagos
         ]);
     }
+
     // DELETE /api/perfil
     public function eliminarCuenta(Request $request)
     {

@@ -35,10 +35,10 @@
                 </div>
             @endif
 
-            <form action="{{ route('admin.solicitudes.store') }}" method="POST">
+            <form action="{{ route('admin.solicitudes.store') }}" method="POST" novalidate>
                 @csrf
 
-                {{-- BLOQUE 1: Credenciales --}}
+                {{-- BLOQUE 1 --}}
                 <div class="ea-card p-0 overflow-hidden mb-4">
                     <div class="p-4 border-bottom"
                          style="border-color: var(--ea-line) !important; background: rgba(255,255,255,.25);">
@@ -53,11 +53,15 @@
                             <div class="col-12 col-md-6">
                                 <label class="form-label fw-bold">Correo electrónico</label>
                                 <input type="email"
+                                       id="correo"
                                        name="correo"
                                        value="{{ old('correo') }}"
                                        required
                                        placeholder="ejemplo@correo.com"
                                        class="form-control rounded-3 py-2 @error('correo') is-invalid @enderror">
+                                <div id="correoError" class="text-danger small mt-1 d-none">
+                                    Correo no válido
+                                </div>
                                 @error('correo')
                                     <div class="small text-danger mt-1">{{ $message }}</div>
                                 @enderror
@@ -81,13 +85,18 @@
                                 @enderror
                             </div>
 
+                            {{-- PASSWORD --}}
                             <div class="col-12 col-md-6">
                                 <label class="form-label fw-bold">Contraseña</label>
-                                <input type="password"
-                                       name="password"
-                                       required
-                                       placeholder="••••••••"
-                                       class="form-control rounded-3 py-2 @error('password') is-invalid @enderror">
+                                <div class="input-group">
+                                    <input type="password"
+                                           id="password"
+                                           name="password"
+                                           required
+                                           placeholder="••••••••"
+                                           class="form-control rounded-3 py-2 @error('password') is-invalid @enderror">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('password')">👁</button>
+                                </div>
                                 @error('password')
                                     <div class="small text-danger mt-1">{{ $message }}</div>
                                 @enderror
@@ -95,32 +104,36 @@
 
                             <div class="col-12 col-md-6">
                                 <label class="form-label fw-bold">Confirmar contraseña</label>
-                                <input type="password"
-                                       name="password_confirmation"
-                                       required
-                                       placeholder="••••••••"
-                                       class="form-control rounded-3 py-2">
+                                <div class="input-group">
+                                    <input type="password"
+                                           id="password_confirmation"
+                                           name="password_confirmation"
+                                           required
+                                           placeholder="••••••••"
+                                           class="form-control rounded-3 py-2">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('password_confirmation')">👁</button>
+                                </div>
                             </div>
 
                         </div>
                     </div>
                 </div>
 
-                {{-- BLOQUE 2: Información personal (con apellidos unificado) --}}
+                {{-- BLOQUE 2 --}}
                 <div class="ea-card p-0 overflow-hidden mb-4">
                     <div class="p-4 border-bottom"
-                         style="border-color: var(--ea-line) !important; background: rgba(255,255,255,.25);">
-                        <div class="fw-semibold" style="color: var(--ea-text);">
-                            👤 Información Personal del Usuario
-                        </div>
+                         style="border-color: var(--ea-line) !important;">
+                        <div class="fw-semibold">👤 Información Personal del Usuario</div>
                     </div>
 
                     <div class="p-4">
                         <div class="row g-3">
 
+                            {{-- NOMBRE SOLO LETRAS --}}
                             <div class="col-12 col-md-6">
                                 <label class="form-label fw-bold">Nombre(s)</label>
                                 <input type="text"
+                                       id="nombre"
                                        name="nombre"
                                        value="{{ old('nombre') }}"
                                        required
@@ -131,10 +144,11 @@
                                 @enderror
                             </div>
 
-                            {{-- Campo único para apellidos --}}
+                            {{-- APELLIDOS SOLO LETRAS --}}
                             <div class="col-12 col-md-6">
                                 <label class="form-label fw-bold">Apellidos</label>
                                 <input type="text"
+                                       id="apellidos"
                                        name="apellidos"
                                        value="{{ old('apellidos') }}"
                                        required
@@ -145,12 +159,15 @@
                                 @enderror
                             </div>
 
+                            {{-- TELÉFONO --}}
                             <div class="col-12 col-md-6">
                                 <label class="form-label fw-bold">Número de teléfono / WhatsApp</label>
                                 <input type="text"
                                        name="telefono"
+                                       id="telefono"
                                        value="{{ old('telefono') }}"
                                        required
+                                       maxlength="10"
                                        placeholder="Ej: 9671234567"
                                        class="form-control rounded-3 py-2 font-monospace @error('telefono') is-invalid @enderror">
                                 @error('telefono')
@@ -162,16 +179,13 @@
                     </div>
                 </div>
 
-                {{-- Acciones --}}
-                <div class="d-flex flex-column flex-md-row justify-content-end gap-2 mt-4 pt-4 border-top"
-                     style="border-color: rgba(15,42,36,.10) !important;">
-                    <button type="reset"
-                            class="btn btn-light border rounded-3 px-4 py-2 fw-semibold">
+                {{-- BOTONES --}}
+                <div class="d-flex justify-content-end gap-2 mt-4 pt-4 border-top">
+                    <button type="reset" class="btn btn-light border rounded-3 px-4 py-2 fw-semibold">
                         🧹 Limpiar formulario
                     </button>
 
-                    <button type="submit"
-                            class="btn ea-btn-green rounded-3 px-4 py-2 fw-semibold">
+                    <button type="submit" class="btn ea-btn-green rounded-3 px-4 py-2 fw-semibold">
                         ✅ Guardar y habilitar usuario
                     </button>
                 </div>
@@ -181,5 +195,48 @@
         </div>
     </div>
 </div>
+
+{{-- SCRIPT --}}
+<script>
+// Mostrar contraseña
+function togglePassword(id) {
+    const input = document.getElementById(id);
+    input.type = input.type === "password" ? "text" : "password";
+}
+
+// Correo validación
+document.getElementById('correo').addEventListener('input', function() {
+    const error = document.getElementById('correoError');
+    error.classList.toggle('d-none', this.value.includes('@'));
+});
+
+// Teléfono solo números
+document.getElementById('telefono').addEventListener('input', function() {
+    this.value = this.value.replace(/[^0-9]/g, '');
+});
+
+// SOLO LETRAS (incluye acentos y espacios)
+function soloLetras(input) {
+    input.value = input.value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, '');
+}
+
+document.getElementById('nombre').addEventListener('input', function() {
+    soloLetras(this);
+});
+
+document.getElementById('apellidos').addEventListener('input', function() {
+    soloLetras(this);
+});
+
+// Bloquear envío si correo inválido
+document.querySelector('form').addEventListener('submit', function(e) {
+    const correo = document.getElementById('correo');
+    if (!correo.value.includes('@')) {
+        e.preventDefault();
+        document.getElementById('correoError').classList.remove('d-none');
+        correo.focus();
+    }
+});
+</script>
 
 @endsection

@@ -63,7 +63,6 @@ class ApiRutaController extends Controller
                 'destino.id_destino',
                 'destino.nombre',
                 'destino.descripcion',
-                'destino.recomendaciones',
                 'destino.lat',
                 'destino.lng',
                 'ruta_destino.orden'
