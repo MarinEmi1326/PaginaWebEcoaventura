@@ -128,6 +128,13 @@ class PagoController extends Controller
                 $pago    = DB::table('pago')->where('id_pago', $id_pago)->first();
                 $destino = DB::table('destino')->where('id_destino', $paquete->id_destino)->first();
 
+                // ============================================
+                // LOGS PARA DEPURAR
+                // ============================================
+                \Log::info('=== INICIO NOTIFICACIONES PAGO ===');
+                \Log::info('Token del turista (usuario logueado): ' . ($user->fcm_token ?? 'NULL'));
+                \Log::info('ID Usuario turista: ' . $user->id_usuario);
+
                 // Correo al turista
                 $correoTurista = DB::table('usuario')
                     ->where('id_usuario', $user->id_usuario)
@@ -136,6 +143,28 @@ class PagoController extends Controller
                 Mail::to($correoTurista)
                     ->send(new ConfirmacionPagoTurista($pago, $paquete, $destino, $persona));
 
+                // ============================================
+                // NOTIFICACIÓN PARA EL TURISTA (NUEVO)
+                // ============================================
+                if ($user->fcm_token) {
+                    \Log::info('Enviando notificación al turista...');
+                    $this->enviarNotificacionFCM(
+                        $user->fcm_token,
+                        '🎉 Pago exitoso',
+                        "Has adquirido el paquete {$paquete->nombre} para {$destino->nombre} el {$fecha_visita} a las {$horario}",
+                        [
+                            'id_pago'    => (string) $id_pago,
+                            'id_destino' => (string) $destino->id_destino,
+                            'tipo'       => 'pago_turista',
+                        ]
+                    );
+                } else {
+                    \Log::info('El turista NO tiene token FCM guardado');
+                }
+
+                // ============================================
+                // NOTIFICACIÓN PARA EL ADMIN
+                // ============================================
                 // Obtener creador del destino
                 $creadorDestino = DB::table('persona')
                     ->where('id_persona', $destino->creado_por)
@@ -147,12 +176,16 @@ class PagoController extends Controller
                         ->first();
 
                     if ($usuarioAdmin) {
+                        \Log::info('Token del admin: ' . ($usuarioAdmin->fcm_token ?? 'NULL'));
+                        \Log::info('ID Usuario admin: ' . $usuarioAdmin->id_usuario);
+
                         // Correo al admin dueño del destino
                         Mail::to($usuarioAdmin->correo)
                             ->send(new NotificacionPagoAdmin($pago, $paquete, $destino, $persona));
 
-                        // Notificación FCM
+                        // Notificación FCM al admin
                         if ($usuarioAdmin->fcm_token) {
+                            \Log::info('Enviando notificación al admin...');
                             $this->enviarNotificacionFCM(
                                 $usuarioAdmin->fcm_token,
                                 '💰 Nuevo pago recibido',
@@ -160,12 +193,16 @@ class PagoController extends Controller
                                 [
                                     'id_pago'    => (string) $id_pago,
                                     'id_destino' => (string) $destino->id_destino,
-                                    'tipo'       => 'pago',
+                                    'tipo'       => 'pago_admin',
                                 ]
                             );
+                        } else {
+                            \Log::info('El admin NO tiene token FCM guardado');
                         }
                     }
                 }
+
+                \Log::info('=== FIN NOTIFICACIONES PAGO ===');
 
                 return redirect()->route('pagos.confirmacion', $id_paquete)
                     ->with('success', '¡Pago realizado con éxito!');
@@ -175,6 +212,7 @@ class PagoController extends Controller
         } catch (\Stripe\Exception\CardException $e) {
             return back()->with('error', 'Tarjeta rechazada: ' . $e->getError()->message);
         } catch (\Exception $e) {
+            \Log::error('Error en pago: ' . $e->getMessage());
             return back()->with('error', 'Error al procesar el pago: ' . $e->getMessage());
         }
     }
@@ -202,8 +240,9 @@ class PagoController extends Controller
             ]);
 
             $messaging->send($message);
+            \Log::info('✅ Notificación FCM enviada correctamente a: ' . substr($token, 0, 20) . '...');
         } catch (\Exception $e) {
-            \Log::error('Error FCM: ' . $e->getMessage());
+            \Log::error('❌ Error FCM: ' . $e->getMessage());
         }
     }
 }

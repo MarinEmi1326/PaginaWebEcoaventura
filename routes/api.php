@@ -15,8 +15,6 @@ Route::get('/destinos/{id}', [ApiDestinoController::class, 'show']);
 Route::get('/destinos/{id}/comentarios', [ApiDestinoController::class, 'comentarios']);
 Route::get('/destinos/categoria/{id_categoria}', [ApiDestinoController::class, 'porCategoria']);
 
-
-
 Route::get('/rutas', [ApiRutaController::class, 'index']);
 Route::get('/rutas/{id}', [ApiRutaController::class, 'show']);
 
@@ -35,9 +33,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::delete('/perfil', [ApiAuthController::class, 'eliminarCuenta']);
 
+    // ==================== NUEVAS RUTAS PARA TOKENS FCM ====================
+    Route::post('/actualizar-token', [ApiAuthController::class, 'actualizarToken']);
+    Route::post('/eliminar-token', [ApiAuthController::class, 'eliminarToken']);
+    // ==================== FIN NUEVAS RUTAS ====================
 
-
-    
     Route::get('/admin/dashboard', [ApiAdminDestinosController::class, 'dashboard']);
     Route::get('/admin/destinos', [ApiAdminDestinosController::class, 'misDestinos']);
     Route::get('/admin/pagos', [ApiAdminDestinosController::class, 'pagos']);
