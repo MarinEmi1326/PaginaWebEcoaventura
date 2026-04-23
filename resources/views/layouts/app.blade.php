@@ -119,17 +119,30 @@
 
                         <div class="dropdown">
 
-                            <button class="btn btn-success rounded-pill dropdown-toggle" type="button"
+                            <button class="btn btn-user dropdown-toggle d-flex align-items-center gap-2" type="button"
                                 data-bs-toggle="dropdown">
-                                <i class="bi bi-person-circle me-1"></i>
-                                {{ $nombreMostrar }}
+
+                                {{-- 🔥 AVATAR DINÁMICO --}}
+                                <div class="ea-avatar d-flex align-items-center justify-content-center overflow-hidden"
+                                    style="width:25px; height:25px; border-radius:40%; background:#DFE6DE;">
+
+                                    @if ($user->foto_perfil)
+                                        <img src="{{ asset('storage/' . $user->foto_perfil) }}"
+                                            style="width:100%; height:100%; object-fit:cover;">
+                                    @else
+                                        <i class="bi bi-person-fill" style="font-size: 1.2rem; color:#1F2A24;"></i>
+                                    @endif
+
+                                </div>
+
+                                <span>{{ $nombreMostrar }}</span>
                             </button>
 
                             <ul class="dropdown-menu dropdown-menu-end">
 
                                 <li>
                                     <a class="dropdown-item" href="{{ route('perfil') }}">
-                                        <i class="bi bi-person me-1"></i>
+                                        <i class="bi bi-person me-2"></i>
                                         Mi perfil
                                     </a>
                                 </li>
@@ -138,7 +151,7 @@
                                 @if ($esTurista)
                                     <li>
                                         <a class="dropdown-item" href="{{ route('turista.viajes') }}">
-                                            <i class="bi bi-suitcase me-1"></i>
+                                            <i class="bi bi-suitcase me-2"></i>
                                             Mis Viajes
                                         </a>
                                     </li>
@@ -148,7 +161,7 @@
                                 @if (!$esTurista && !empty($roles))
                                     <li>
                                         <a class="dropdown-item" href="{{ $panelUrl }}">
-                                            <i class="bi bi-speedometer2 me-1"></i>
+                                            <i class="bi bi-speedometer2 me-2"></i>
                                             Ir a mi panel
                                         </a>
                                     </li>
@@ -162,7 +175,7 @@
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
                                         <button type="submit" class="dropdown-item text-danger">
-                                            <i class="bi bi-box-arrow-right me-1"></i>
+                                            <i class="bi bi-box-arrow-right me-2"></i>
                                             Cerrar sesión
                                         </button>
                                     </form>
@@ -172,8 +185,11 @@
 
                         </div>
                     @else
-                        <a href="{{ route('login') }}" class="btn btn-success rounded-pill">
-                            Iniciar sesión
+                        <a href="{{ route('login') }}"
+                            class="btn btn-login-main d-flex align-items-center gap-2 px-3 py-2 shadow-sm">
+
+                            <i class="bi bi-person"></i>
+                            <span>Iniciar sesión</span>
                         </a>
 
                     @endauth

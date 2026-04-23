@@ -35,7 +35,6 @@ class RutaController extends Controller
     // ── Vista pública de rutas para turistas ──
     public function publicIndex()
     {
-        // Obtener rutas con el nombre del creador en una sola consulta
         $rutas = DB::table('ruta')
             ->leftJoin('persona', 'ruta.creado_por', '=', 'persona.id_persona')
             ->where('ruta.activo', 'activo')
@@ -49,7 +48,6 @@ class RutaController extends Controller
 
         $idsRutas = $rutas->pluck('id_ruta')->toArray();
 
-        // Contar paradas
         $paradas = DB::table('ruta_destino')
             ->whereIn('id_ruta', $idsRutas)
             ->select('id_ruta', DB::raw('COUNT(*) as total'))
@@ -57,7 +55,6 @@ class RutaController extends Controller
             ->get()
             ->keyBy('id_ruta');
 
-        // Primeras imágenes
         $imagenes = DB::table('imagen')
             ->where('entidad', 'ruta')
             ->whereIn('id_ruta', $idsRutas)
@@ -74,36 +71,53 @@ class RutaController extends Controller
         return view('rutas.ruta', compact('rutas'));
     }
 
+    // ── FORMULARIO DE CREACIÓN (CORREGIDO) ──
     public function create()
     {
+        $personaId = $this->getPersonaId();
+        if (!$personaId) {
+            return redirect()->route('login')->with('error', 'Perfil no encontrado.');
+        }
+
         $destinos = Destino::where('activo', 'activo')
             ->orderBy('nombre')
             ->get();
 
-        return view('admin.gestor_rutas.create', compact('destinos'));
-    }
-
-    // ── INFO DESTINO: endpoint que consume el JavaScript del formulario ──
-    public function infoDestino($id)
-    {
-        $destino = DB::table('destino')->where('id_destino', $id)->first();
-
-        if (!$destino) {
-            return response()->json(['error' => 'No encontrado'], 404);
-        }
-
-        $actividades = DB::table('actividad')
-            ->join('destino_actividad', 'actividad.id_actividad', '=', 'destino_actividad.id_actividad')
-            ->where('destino_actividad.id_destino', $id)
-            ->select('actividad.id_actividad', 'actividad.nombre', 'actividad.dificultad')
+        // Recomendaciones disponibles (catálogo)
+        $recomendacionesDisponibles = DB::table('recomendacion')
+            ->where('activo', 1)
+            ->orderBy('descripcion')
             ->get();
 
-        return response()->json([
-            'descripcion' => $destino->descripcion,
-            'lat'         => $destino->lat,
-            'lng'         => $destino->lng,
-            'actividades' => $actividades,
-        ]);
+        return view('admin.gestor_rutas.create', compact('destinos', 'recomendacionesDisponibles'));
+    }
+
+    // ── INFO DESTINO (CORREGIDO, siempre devuelve JSON) ──
+    public function infoDestino($id)
+    {
+        try {
+            $destino = DB::table('destino')->where('id_destino', $id)->first();
+
+            if (!$destino) {
+                return response()->json(['error' => 'Destino no encontrado'], 404);
+            }
+
+            $actividades = DB::table('actividad')
+                ->join('destino_actividad', 'actividad.id_actividad', '=', 'destino_actividad.id_actividad')
+                ->where('destino_actividad.id_destino', $id)
+                ->select('actividad.id_actividad', 'actividad.nombre')
+                ->get();
+
+            return response()->json([
+                'descripcion' => $destino->descripcion,
+                'lat'         => $destino->lat,
+                'lng'         => $destino->lng,
+                'actividades' => $actividades,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error en infoDestino: ' . $e->getMessage());
+            return response()->json(['error' => 'Error interno del servidor'], 500);
+        }
     }
 
     // ── STORE: guardar la ruta ──
@@ -120,9 +134,10 @@ class RutaController extends Controller
             'dificultad'             => 'required|in:baja,media,alta',
             'distancia_km'           => 'nullable|numeric',
             'duracion_estimada'      => 'nullable|string|max:50',
-            'recomendaciones'        => 'nullable|string',
             'fecha_inicio_operacion' => 'nullable|date',
             'fecha_fin_operacion'    => 'nullable|date|after_or_equal:fecha_inicio_operacion',
+            'recomendaciones'        => 'nullable|array',
+            'recomendaciones.*'      => 'exists:recomendacion,id_recomendacion',
             'destinos'               => 'required|array|min:1',
             'destinos.*'             => 'required|exists:destino,id_destino',
             'fotos'                  => 'nullable|array',
@@ -130,14 +145,12 @@ class RutaController extends Controller
         ]);
 
         DB::transaction(function () use ($request, $personaId) {
-
             $ruta = Ruta::create([
                 'nombre'                 => $request->nombre,
                 'descripcion'            => $request->descripcion,
                 'dificultad'             => $request->dificultad,
                 'distancia_km'           => $request->distancia_km,
                 'duracion_estimada'      => $request->duracion_estimada,
-                'recomendaciones'        => $request->recomendaciones,
                 'fecha_inicio_operacion' => $request->fecha_inicio_operacion,
                 'fecha_fin_operacion'    => $request->fecha_fin_operacion,
                 'activo'                 => 'activo',
@@ -145,13 +158,23 @@ class RutaController extends Controller
                 'fecha_creacion'         => now(),
             ]);
 
+            // Recomendaciones
+            if ($request->filled('recomendaciones')) {
+                foreach ($request->recomendaciones as $idRecomendacion) {
+                    DB::table('ruta_recomendacion')->insert([
+                        'id_ruta'          => $ruta->id_ruta,
+                        'id_recomendacion' => $idRecomendacion,
+                    ]);
+                }
+            }
+
+            // Imágenes
             if ($request->hasFile('fotos')) {
                 foreach ($request->file('fotos') as $foto) {
                     $rutaArchivo = $foto->store('rutas', 'public');
                     DB::table('imagen')->insert([
                         'entidad'      => 'ruta',
                         'id_ruta'      => $ruta->id_ruta,
-                        'id_destino'   => null,
                         'ruta_archivo' => $rutaArchivo,
                         'subida_por'   => $personaId,
                         'fecha'        => now(),
@@ -159,6 +182,7 @@ class RutaController extends Controller
                 }
             }
 
+            // Destinos y actividades
             foreach ($request->destinos as $index => $idDestino) {
                 DB::table('ruta_destino')->insert([
                     'id_ruta'    => $ruta->id_ruta,
@@ -183,26 +207,16 @@ class RutaController extends Controller
 
     public function show($id)
     {
-        // 1. Traer la ruta
         $ruta = DB::table('ruta')->where('id_ruta', $id)->where('activo', 'activo')->first();
         abort_if(!$ruta, 404);
 
-        // 2. Traer los destinos de la ruta en orden
         $destinos = DB::table('ruta_destino')
             ->join('destino', 'ruta_destino.id_destino', '=', 'destino.id_destino')
             ->where('ruta_destino.id_ruta', $id)
             ->orderBy('ruta_destino.orden')
-            ->select(
-                'destino.id_destino',
-                'destino.nombre',
-                'destino.descripcion',
-                'destino.lat',
-                'destino.lng',
-                'ruta_destino.orden'
-            )
+            ->select('destino.id_destino', 'destino.nombre', 'destino.descripcion', 'destino.lat', 'destino.lng', 'ruta_destino.orden')
             ->get();
 
-        // 3. Para cada destino traer sus actividades en esta ruta
         foreach ($destinos as $destino) {
             $destino->actividades = DB::table('actividad')
                 ->join('ruta_destino_actividad', 'actividad.id_actividad', '=', 'ruta_destino_actividad.id_actividad')
@@ -212,7 +226,6 @@ class RutaController extends Controller
                 ->get();
         }
 
-        // 4. Comentarios
         $comentarios = DB::table('comentario')
             ->join('persona', 'comentario.id_persona', '=', 'persona.id_persona')
             ->where('comentario.entidad', 'ruta')
@@ -221,7 +234,6 @@ class RutaController extends Controller
             ->select('comentario.id_comentario', 'comentario.comentario', 'comentario.fecha', 'persona.nombre', 'persona.apellidos')
             ->get();
 
-        // 5. Recomendaciones
         $recomendaciones = DB::table('ruta_recomendacion')
             ->join('recomendacion', 'ruta_recomendacion.id_recomendacion', '=', 'recomendacion.id_recomendacion')
             ->where('ruta_recomendacion.id_ruta', $id)
@@ -229,22 +241,14 @@ class RutaController extends Controller
             ->pluck('recomendacion.descripcion')
             ->toArray();
 
-        // 6. JSON para el mapa (solo destinos con coordenadas válidas)
-        $destinosJson = $destinos->filter(function ($d) {
-            return !is_null($d->lat) && !is_null($d->lng) && is_numeric($d->lat) && is_numeric($d->lng);
-        })->map(function ($d) {
-            return [
-                'orden'  => $d->orden,
-                'nombre' => $d->nombre,
-                'lat'    => (float) $d->lat,
-                'lng'    => (float) $d->lng,
-            ];
-        })->values()->toJson(); // values() reindexa el array
+        $destinosJson = $destinos->filter(fn($d) => $d->lat && $d->lng)
+            ->map(fn($d) => ['orden' => $d->orden, 'nombre' => $d->nombre, 'lat' => (float) $d->lat, 'lng' => (float) $d->lng])
+            ->values()->toJson();
 
         return view('rutas.show', compact('ruta', 'destinos', 'comentarios', 'recomendaciones', 'destinosJson'));
     }
 
-    // ── EDIT: mostrar formulario de edición ──
+    // ── EDIT: mostrar formulario de edición (CORREGIDO) ──
     public function edit($id)
     {
         $personaId = $this->getPersonaId();
@@ -255,7 +259,6 @@ class RutaController extends Controller
         $ruta = Ruta::where('id_ruta', $id)
             ->where('creado_por', $personaId)
             ->first();
-
         abort_if(!$ruta, 404);
 
         $imagenes = DB::table('imagen')
@@ -267,13 +270,17 @@ class RutaController extends Controller
             ->join('destino', 'ruta_destino.id_destino', '=', 'destino.id_destino')
             ->where('ruta_destino.id_ruta', $id)
             ->orderBy('ruta_destino.orden')
-            ->select('destino.nombre', 'ruta_destino.orden')
+            ->select('destino.id_destino', 'destino.nombre', 'destino.descripcion', 'ruta_destino.orden')
             ->get();
 
-        return view('admin.gestor_rutas.edit', compact('ruta', 'imagenes', 'destinos'));
+        $todosDestinos = DB::table('destino')->where('activo', 'activo')->orderBy('nombre')->get();
+        $recomendacionesDisponibles = DB::table('recomendacion')->where('activo', 1)->orderBy('descripcion')->get();
+        $recomendacionesSeleccionadas = DB::table('ruta_recomendacion')->where('id_ruta', $id)->pluck('id_recomendacion')->toArray();
+
+        return view('admin.gestor_rutas.edit', compact('ruta', 'imagenes', 'destinos', 'todosDestinos', 'recomendacionesDisponibles', 'recomendacionesSeleccionadas'));
     }
 
-    // ── UPDATE: guardar cambios ──
+    // ── UPDATE: guardar cambios (CORREGIDO) ──
     public function update(Request $request, $id)
     {
         $personaId = $this->getPersonaId();
@@ -284,41 +291,87 @@ class RutaController extends Controller
         $ruta = Ruta::where('id_ruta', $id)
             ->where('creado_por', $personaId)
             ->first();
-
         abort_if(!$ruta, 404);
 
         $request->validate([
-            'nombre'          => 'required|string|max:120',
-            'descripcion'     => 'required|string',
-            'recomendaciones' => 'nullable|string',
-            'fotos'           => 'nullable|array',
-            'fotos.*'         => 'image|mimes:jpg,jpeg,png|max:5120',
+            'nombre'                 => 'required|string|max:120',
+            'descripcion'            => 'required|string',
+            'dificultad'             => 'required|in:baja,media,alta',
+            'distancia_km'           => 'nullable|numeric',
+            'duracion_estimada'      => 'nullable|string|max:50',
+            'fecha_inicio_operacion' => 'nullable|date',
+            'fecha_fin_operacion'    => 'nullable|date|after_or_equal:fecha_inicio_operacion',
+            'recomendaciones'        => 'nullable|array',
+            'recomendaciones.*'      => 'exists:recomendacion,id_recomendacion',
+            'destinos'               => 'required|array|min:1',
+            'destinos.*'             => 'required|exists:destino,id_destino',
+            'fotos'                  => 'nullable|array',
+            'fotos.*'                => 'image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
-        DB::table('ruta')
-            ->where('id_ruta', $id)
-            ->update([
-                'nombre'          => $request->nombre,
-                'descripcion'     => $request->descripcion,
-                'recomendaciones' => $request->recomendaciones,
+        DB::beginTransaction();
+        try {
+            DB::table('ruta')->where('id_ruta', $id)->update([
+                'nombre'                 => $request->nombre,
+                'descripcion'            => $request->descripcion,
+                'dificultad'             => $request->dificultad,
+                'distancia_km'           => $request->distancia_km,
+                'duracion_estimada'      => $request->duracion_estimada,
+                'fecha_inicio_operacion' => $request->fecha_inicio_operacion,
+                'fecha_fin_operacion'    => $request->fecha_fin_operacion,
             ]);
 
-        if ($request->hasFile('fotos')) {
-            foreach ($request->file('fotos') as $foto) {
-                $rutaArchivo = $foto->store('rutas', 'public');
-                DB::table('imagen')->insert([
-                    'entidad'      => 'ruta',
-                    'id_ruta'      => $id,
-                    'id_destino'   => null,
-                    'ruta_archivo' => $rutaArchivo,
-                    'subida_por'   => $personaId,
-                    'fecha'        => now(),
-                ]);
+            DB::table('ruta_recomendacion')->where('id_ruta', $id)->delete();
+            if ($request->filled('recomendaciones')) {
+                foreach ($request->recomendaciones as $idRecomendacion) {
+                    DB::table('ruta_recomendacion')->insert([
+                        'id_ruta'          => $id,
+                        'id_recomendacion' => $idRecomendacion,
+                    ]);
+                }
             }
-        }
 
-        return redirect()->route('rutas.index')
-            ->with('success', 'Ruta actualizada correctamente.');
+            DB::table('ruta_destino_actividad')->where('id_ruta', $id)->delete();
+            DB::table('ruta_destino')->where('id_ruta', $id)->delete();
+
+            foreach ($request->destinos as $index => $idDestino) {
+                $orden = $index + 1;
+                DB::table('ruta_destino')->insert([
+                    'id_ruta'    => $id,
+                    'id_destino' => $idDestino,
+                    'orden'      => $orden,
+                ]);
+
+                $actividades = $request->input("actividades_{$idDestino}", []);
+                foreach ($actividades as $idActividad) {
+                    DB::table('ruta_destino_actividad')->insert([
+                        'id_ruta'      => $id,
+                        'id_destino'   => $idDestino,
+                        'id_actividad' => $idActividad,
+                    ]);
+                }
+            }
+
+            if ($request->hasFile('fotos')) {
+                foreach ($request->file('fotos') as $foto) {
+                    $rutaArchivo = $foto->store('rutas', 'public');
+                    DB::table('imagen')->insert([
+                        'entidad'      => 'ruta',
+                        'id_ruta'      => $id,
+                        'ruta_archivo' => $rutaArchivo,
+                        'subida_por'   => $personaId,
+                        'fecha'        => now(),
+                    ]);
+                }
+            }
+
+            DB::commit();
+            return redirect()->route('rutas.index')
+                ->with('success', 'Ruta actualizada correctamente.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withInput()->with('error', 'Error al actualizar: ' . $e->getMessage());
+        }
     }
 
     public function destroyImagen($id)
@@ -329,12 +382,16 @@ class RutaController extends Controller
         }
 
         $imagen = DB::table('imagen')->where('id_imagen', $id)->first();
-        abort_if(!$imagen, 404);
+        if (!$imagen) {
+            return response()->json(['error' => 'Imagen no encontrada'], 404);
+        }
 
         $ruta = Ruta::where('id_ruta', $imagen->id_ruta)
             ->where('creado_por', $personaId)
             ->first();
-        abort_if(!$ruta, 403);
+        if (!$ruta) {
+            return response()->json(['error' => 'No autorizado'], 403);
+        }
 
         Storage::disk('public')->delete($imagen->ruta_archivo);
         DB::table('imagen')->where('id_imagen', $id)->delete();
@@ -352,7 +409,6 @@ class RutaController extends Controller
         $ruta = Ruta::where('id_ruta', $id)
             ->where('creado_por', $personaId)
             ->first();
-
         abort_if(!$ruta, 404);
 
         $imagenes = DB::table('imagen')
