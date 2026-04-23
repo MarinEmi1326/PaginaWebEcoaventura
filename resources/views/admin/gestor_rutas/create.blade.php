@@ -31,16 +31,25 @@
             <div class="p-4 border-bottom" style="background: rgba(255,255,255,.25);">
                 <div class="fw-semibold"><i class="bi bi-signpost-2 me-2"></i>Información General</div>
             </div>
+
             <div class="p-4">
                 <div class="row g-3">
+
+                    {{-- ✅ NOMBRE SOLO LETRAS --}}
                     <div class="col-12">
                         <label class="form-label fw-bold">Nombre de la ruta <span class="text-danger">*</span></label>
-                        <input type="text" name="nombre" value="{{ old('nombre') }}" class="form-control rounded-3 py-2" required maxlength="120">
+                        <input type="text" name="nombre" value="{{ old('nombre') }}" class="form-control rounded-3 py-2"
+                            required maxlength="120"
+                            oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g,'')">
                     </div>
+
+                    {{-- ✅ DESCRIPCIÓN SOLO LETRAS --}}
                     <div class="col-12">
                         <label class="form-label fw-bold">Descripción <span class="text-danger">*</span></label>
-                        <textarea name="descripcion" rows="4" class="form-control rounded-3 py-2" required>{{ old('descripcion') }}</textarea>
+                        <textarea name="descripcion" rows="4" class="form-control rounded-3 py-2" required
+                            oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g,'')">{{ old('descripcion') }}</textarea>
                     </div>
+
                     <div class="col-md-4">
                         <label class="form-label fw-bold">Dificultad <span class="text-danger">*</span></label>
                         <select name="dificultad" class="form-select" required>
@@ -49,27 +58,38 @@
                             <option value="alta" {{ old('dificultad') == 'alta' ? 'selected' : '' }}>Alta</option>
                         </select>
                     </div>
+
                     <div class="col-md-4">
                         <label class="form-label fw-bold">Duración estimada</label>
-                        <input type="text" name="duracion_estimada" value="{{ old('duracion_estimada') }}" class="form-control rounded-3 py-2" placeholder="Ej. 1 día, 6 horas">
+                        <input type="text" name="duracion_estimada" value="{{ old('duracion_estimada') }}"
+                            class="form-control rounded-3 py-2" placeholder="Ej. 1 día, 6 horas">
                     </div>
+
+                    {{-- ✅ DISTANCIA SIN NEGATIVOS --}}
                     <div class="col-md-4">
                         <label class="form-label fw-bold">Distancia (km)</label>
-                        <input type="number" step="0.01" name="distancia_km" value="{{ old('distancia_km') }}" class="form-control rounded-3 py-2" placeholder="Ej. 45.5">
+                        <input type="number" step="0.01" min="0" name="distancia_km"
+                            value="{{ old('distancia_km') }}" class="form-control rounded-3 py-2" placeholder="Ej. 45.5"
+                            oninput="if(this.value < 0) this.value = 0">
                     </div>
+
                     <div class="col-md-6">
                         <label class="form-label fw-bold">Fecha inicio operación</label>
-                        <input type="date" name="fecha_inicio_operacion" value="{{ old('fecha_inicio_operacion') }}" class="form-control rounded-3 py-2">
+                        <input type="date" name="fecha_inicio_operacion" value="{{ old('fecha_inicio_operacion') }}"
+                            class="form-control rounded-3 py-2">
                     </div>
+
                     <div class="col-md-6">
                         <label class="form-label fw-bold">Fecha fin operación</label>
-                        <input type="date" name="fecha_fin_operacion" value="{{ old('fecha_fin_operacion') }}" class="form-control rounded-3 py-2">
+                        <input type="date" name="fecha_fin_operacion" value="{{ old('fecha_fin_operacion') }}"
+                            class="form-control rounded-3 py-2">
                     </div>
+
                 </div>
             </div>
         </div>
 
-        {{-- BLOQUE 2: Recomendaciones (catálogo) --}}
+        {{-- BLOQUE 2: Recomendaciones (SIN CAMBIOS) --}}
         <div class="ea-card p-0 overflow-hidden mb-4">
             <div class="p-4 border-bottom">
                 <div class="fw-semibold"><i class="bi bi-lightbulb me-2"></i>Recomendaciones</div>
@@ -79,12 +99,14 @@
                     <div class="row g-2">
                         @foreach ($recomendacionesDisponibles as $rec)
                             <div class="col-12 col-md-4">
-                                <label class="d-flex align-items-center gap-2 p-3 rounded-3 border" style="cursor:pointer; background:#f7f9f7;">
+                                <label class="d-flex align-items-center gap-2 p-3 rounded-3 border"
+                                    style="cursor:pointer; background:#f7f9f7;">
                                     <input type="checkbox" name="recomendaciones[]" value="{{ $rec->id_recomendacion }}"
                                         class="form-check-input flex-shrink-0">
                                     <div>
                                         <span class="fw-semibold small">{{ $rec->descripcion }}</span>
-                                        <div><span class="badge bg-light text-dark border" style="font-size:.7rem;">{{ ucfirst($rec->tipo) }}</span></div>
+                                        <div><span class="badge bg-light text-dark border"
+                                                style="font-size:.7rem;">{{ ucfirst($rec->tipo) }}</span></div>
                                     </div>
                                 </label>
                             </div>
@@ -103,7 +125,8 @@
             </div>
             <div class="p-4">
                 <div class="d-flex align-items-center gap-3 mb-4">
-                    <div class="p-2 px-3 rounded-3 fw-semibold small" style="background:#f0f7f4; border:1px solid var(--ea-green);">
+                    <div class="p-2 px-3 rounded-3 fw-semibold small"
+                        style="background:#f0f7f4; border:1px solid var(--ea-green);">
                         <i class="bi bi-geo-alt me-1"></i>
                         <span id="contador-paradas">0</span> Destino(s)
                     </div>
@@ -138,9 +161,13 @@
                 <div class="fw-semibold"><i class="bi bi-images me-2"></i>Imágenes de la Ruta</div>
             </div>
             <div class="p-4">
-                <input type="file" id="fotosInput" name="fotos[]" accept="image/png,image/jpeg" class="d-none" multiple>
-                <div id="dropzone" class="rounded-3 border border-2 border-dashed p-5 text-center" style="border-color: #cdd8cd !important; background: #f7f9f7; cursor:pointer;" onclick="document.getElementById('fotosInput').click()">
-                    <div class="mx-auto mb-3 rounded-3 d-inline-flex align-items-center justify-content-center" style="width:48px;height:48px;background:#e2ece9;">
+                <input type="file" id="fotosInput" name="fotos[]" accept="image/png,image/jpeg" class="d-none"
+                    multiple>
+                <div id="dropzone" class="rounded-3 border border-2 border-dashed p-5 text-center"
+                    style="border-color: #cdd8cd !important; background: #f7f9f7; cursor:pointer;"
+                    onclick="document.getElementById('fotosInput').click()">
+                    <div class="mx-auto mb-3 rounded-3 d-inline-flex align-items-center justify-content-center"
+                        style="width:48px;height:48px;background:#e2ece9;">
                         <i class="bi bi-cloud-arrow-up text-success fs-4"></i>
                     </div>
                     <div class="fw-semibold text-dark">Haz clic para subir o arrastra imágenes</div>
@@ -151,7 +178,8 @@
         </div>
 
         <div class="d-flex justify-content-end gap-2 mt-4 pt-4 border-top">
-            <a href="{{ route('rutas.index') }}" class="btn btn-light border rounded-3 px-4 py-2 fw-semibold">Cancelar</a>
+            <a href="{{ route('rutas.index') }}"
+                class="btn btn-light border rounded-3 px-4 py-2 fw-semibold">Cancelar</a>
             <button type="submit" class="btn ea-btn-green rounded-3 px-4 py-2 fw-semibold">
                 <i class="bi bi-send me-1"></i> Guardar Ruta
             </button>
@@ -159,25 +187,26 @@
     </form>
 
     @push('scripts')
-    <script>
-        // ==================================================
-        // VARIABLES GLOBALES
-        // ==================================================
-        let contadorParadas = 0;
-        let opcionesDestinos = @json($destinos->map(fn($d) => ['id' => $d->id_destino, 'nombre' => $d->nombre]));
-        let mapaRuta, directionsService, directionsRenderer, marcadores = [], infoWindow;
+        <script>
+            // ==================================================
+            // VARIABLES GLOBALES
+            // ==================================================
+            let contadorParadas = 0;
+            let opcionesDestinos = @json($destinos->map(fn($d) => ['id' => $d->id_destino, 'nombre' => $d->nombre]));
+            let mapaRuta, directionsService, directionsRenderer, marcadores = [],
+                infoWindow;
 
-        // ==================================================
-        // FUNCIONES PARA DESTINOS
-        // ==================================================
-        function agregarParada() {
-            contadorParadas++;
-            const id = contadorParadas;
-            let options = '<option value="">-- Selecciona un destino --</option>';
-            opcionesDestinos.forEach(d => {
-                options += `<option value="${d.id}">${d.nombre}</option>`;
-            });
-            const html = `
+            // ==================================================
+            // FUNCIONES PARA DESTINOS
+            // ==================================================
+            function agregarParada() {
+                contadorParadas++;
+                const id = contadorParadas;
+                let options = '<option value="">-- Selecciona un destino --</option>';
+                opcionesDestinos.forEach(d => {
+                    options += `<option value="${d.id}">${d.nombre}</option>`;
+                });
+                const html = `
             <div class="ea-card p-0 overflow-hidden mb-3 border" id="bloque-${id}">
                 <div class="p-3 border-bottom d-flex align-items-center justify-content-between" style="background: rgba(255,255,255,.15);">
                     <div class="d-flex align-items-center gap-2">
@@ -202,259 +231,284 @@
                     </div>
                 </div>
             </div>`;
-            document.getElementById('contenedor-paradas').insertAdjacentHTML('beforeend', html);
-            document.getElementById('sin-paradas').style.display = 'none';
-            actualizarNumeros();
-        }
-
-        function eliminarParada(id) {
-            document.getElementById(`bloque-${id}`).remove();
-            actualizarNumeros();
-            actualizarMapa();
-            if (document.querySelectorAll('#contenedor-paradas > div').length === 0) {
-                document.getElementById('sin-paradas').style.display = 'block';
+                document.getElementById('contenedor-paradas').insertAdjacentHTML('beforeend', html);
+                document.getElementById('sin-paradas').style.display = 'none';
+                actualizarNumeros();
             }
-        }
 
-        function moverArriba(id) {
-            const bloque = document.getElementById(`bloque-${id}`);
-            const anterior = bloque.previousElementSibling;
-            if (anterior) {
-                bloque.parentNode.insertBefore(bloque, anterior);
+            function eliminarParada(id) {
+                document.getElementById(`bloque-${id}`).remove();
                 actualizarNumeros();
                 actualizarMapa();
-            }
-        }
-
-        function moverAbajo(id) {
-            const bloque = document.getElementById(`bloque-${id}`);
-            const siguiente = bloque.nextElementSibling;
-            if (siguiente) {
-                bloque.parentNode.insertBefore(siguiente, bloque);
-                actualizarNumeros();
-                actualizarMapa();
-            }
-        }
-
-        function actualizarNumeros() {
-            const bloques = document.querySelectorAll('#contenedor-paradas > div[id^="bloque-"]');
-            bloques.forEach((bloque, idx) => {
-                const numero = idx + 1;
-                bloque.querySelector('.num-parada').textContent = numero;
-                const select = bloque.querySelector('select');
-                if (select) select.dataset.bloque = numero;
-            });
-            document.getElementById('contador-paradas').textContent = bloques.length;
-        }
-
-        // ==================================================
-        // CARGAR INFO DESTINO
-        // ==================================================
-        async function cargarInfoDestino(selectElement) {
-            const idDestino = selectElement.value;
-            const idBloque = selectElement.dataset.bloque;
-            const infoDiv = document.getElementById(`info-parada-${idBloque}`);
-            const descDiv = document.getElementById(`desc-parada-${idBloque}`);
-            const actividadesDiv = document.getElementById(`actividades-parada-${idBloque}`);
-
-            if (!idDestino) {
-                if (infoDiv) infoDiv.style.display = 'none';
-                return;
+                if (document.querySelectorAll('#contenedor-paradas > div').length === 0) {
+                    document.getElementById('sin-paradas').style.display = 'block';
+                }
             }
 
-            infoDiv.style.display = 'block';
-            const response = await fetch(`/api/destino-info/${idDestino}`);
-            const data = await response.json();
-            descDiv.innerHTML = data.descripcion;
+            function moverArriba(id) {
+                const bloque = document.getElementById(`bloque-${id}`);
+                const anterior = bloque.previousElementSibling;
+                if (anterior) {
+                    bloque.parentNode.insertBefore(bloque, anterior);
+                    actualizarNumeros();
+                    actualizarMapa();
+                }
+            }
 
-            if (data.actividades && data.actividades.length) {
-                actividadesDiv.innerHTML = '';
-                data.actividades.forEach(act => {
-                    const label = document.createElement('label');
-                    label.className = 'col-12 col-md-4 d-flex align-items-center gap-2 p-3 rounded-3 border';
-                    label.style.cssText = 'cursor:pointer; background:#f7f9f7;';
-                    label.innerHTML = `
+            function moverAbajo(id) {
+                const bloque = document.getElementById(`bloque-${id}`);
+                const siguiente = bloque.nextElementSibling;
+                if (siguiente) {
+                    bloque.parentNode.insertBefore(siguiente, bloque);
+                    actualizarNumeros();
+                    actualizarMapa();
+                }
+            }
+
+            function actualizarNumeros() {
+                const bloques = document.querySelectorAll('#contenedor-paradas > div[id^="bloque-"]');
+                bloques.forEach((bloque, idx) => {
+                    const numero = idx + 1;
+                    bloque.querySelector('.num-parada').textContent = numero;
+                    const select = bloque.querySelector('select');
+                    if (select) select.dataset.bloque = numero;
+                });
+                document.getElementById('contador-paradas').textContent = bloques.length;
+            }
+
+            // ==================================================
+            // CARGAR INFO DESTINO
+            // ==================================================
+            async function cargarInfoDestino(selectElement) {
+                const idDestino = selectElement.value;
+                const idBloque = selectElement.dataset.bloque;
+                const infoDiv = document.getElementById(`info-parada-${idBloque}`);
+                const descDiv = document.getElementById(`desc-parada-${idBloque}`);
+                const actividadesDiv = document.getElementById(`actividades-parada-${idBloque}`);
+
+                if (!idDestino) {
+                    if (infoDiv) infoDiv.style.display = 'none';
+                    return;
+                }
+
+                infoDiv.style.display = 'block';
+                const response = await fetch(`/api/destino-info/${idDestino}`);
+                const data = await response.json();
+                descDiv.innerHTML = data.descripcion;
+
+                if (data.actividades && data.actividades.length) {
+                    actividadesDiv.innerHTML = '';
+                    data.actividades.forEach(act => {
+                        const label = document.createElement('label');
+                        label.className = 'col-12 col-md-4 d-flex align-items-center gap-2 p-3 rounded-3 border';
+                        label.style.cssText = 'cursor:pointer; background:#f7f9f7;';
+                        label.innerHTML = `
                         <input type="checkbox" name="actividades_${idDestino}[]" value="${act.id_actividad}" class="form-check-input flex-shrink-0">
                         <span class="fw-semibold small">${act.nombre}</span>
                     `;
-                    actividadesDiv.appendChild(label);
-                });
-            } else {
-                actividadesDiv.innerHTML = '<div class="col-12 text-muted small">Este destino no tiene actividades registradas.</div>';
+                        actividadesDiv.appendChild(label);
+                    });
+                } else {
+                    actividadesDiv.innerHTML =
+                        '<div class="col-12 text-muted small">Este destino no tiene actividades registradas.</div>';
+                }
+                actualizarMapa();
             }
-            actualizarMapa();
-        }
 
-        // ==================================================
-        // MAPA (Directions API + marcadores numerados)
-        // ==================================================
-        async function actualizarMapa() {
-            if (!mapaRuta) return;
+            // ==================================================
+            // MAPA (Directions API + marcadores numerados)
+            // ==================================================
+            async function actualizarMapa() {
+                if (!mapaRuta) return;
 
-            const bloques = document.querySelectorAll('#contenedor-paradas > div[id^="bloque-"]');
-            const destinosMapa = [];
-            for (let bloque of bloques) {
-                const select = bloque.querySelector('select');
-                const idDestino = select ? select.value : null;
-                if (!idDestino) continue;
-                const nombre = select.options[select.selectedIndex].text;
-                try {
-                    const res = await fetch(`/api/destino-info/${idDestino}`);
-                    const data = await res.json();
-                    if (data.lat && data.lng) {
-                        destinosMapa.push({
-                            id: idDestino,
-                            nombre: nombre,
-                            lat: parseFloat(data.lat),
-                            lng: parseFloat(data.lng),
-                            orden: destinosMapa.length + 1
-                        });
+                const bloques = document.querySelectorAll('#contenedor-paradas > div[id^="bloque-"]');
+                const destinosMapa = [];
+                for (let bloque of bloques) {
+                    const select = bloque.querySelector('select');
+                    const idDestino = select ? select.value : null;
+                    if (!idDestino) continue;
+                    const nombre = select.options[select.selectedIndex].text;
+                    try {
+                        const res = await fetch(`/api/destino-info/${idDestino}`);
+                        const data = await res.json();
+                        if (data.lat && data.lng) {
+                            destinosMapa.push({
+                                id: idDestino,
+                                nombre: nombre,
+                                lat: parseFloat(data.lat),
+                                lng: parseFloat(data.lng),
+                                orden: destinosMapa.length + 1
+                            });
+                        }
+                    } catch (err) {
+                        console.error(err);
                     }
-                } catch (err) { console.error(err); }
+                }
+
+                if (directionsRenderer) directionsRenderer.setMap(null);
+                marcadores.forEach(m => m.map = null);
+                marcadores = [];
+
+                if (destinosMapa.length === 0) return;
+
+                const bounds = new google.maps.LatLngBounds();
+                destinosMapa.forEach(d => {
+                    const pos = {
+                        lat: d.lat,
+                        lng: d.lng
+                    };
+                    bounds.extend(pos);
+                    const marker = crearMarcadorNumerado(d.orden, pos, d.nombre);
+                    marcadores.push(marker);
+                });
+                mapaRuta.fitBounds(bounds);
+                if (destinosMapa.length === 1) mapaRuta.setZoom(13);
+
+                if (destinosMapa.length > 1) {
+                    directionsService = new google.maps.DirectionsService();
+                    directionsRenderer = new google.maps.DirectionsRenderer({
+                        suppressMarkers: true,
+                        polylineOptions: {
+                            strokeColor: '#4285F4',
+                            strokeOpacity: 1,
+                            strokeWeight: 6
+                        }
+                    });
+                    directionsRenderer.setMap(mapaRuta);
+                    const origen = destinosMapa[0];
+                    const destino = destinosMapa[destinosMapa.length - 1];
+                    const waypoints = destinosMapa.slice(1, -1).map(p => ({
+                        location: new google.maps.LatLng(p.lat, p.lng),
+                        stopover: true,
+                    }));
+                    directionsService.route({
+                        origin: new google.maps.LatLng(origen.lat, origen.lng),
+                        destination: new google.maps.LatLng(destino.lat, destino.lng),
+                        waypoints: waypoints,
+                        travelMode: google.maps.TravelMode.DRIVING,
+                        optimizeWaypoints: false,
+                    }, (result, status) => {
+                        if (status === google.maps.DirectionsStatus.OK) {
+                            directionsRenderer.setDirections(result);
+                        } else {
+                            console.warn('No se pudo trazar la ruta:', status);
+                        }
+                    });
+                }
             }
 
-            if (directionsRenderer) directionsRenderer.setMap(null);
-            marcadores.forEach(m => m.map = null);
-            marcadores = [];
-
-            if (destinosMapa.length === 0) return;
-
-            const bounds = new google.maps.LatLngBounds();
-            destinosMapa.forEach(d => {
-                const pos = { lat: d.lat, lng: d.lng };
-                bounds.extend(pos);
-                const marker = crearMarcadorNumerado(d.orden, pos, d.nombre);
-                marcadores.push(marker);
-            });
-            mapaRuta.fitBounds(bounds);
-            if (destinosMapa.length === 1) mapaRuta.setZoom(13);
-
-            if (destinosMapa.length > 1) {
-                directionsService = new google.maps.DirectionsService();
-                directionsRenderer = new google.maps.DirectionsRenderer({
-                    suppressMarkers: true,
-                    polylineOptions: { strokeColor: '#4285F4', strokeOpacity: 1, strokeWeight: 6 }
-                });
-                directionsRenderer.setMap(mapaRuta);
-                const origen = destinosMapa[0];
-                const destino = destinosMapa[destinosMapa.length - 1];
-                const waypoints = destinosMapa.slice(1, -1).map(p => ({
-                    location: new google.maps.LatLng(p.lat, p.lng),
-                    stopover: true,
-                }));
-                directionsService.route({
-                    origin: new google.maps.LatLng(origen.lat, origen.lng),
-                    destination: new google.maps.LatLng(destino.lat, destino.lng),
-                    waypoints: waypoints,
-                    travelMode: google.maps.TravelMode.DRIVING,
-                    optimizeWaypoints: false,
-                }, (result, status) => {
-                    if (status === google.maps.DirectionsStatus.OK) {
-                        directionsRenderer.setDirections(result);
-                    } else {
-                        console.warn('No se pudo trazar la ruta:', status);
-                    }
-                });
-            }
-        }
-
-        function crearMarcadorNumerado(orden, posicion, titulo) {
-            const pin = document.createElement('div');
-            pin.style.cssText = 'position:relative; display:flex; flex-direction:column; align-items:center;';
-            const circulo = document.createElement('div');
-            circulo.style.cssText = `
+            function crearMarcadorNumerado(orden, posicion, titulo) {
+                const pin = document.createElement('div');
+                pin.style.cssText = 'position:relative; display:flex; flex-direction:column; align-items:center;';
+                const circulo = document.createElement('div');
+                circulo.style.cssText = `
                 background:#1F6B4B; color:white; border-radius:50%;
                 width:34px; height:34px; display:flex; align-items:center;
                 justify-content:center; font-weight:bold; font-size:13px;
                 border:2px solid white; box-shadow:0 2px 6px rgba(0,0,0,.4);
             `;
-            circulo.textContent = orden.toString();
-            const flecha = document.createElement('div');
-            flecha.style.cssText = `
+                circulo.textContent = orden.toString();
+                const flecha = document.createElement('div');
+                flecha.style.cssText = `
                 width:0; height:0;
                 border-left:7px solid transparent; border-right:7px solid transparent;
                 border-top:10px solid #1F6B4B; margin-top:-2px;
             `;
-            pin.appendChild(circulo);
-            pin.appendChild(flecha);
-            const marker = new google.maps.marker.AdvancedMarkerElement({
-                position: posicion,
-                map: mapaRuta,
-                title: titulo,
-                content: pin,
-            });
-            marker.addListener('click', () => {
-                infoWindow.setContent(`
+                pin.appendChild(circulo);
+                pin.appendChild(flecha);
+                const marker = new google.maps.marker.AdvancedMarkerElement({
+                    position: posicion,
+                    map: mapaRuta,
+                    title: titulo,
+                    content: pin,
+                });
+                marker.addListener('click', () => {
+                    infoWindow.setContent(`
                     <div style="padding:6px;">
                         <strong style="color:#1F6B4B;">${titulo}</strong><br>
                         <span style="font-size:11px;">Parada ${orden}</span><br>
                         <a href="https://www.google.com/maps/search/?api=1&query=${posicion.lat},${posicion.lng}" target="_blank">Ver en Google Maps →</a>
                     </div>
                 `);
-                infoWindow.open({ anchor: marker, map: mapaRuta });
-            });
-            return marker;
-        }
-
-        async function initMapaCreacion() {
-            const contenedor = document.getElementById('mapa-creacion');
-            if (!contenedor) return;
-            const { Map } = await google.maps.importLibrary("maps");
-            const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
-            mapaRuta = new Map(contenedor, {
-                center: { lat: 16.75, lng: -92.64 },
-                zoom: 8,
-                mapId: "DEMO_MAP_ID",
-            });
-            infoWindow = new google.maps.InfoWindow();
-            actualizarMapa();
-        }
-
-        // ==================================================
-        // IMÁGENES
-        // ==================================================
-        const fotosInput = document.getElementById('fotosInput');
-        const dropzone = document.getElementById('dropzone');
-        const previews = document.getElementById('previews');
-        function mostrarPreviews(files) {
-            previews.innerHTML = '';
-            Array.from(files).forEach(file => {
-                const img = document.createElement('img');
-                img.src = URL.createObjectURL(file);
-                img.className = 'rounded-3 border';
-                img.style.cssText = 'width:100px;height:80px;object-fit:cover;';
-                previews.appendChild(img);
-            });
-        }
-        fotosInput.addEventListener('change', e => mostrarPreviews(e.target.files));
-        dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.style.borderColor = '#1F6B4B'; });
-        dropzone.addEventListener('dragleave', () => dropzone.style.borderColor = '#cdd8cd');
-        dropzone.addEventListener('drop', e => {
-            e.preventDefault();
-            dropzone.style.borderColor = '#cdd8cd';
-            fotosInput.files = e.dataTransfer.files;
-            mostrarPreviews(e.dataTransfer.files);
-        });
-
-        // ==================================================
-        // INICIALIZACIÓN
-        // ==================================================
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof google !== 'undefined' && google.maps) {
-                initMapaCreacion();
-            } else {
-                window.initMapaCreacion = initMapaCreacion;
-                const script = document.createElement('script');
-                script.src = `https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.key') }}&callback=initMapaCreacion`;
-                script.async = true;
-                script.defer = true;
-                document.head.appendChild(script);
+                    infoWindow.open({
+                        anchor: marker,
+                        map: mapaRuta
+                    });
+                });
+                return marker;
             }
-            // Observar cambios en selects para actualizar el mapa
-            document.getElementById('contenedor-paradas').addEventListener('change', (e) => {
-                if (e.target && e.target.tagName === 'SELECT') actualizarMapa();
+
+            async function initMapaCreacion() {
+                const contenedor = document.getElementById('mapa-creacion');
+                if (!contenedor) return;
+                const {
+                    Map
+                } = await google.maps.importLibrary("maps");
+                const {
+                    AdvancedMarkerElement
+                } = await google.maps.importLibrary("marker");
+                mapaRuta = new Map(contenedor, {
+                    center: {
+                        lat: 16.75,
+                        lng: -92.64
+                    },
+                    zoom: 8,
+                    mapId: "DEMO_MAP_ID",
+                });
+                infoWindow = new google.maps.InfoWindow();
+                actualizarMapa();
+            }
+
+            // ==================================================
+            // IMÁGENES
+            // ==================================================
+            const fotosInput = document.getElementById('fotosInput');
+            const dropzone = document.getElementById('dropzone');
+            const previews = document.getElementById('previews');
+
+            function mostrarPreviews(files) {
+                previews.innerHTML = '';
+                Array.from(files).forEach(file => {
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(file);
+                    img.className = 'rounded-3 border';
+                    img.style.cssText = 'width:100px;height:80px;object-fit:cover;';
+                    previews.appendChild(img);
+                });
+            }
+            fotosInput.addEventListener('change', e => mostrarPreviews(e.target.files));
+            dropzone.addEventListener('dragover', e => {
+                e.preventDefault();
+                dropzone.style.borderColor = '#1F6B4B';
             });
-        });
-    </script>
+            dropzone.addEventListener('dragleave', () => dropzone.style.borderColor = '#cdd8cd');
+            dropzone.addEventListener('drop', e => {
+                e.preventDefault();
+                dropzone.style.borderColor = '#cdd8cd';
+                fotosInput.files = e.dataTransfer.files;
+                mostrarPreviews(e.dataTransfer.files);
+            });
+
+            // ==================================================
+            // INICIALIZACIÓN
+            // ==================================================
+            document.addEventListener('DOMContentLoaded', function() {
+                if (typeof google !== 'undefined' && google.maps) {
+                    initMapaCreacion();
+                } else {
+                    window.initMapaCreacion = initMapaCreacion;
+                    const script = document.createElement('script');
+                    script.src =
+                        `https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.key') }}&callback=initMapaCreacion`;
+                    script.async = true;
+                    script.defer = true;
+                    document.head.appendChild(script);
+                }
+                // Observar cambios en selects para actualizar el mapa
+                document.getElementById('contenedor-paradas').addEventListener('change', (e) => {
+                    if (e.target && e.target.tagName === 'SELECT') actualizarMapa();
+                });
+            });
+        </script>
     @endpush
 @endsection
