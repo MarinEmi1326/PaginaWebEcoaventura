@@ -16,15 +16,15 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    public function showLogin() 
-    { 
-        return view('auth.login'); 
+    public function showLogin()
+    {
+        return view('auth.login');
     }
-    
+
     // ========== REGISTRO ADMIN DESTINOS ==========
-    public function showRegistroDestinos() 
-    { 
-        return view('auth.registro-destinos'); 
+    public function showRegistroDestinos()
+    {
+        return view('auth.registro-destinos');
     }
 
     public function registroDestinos(Request $request)
@@ -62,7 +62,9 @@ class AuthController extends Controller
 
             try {
                 Mail::to($usuario->correo)->send(new SolicitudPendienteMail($usuario));
-            } catch (\Exception $e) { Log::warning("Mail error: " . $e->getMessage()); }
+            } catch (\Exception $e) {
+                Log::warning("Mail error: " . $e->getMessage());
+            }
 
             return redirect()->route('registro.destinos.exito');
         } catch (\Exception $e) {
@@ -112,7 +114,9 @@ class AuthController extends Controller
 
             try {
                 Mail::to($usuario->correo)->send(new SolicitudPendienteMail($usuario));
-            } catch (\Exception $e) { Log::warning("Mail error: " . $e->getMessage()); }
+            } catch (\Exception $e) {
+                Log::warning("Mail error: " . $e->getMessage());
+            }
 
             return redirect()->route('registro.rutas.exito');
         } catch (\Exception $e) {
@@ -145,8 +149,8 @@ class AuthController extends Controller
             $usuario = Usuario::create([
                 'correo'             => $validated['correo'],
                 'password'           => Hash::make($validated['password']),
-                'activo'             => true,           // Turista activo automáticamente
-                'estado'             => 'aprobado',     // Aprobado sin revisión
+                'activo'             => true,
+                'estado'             => 'aprobado',
                 'correo_verificado'  => 1,
                 'token_verificacion' => null,
                 'fecha_solicitud'    => now(),
@@ -161,9 +165,6 @@ class AuthController extends Controller
             $persona->roles()->attach($rol->id_rol);
             DB::commit();
 
-            // Opcional: enviar correo de bienvenida
-            // Mail::to($usuario->correo)->send(new BienvenidaTuristaMail($usuario));
-
             return redirect()->route('login')->with('ok', 'Cuenta creada exitosamente. Ahora puedes iniciar sesión.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -171,7 +172,7 @@ class AuthController extends Controller
         }
     }
 
-    // ========== LOGIN Y OTROS MÉTODOS ==========
+    // ========== LOGIN CORREGIDO (con verificación de activo y errores específicos) ==========
     public function login(Request $request)
     {
         $request->validate([
@@ -179,7 +180,7 @@ class AuthController extends Controller
             'password' => 'required'
         ]);
 
-        // Buscar usuario por correo
+        // 1. Buscar usuario por correo
         $user = Usuario::where('correo', $request->correo)->first();
 
         // CORREO NO EXISTE
@@ -192,33 +193,20 @@ class AuthController extends Controller
             return back()->with('error_tipo', 'password')->withInput();
         }
 
-        // LOGIN CORRECTO
+        // 2. Verificar si el usuario está activo
+        if (!$user->activo) {
+            return back()->withErrors(['error' => 'Tu cuenta ha sido suspendida. No puedes iniciar sesión.'])->withInput();
+        }
+
+        // 3. Login correcto
         Auth::login($user);
 
         $rol = $user->persona?->roles->first()?->descripcion;
 
-        // ROLES 
         if ($rol === 'admin_general') return redirect()->route('admin.index');
         if ($rol === 'admin_destinos') return redirect()->route('misdestinos.index');
         if ($rol === 'gestor_rutas') return redirect()->route('rutas.index');
 
         return redirect('/');
-
-    }
-
-    public function verificarCorreo($token)
-    {
-        $usuario = Usuario::where('token_verificacion', $token)->first();
-        if (!$usuario) return redirect('/login')->with('error', 'Enlace inválido.');
-        $usuario->update(['correo_verificado' => 1, 'token_verificacion' => null]);
-        return redirect('/login')->with('ok', 'Correo verificado. Ahora un administrador revisará tu solicitud.');
-    }
-
-    public function logout(Request $request)
-    {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        return redirect('/login');
     }
 }
