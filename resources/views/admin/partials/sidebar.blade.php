@@ -25,14 +25,14 @@
 
         {{-- Dashboard --}}
         <a href="{{ route('admin.index') }}"
-            class="ea-nav-pill {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+            class="ea-nav-pill {{ request()->routeIs('admin.index') ? 'active' : '' }}">
             <i class="bi bi-bar-chart-line"></i>
             <span>Dashboard</span>
         </a>
 
         {{-- Destinos --}}
         <a href="{{ route('admin.destino') }}"
-            class="ea-nav-pill {{ request()->routeIs('admin.aprobacion') ? 'active' : '' }}">
+            class="ea-nav-pill {{ request()->routeIs('admin.destino') ? 'active' : '' }}">
             <i class="bi bi-geo-alt"></i>
             <span>Destinos</span>
         </a>
@@ -58,7 +58,7 @@
             <span>Reportes de Usuarios</span>
         </a>
          <a href="{{ route('admin.reportes.rutas.index') }}"
-            class="ea-nav-pill {{ request()->routeIs('admin.reportes-rutas.*') ? 'active' : '' }}">
+            class="ea-nav-pill {{ request()->routeIs('admin.reportes.rutas.*') ? 'active' : '' }}">
             <i class="bi bi-signpost-2"></i>
             <span>Reportes de Rutas</span>
         </a>

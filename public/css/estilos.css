@@ -499,9 +499,9 @@ body {
   width: 280px;
   flex: 0 0 280px;
   flex-shrink: 0;
-  background: rgba(255, 255, 255, .55);
+  background: rgba(255, 255, 255, 0.72);
   border-right: 1px solid var(--ea-line);
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(8px);
 }
 
 .ea-logo-badge {
@@ -516,17 +516,48 @@ body {
 
 .ea-nav-pill {
   background: var(--ea-pill);
-  border: 1px solid rgba(15, 42, 36, .08);
+  border: 1px solid rgba(15, 42, 36, 0.08);
   border-radius: 14px;
-  padding: 10px 14px;
+  padding: 12px 16px;
   color: var(--ea-text);
   text-decoration: none;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.25s ease;
 }
 
+.ea-nav-pill i {
+  font-size: 1rem;
+  color: #435046;
+  transition: all 0.25s ease;
+}
+
+.ea-nav-pill:hover {
+  background: #d7e0d7;
+  color: #16211b;
+  transform: translateX(2px);
+}
+
+.ea-nav-pill:hover i {
+  color: #16211b;
+}
+
+.ea-nav-pill.active {
+  background: #bcccbc;
+  color: #102019;
+  font-weight: 700;
+  border: 1px solid #9db39d;
+  border-left: 5px solid #0F5A3A;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.ea-nav-pill.active i,
+.ea-nav-pill.active span {
+  color: #102019;
+}
 .ea-nav-pill:hover {
   filter: brightness(.98);
 }

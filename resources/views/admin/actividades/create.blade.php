@@ -7,16 +7,21 @@
     @csrf
 
     <div class="ea-card p-4">
-        <label for="nombre" class="form-label fw-bold fs-5">Nombre de la actividad *</label>
-        <input type="text"
-               id="nombre"
-               name="nombre"
-               value="{{ old('nombre') }}"
-               class="form-control form-control-lg py-3 border-2"
-               style="background-color: #fef9e6; border-color: #8a827b; font-size: 1.1rem;"
-               required
-               maxlength="80"
-               placeholder="Ej. Avistamiento de mariposas monarca">
+        <label for="nombreActividad" class="form-label fw-bold fs-5">
+            Nombre de la actividad *
+        </label>
+
+        <input
+            type="text"
+            id="nombreActividad"
+            name="nombre"
+            value="{{ old('nombre') }}"
+            class="form-control form-control-lg py-3 border-2"
+            style="background-color: #fef9e6; border-color: #8a827b; font-size: 1.1rem;"
+            required
+            maxlength="80"
+            placeholder="Ej. Avistamiento de mariposas monarca"
+        >
 
         <div class="form-text text-muted mt-2">
             Escribe el nombre de la actividad (único).
@@ -33,9 +38,9 @@
     </div>
 </form>
 
+{{-- Validación en tiempo real: solo letras, espacios y eñes --}}
 <script>
-    // Validación: solo letras (incluye acentos, espacios y eñes)
-    document.getElementById('nombre').addEventListener('input', function() {
+    document.getElementById('nombreActividad').addEventListener('input', function () {
         this.value = this.value.replace(/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/g, '');
     });
 </script>
