@@ -179,17 +179,31 @@ class AuthController extends Controller
             'password' => 'required'
         ]);
 
-        if (Auth::attempt(['correo' => $request->correo, 'password' => $request->password])) {
-            $user = Auth::user();
-            $rol = $user->persona?->roles->first()?->descripcion;
+        // Buscar usuario por correo
+        $user = Usuario::where('correo', $request->correo)->first();
 
-            if ($rol === 'admin_general') return redirect()->route('admin.index');
-            if ($rol === 'admin_destinos') return redirect()->route('misdestinos.index');
-            if ($rol === 'gestor_rutas') return redirect()->route('rutas.index');
-            return redirect('/');
+        // CORREO NO EXISTE
+        if (!$user) {
+            return back()->with('error_tipo', 'correo')->withInput();
         }
 
-        return back()->withErrors(['error' => 'Credenciales incorrectas'])->withInput();
+        // CONTRASEÑA INCORRECTA
+        if (!Hash::check($request->password, $user->password)) {
+            return back()->with('error_tipo', 'password')->withInput();
+        }
+
+        // LOGIN CORRECTO
+        Auth::login($user);
+
+        $rol = $user->persona?->roles->first()?->descripcion;
+
+        // ROLES 
+        if ($rol === 'admin_general') return redirect()->route('admin.index');
+        if ($rol === 'admin_destinos') return redirect()->route('misdestinos.index');
+        if ($rol === 'gestor_rutas') return redirect()->route('rutas.index');
+
+        return redirect('/');
+
     }
 
     public function verificarCorreo($token)
