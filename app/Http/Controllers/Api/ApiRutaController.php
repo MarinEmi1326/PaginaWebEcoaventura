@@ -70,18 +70,19 @@ class ApiRutaController extends Controller
             )
             ->get();
 
+        // ✅ CORREGIDO: Actividades - solo nombre (dificultad y duración están en ruta, no en actividad)
         foreach ($destinos as $destino) {
             $destino->actividades = DB::table('actividad')
                 ->join('ruta_destino_actividad', 'actividad.id_actividad', '=', 'ruta_destino_actividad.id_actividad')
                 ->where('ruta_destino_actividad.id_ruta', $id)
                 ->where('ruta_destino_actividad.id_destino', $destino->id_destino)
-                ->select('actividad.nombre', 'actividad.dificultad', 'actividad.duracion_estimada')
+                ->select('actividad.id_actividad', 'actividad.nombre') // ✅ Solo nombre
                 ->get();
         }
 
         $ruta->destinos = $destinos;
 
-        // CAMBIADO: Comentarios usando persona en lugar de turista
+        // Comentarios usando persona
         $ruta->comentarios = DB::table('comentario')
             ->join('persona', 'comentario.id_persona', '=', 'persona.id_persona')
             ->where('comentario.entidad', 'ruta')

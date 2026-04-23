@@ -62,7 +62,7 @@ class ApiDestinoController extends Controller
             ->where('destino_actividad.id_destino', $id)
             ->select('actividad.*')->get();
         $destino->paquetes    = DB::table('paquete')->where('id_destino', $id)->where('activo', 'activo')->get();
-        
+
         // CAMBIADO: usar persona en lugar de turista
         $destino->comentarios = DB::table('comentario')
             ->join('persona', 'comentario.id_persona', '=', 'persona.id_persona')
@@ -124,8 +124,8 @@ class ApiDestinoController extends Controller
     public function store(Request $request)
     {
         $user = auth()->user();
-        
-        // CAMBIADO: verificar rol desde persona
+
+        // Verificar rol desde persona
         $persona = $this->getPersona($user->id_usuario);
         $roles = DB::table('persona_rol')
             ->join('rol', 'persona_rol.id_rol', '=', 'rol.id_rol')
@@ -153,14 +153,22 @@ class ApiDestinoController extends Controller
             'actividades_existentes.*' => 'exists:actividad,id_actividad',
             'nuevas_actividades'       => 'nullable|array',
             'nuevas_actividades.*.nombre' => 'required_with:nuevas_actividades|string|max:80',
-            'nuevas_actividades.*.dificultad' => 'required_with:nuevas_actividades|in:baja,media,alta',
+            // ⚠️ NOTA: dificultad, duracion, etc. YA NO se guardan aquí
             'paquetes'    => 'nullable|array',
             'paquetes.*.nombre' => 'required_with:paquetes|string|max:120',
+            'paquetes.*.descripcion' => 'nullable|string',
+            'paquetes.*.precio' => 'nullable|numeric',
+            'paquetes.*.actividades' => 'nullable|array', // Actividades del paquete con minimo_personas
+            'paquetes.*.actividades.*.id_actividad' => 'exists:actividad,id_actividad',
+            'paquetes.*.actividades.*.minimo_personas' => 'required|integer|min:1',
+            'paquetes.*.actividades.*.maximo_personas' => 'required|integer|min:1',
+            'recomendaciones_ids' => 'nullable|array', // Recomendaciones existentes
+            'recomendaciones_ids.*' => 'exists:recomendacion,id_recomendacion',
             'fotos'       => 'nullable|array',
             'fotos.*'     => 'image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
-        // CAMBIADO: Insertar destino con id_persona
+        // Insertar destino con id_persona
         $id_destino = DB::table('destino')->insertGetId([
             'nombre'          => $request->nombre,
             'descripcion'     => $request->descripcion,
@@ -169,11 +177,11 @@ class ApiDestinoController extends Controller
             'lat'             => $request->lat,
             'lng'             => $request->lng,
             'activo'          => 'activo',
-            'creado_por'      => $persona->id_persona,  // CAMBIADO: id_persona
+            'creado_por'      => $persona->id_persona,
             'fecha_creacion'  => now(),
         ]);
 
-        // Categorías
+        // ==================== CATEGORÍAS ====================
         if ($request->categorias) {
             foreach ($request->categorias as $id_cat) {
                 DB::table('destino_categoria')->insert([
@@ -183,7 +191,7 @@ class ApiDestinoController extends Controller
             }
         }
 
-        // Actividades existentes
+        // ==================== ACTIVIDADES EXISTENTES ====================
         if ($request->actividades_existentes) {
             foreach ($request->actividades_existentes as $id_act) {
                 DB::table('destino_actividad')->insert([
@@ -193,16 +201,13 @@ class ApiDestinoController extends Controller
             }
         }
 
-        // Nuevas actividades
+        // ==================== NUEVAS ACTIVIDADES (SOLO NOMBRE) ====================
         if ($request->nuevas_actividades) {
             foreach ($request->nuevas_actividades as $act) {
                 if (empty($act['nombre'])) continue;
+                // ✅ Solo guardamos el nombre, como está en tu BD
                 $id_act = DB::table('actividad')->insertGetId([
-                    'nombre'            => $act['nombre'],
-                    'dificultad'        => $act['dificultad'] ?? 'baja',
-                    'duracion_estimada' => $act['duracion'] ?? null,
-                    'minimo_personas'   => $act['min_personas'] ?? null,
-                    'recomendacion'     => $act['recomendacion'] ?? null,
+                    'nombre' => $act['nombre'],
                 ]);
                 DB::table('destino_actividad')->insert([
                     'id_destino'   => $id_destino,
@@ -211,22 +216,49 @@ class ApiDestinoController extends Controller
             }
         }
 
-        // Paquetes
+        // ==================== PAQUETES CON SUS ACTIVIDADES ====================
         if ($request->paquetes) {
             foreach ($request->paquetes as $paq) {
                 if (empty($paq['nombre'])) continue;
-                DB::table('paquete')->insert([
-                    'id_destino'      => $id_destino,
-                    'nombre'          => $paq['nombre'],
-                    'descripcion'     => $paq['descripcion'] ?? null,
-                    'precio'          => $paq['precio'] ?? null,
-                    'minimo_personas' => $paq['minimo_personas'] ?? null,
-                    'activo'          => 'activo',
+
+                // Insertar paquete
+                $id_paquete = DB::table('paquete')->insertGetId([
+                    'id_destino'  => $id_destino,
+                    'nombre'      => $paq['nombre'],
+                    'descripcion' => $paq['descripcion'] ?? null,
+                    'precio'      => $paq['precio'] ?? null,
+                    'tipo_publico' => $paq['tipo_publico'] ?? 'todo',
+                    'edad_minima' => $paq['edad_minima'] ?? null,
+                    'edad_maxima' => $paq['edad_maxima'] ?? null,
+                    'activo'      => 'activo',
+                ]);
+
+                // Insertar actividades del paquete (con minimo_personas, maximo_personas)
+                if (isset($paq['actividades']) && is_array($paq['actividades'])) {
+                    foreach ($paq['actividades'] as $idx => $actPaq) {
+                        DB::table('paquete_actividad')->insert([
+                            'id_paquete'       => $id_paquete,
+                            'id_actividad'     => $actPaq['id_actividad'],
+                            'minimo_personas'  => $actPaq['minimo_personas'] ?? 1,
+                            'maximo_personas'  => $actPaq['maximo_personas'] ?? 10,
+                            'orden'            => $actPaq['orden'] ?? $idx,
+                        ]);
+                    }
+                }
+            }
+        }
+
+        // ==================== RECOMENDACIONES ====================
+        if ($request->recomendaciones_ids) {
+            foreach ($request->recomendaciones_ids as $id_rec) {
+                DB::table('destino_recomendacion')->insert([
+                    'id_destino'       => $id_destino,
+                    'id_recomendacion' => $id_rec,
                 ]);
             }
         }
 
-        // Imágenes
+        // ==================== IMÁGENES ====================
         if ($request->hasFile('fotos')) {
             foreach ($request->file('fotos') as $foto) {
                 $ruta = $foto->store('destinos', 'public');
@@ -257,7 +289,7 @@ class ApiDestinoController extends Controller
         ]);
 
         $user = auth()->user();
-        
+
         // CAMBIADO: verificar rol turista desde persona
         $persona = $this->getPersona($user->id_usuario);
         $roles = DB::table('persona_rol')
@@ -343,7 +375,7 @@ class ApiDestinoController extends Controller
     {
         $user = $request->user();
         $persona = $this->getPersona($user->id_usuario);
-        
+
         $roles = DB::table('persona_rol')
             ->join('rol', 'persona_rol.id_rol', '=', 'rol.id_rol')
             ->where('persona_rol.id_persona', $persona->id_persona)
@@ -378,7 +410,7 @@ class ApiDestinoController extends Controller
     {
         $user = $request->user();
         $persona = $this->getPersona($user->id_usuario);
-        
+
         $roles = DB::table('persona_rol')
             ->join('rol', 'persona_rol.id_rol', '=', 'rol.id_rol')
             ->where('persona_rol.id_persona', $persona->id_persona)
