@@ -30,7 +30,7 @@
 
         {{-- Ventas (NUEVO) --}}
         <a href="{{ route('admin.ventas.index') }}"
-            class="ea-nav-pill {{ request()->routeIs('admin.ventas') ? 'active' : '' }}">
+            class="ea-nav-pill {{ request()->routeIs('admin.ventas.index') ? 'active' : '' }}">
             <i class="bi bi-graph-up"></i>
             <span>Ventas</span>
         </a>
