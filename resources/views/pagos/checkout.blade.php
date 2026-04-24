@@ -8,7 +8,6 @@
     </a>
 
     <div class="ea-card p-0 overflow-hidden">
-        {{-- Encabezado --}}
         <div class="p-4 border-bottom" style="background:rgba(255,255,255,.25);">
             <p class="text-muted small mb-1"><i class="bi bi-geo-alt me-1"></i>{{ $destino->nombre }}</p>
             <h4 class="fw-bold mb-0">🎒 {{ $paquete->nombre }}</h4>
@@ -17,7 +16,6 @@
             @endif
         </div>
 
-        {{-- Resumen --}}
         <div class="p-4 border-bottom">
             <div class="d-flex justify-content-between align-items-center">
                 <span class="text-muted">Total a pagar</span>
@@ -25,7 +23,6 @@
             </div>
         </div>
 
-        {{-- Formulario de pago --}}
         <div class="p-4">
             @if (session('error'))
                 <div class="alert alert-danger rounded-3 mb-3">{{ session('error') }}</div>
@@ -48,13 +45,25 @@
                     @enderror
                 </div>
 
-                {{-- Número de personas --}}
+                {{-- Número de personas con rango --}}
                 <div class="mb-3">
                     <label class="form-label fw-bold small">
                         <i class="bi bi-people me-1 text-success"></i>Número de personas
                     </label>
-                    <input type="number" name="personas" class="form-control rounded-3 py-2 @error('personas') is-invalid @enderror"
-                        min="1" value="{{ old('personas', 1) }}" placeholder="Cantidad de personas" required>
+                    <input type="number" name="personas" id="personas"
+                        class="form-control rounded-3 py-2 @error('personas') is-invalid @enderror"
+                        min="{{ $rango['min'] }}" 
+                        @if($rango['max'] > 0) max="{{ $rango['max'] }}" @endif
+                        value="{{ old('personas', $rango['min']) }}" required>
+                    @if($rango['min'] > 0 && $rango['max'] > 0)
+                        <div class="form-text small mt-1 text-muted">
+                            <i class="bi bi-info-circle"></i> Este paquete acepta <strong>{{ $rango['min'] }} a {{ $rango['max'] }} personas</strong>.
+                        </div>
+                    @elseif($rango['min'] > 0)
+                        <div class="form-text small mt-1 text-muted">
+                            <i class="bi bi-info-circle"></i> Mínimo <strong>{{ $rango['min'] }}</strong> persona(s).
+                        </div>
+                    @endif
                     @error('personas')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -110,24 +119,23 @@
 
 <script src="https://js.stripe.com/v3/"></script>
 <script>
-    // ============================================
-    // VALIDACIÓN DE HORARIOS OCUPADOS
-    // ============================================
+    const nombreTarjeta = document.getElementById('nombre-tarjeta');
+nombreTarjeta.addEventListener('input', function() {
+    // Permite letras (incluyendo acentos, eñes), espacios, puntos, guiones
+    this.value = this.value.replace(/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s\.\-]/g, '');
+});
+    // Validación de horarios ocupados
     const horariosOcupados = @json($horariosOcupados ?? []);
-    
     function actualizarHorarios() {
         const fecha = document.getElementById('fecha_visita').value;
         const select = document.getElementById('horario_select');
         const aviso = document.getElementById('horario-aviso');
-        
         if (!fecha) {
             aviso.innerHTML = '';
             return;
         }
-        
         const ocupados = horariosOcupados[fecha] || [];
         let opcionSeleccionada = false;
-        
         Array.from(select.options).forEach(option => {
             if (option.value === '') return;
             if (ocupados.includes(option.value)) {
@@ -144,82 +152,46 @@
                 }
             }
         });
-        
         if (ocupados.length > 0) {
-            aviso.innerHTML = '<i class="bi bi-info-circle me-1"></i>Horarios ocupados: ' + ocupados.join(', ');
+            aviso.innerHTML = '<i class="bi bi-info-circle me-1"></i> Horarios ocupados: ' + ocupados.join(', ');
             aviso.style.color = '#dc3545';
         } else {
-            aviso.innerHTML = '<i class="bi bi-check-circle me-1"></i>Hay disponibilidad para esta fecha';
+            aviso.innerHTML = '<i class="bi bi-check-circle me-1"></i> Hay disponibilidad para esta fecha';
             aviso.style.color = '#198754';
         }
     }
-    
     document.getElementById('fecha_visita').addEventListener('change', actualizarHorarios);
-    
-    if (document.getElementById('fecha_visita').value) {
-        actualizarHorarios();
-    }
-    
-    // ============================================
-    // STRIPE - INICIALIZACIÓN CORREGIDA
-    // ============================================
+    if (document.getElementById('fecha_visita').value) actualizarHorarios();
+
+    // Stripe (inicialización correcta)
     document.addEventListener('DOMContentLoaded', function() {
-        const stripeKey = '{{ config('services.stripe.key') }}';
-        const stripe = Stripe(stripeKey);
+        const stripe = Stripe('{{ config('services.stripe.key') }}');
         const elements = stripe.elements();
-        
         const style = {
-            base: {
-                fontSize: '16px',
-                color: '#32325d',
-                '::placeholder': {
-                    color: '#aab7c4'
-                }
-            },
-            invalid: {
-                color: '#dc3545'
-            }
+            base: { fontSize: '16px', color: '#32325d', '::placeholder': { color: '#aab7c4' } },
+            invalid: { color: '#dc3545' }
         };
-        
-        const cardElement = elements.create('card', {
-            style: style,
-            hidePostalCode: true
-        });
-        
+        const cardElement = elements.create('card', { style, hidePostalCode: true });
         cardElement.mount('#card-element');
-        
         cardElement.on('change', ({ error }) => {
-            const errorElement = document.getElementById('card-errors');
-            if (error) {
-                errorElement.textContent = error.message;
-            } else {
-                errorElement.textContent = '';
-            }
+            document.getElementById('card-errors').textContent = error ? error.message : '';
         });
-        
         const form = document.getElementById('forma-pago');
         const btn = document.getElementById('btn-pagar');
         const nombreTarjeta = document.getElementById('nombre-tarjeta');
-        
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             if (!nombreTarjeta.value.trim()) {
                 document.getElementById('card-errors').textContent = 'Ingresa el nombre en la tarjeta';
                 return;
             }
-            
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Procesando...';
-            
             const { paymentMethod, error } = await stripe.createPaymentMethod({
                 type: 'card',
                 card: cardElement,
-                billing_details: {
-                    name: nombreTarjeta.value.trim()
-                }
+                billing_details: { name: nombreTarjeta.value.trim() }
             });
-            
             if (error) {
                 document.getElementById('card-errors').textContent = error.message;
                 btn.disabled = false;

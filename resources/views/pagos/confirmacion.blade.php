@@ -25,14 +25,7 @@
                     @php
                         $pago = DB::table('pago')
                             ->where('id_paquete', $paquete->id_paquete)
-                            ->where(
-                                'id_persona',
-                                auth()->user()
-                                    ? DB::table('persona')
-                                        ->where('id_usuario', auth()->id())
-                                        ->value('id_persona')
-                                    : null,
-                            )
+                            ->where('id_persona', auth()->user() ? DB::table('persona')->where('id_usuario', auth()->id())->value('id_persona') : null)
                             ->orderByDesc('fecha')
                             ->first();
                     @endphp

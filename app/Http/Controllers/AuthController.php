@@ -16,15 +16,15 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    public function showLogin()
-    {
-        return view('auth.login');
+    public function showLogin() 
+    { 
+        return view('auth.login'); 
     }
-
+    
     // ========== REGISTRO ADMIN DESTINOS ==========
-    public function showRegistroDestinos()
-    {
-        return view('auth.registro-destinos');
+    public function showRegistroDestinos() 
+    { 
+        return view('auth.registro-destinos'); 
     }
 
     public function registroDestinos(Request $request)
@@ -62,9 +62,7 @@ class AuthController extends Controller
 
             try {
                 Mail::to($usuario->correo)->send(new SolicitudPendienteMail($usuario));
-            } catch (\Exception $e) {
-                Log::warning("Mail error: " . $e->getMessage());
-            }
+            } catch (\Exception $e) { Log::warning("Mail error: " . $e->getMessage()); }
 
             return redirect()->route('registro.destinos.exito');
         } catch (\Exception $e) {
@@ -114,9 +112,7 @@ class AuthController extends Controller
 
             try {
                 Mail::to($usuario->correo)->send(new SolicitudPendienteMail($usuario));
-            } catch (\Exception $e) {
-                Log::warning("Mail error: " . $e->getMessage());
-            }
+            } catch (\Exception $e) { Log::warning("Mail error: " . $e->getMessage()); }
 
             return redirect()->route('registro.rutas.exito');
         } catch (\Exception $e) {
@@ -208,5 +204,23 @@ class AuthController extends Controller
         if ($rol === 'gestor_rutas') return redirect()->route('rutas.index');
 
         return redirect('/');
+    }
+
+    // ========== VERIFICAR CORREO ==========
+    public function verificarCorreo($token)
+    {
+        $usuario = Usuario::where('token_verificacion', $token)->first();
+        if (!$usuario) return redirect('/login')->with('error', 'Enlace inválido.');
+        $usuario->update(['correo_verificado' => 1, 'token_verificacion' => null]);
+        return redirect('/login')->with('ok', 'Correo verificado. Ahora un administrador revisará tu solicitud.');
+    }
+
+    // ========== LOGOUT ==========
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/login');
     }
 }

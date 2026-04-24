@@ -19,6 +19,31 @@ class PagoController extends Controller
         Stripe::setApiKey(config('services.stripe.secret'));
     }
 
+    // ==========================================
+    // Calcular rango permitido de personas para un paquete
+    // ==========================================
+    private function calcularRangoPersonasPaquete($idPaquete)
+    {
+        $actividades = DB::table('paquete_actividad')
+            ->where('id_paquete', $idPaquete)
+            ->select('minimo_personas', 'maximo_personas')
+            ->get();
+
+        if ($actividades->isEmpty()) {
+            return ['min' => 1, 'max' => 0]; // Sin límite superior
+        }
+
+        $minGlobal = $actividades->max('minimo_personas');
+        $maxGlobal = $actividades->min('maximo_personas');
+
+        // Si la configuración es inválida (min > max), asumimos solo mínimo
+        if ($maxGlobal > 0 && $minGlobal > $maxGlobal) {
+            return ['min' => $minGlobal, 'max' => 0];
+        }
+
+        return ['min' => $minGlobal, 'max' => $maxGlobal];
+    }
+
     // GET /paquetes/{id}/pagar
     public function show($id_paquete)
     {
@@ -33,18 +58,19 @@ class PagoController extends Controller
             ->where('id_destino', $paquete->id_destino)
             ->first();
 
-        // Obtener horarios ocupados para este paquete
+        // Horarios ocupados
         $horariosOcupados = DB::table('pago')
             ->where('id_paquete', $id_paquete)
             ->where('estado', 'completado')
             ->select('fecha_visita', 'horario')
             ->get()
             ->groupBy('fecha_visita')
-            ->map(function ($items) {
-                return $items->pluck('horario')->toArray();
-            });
+            ->map(fn($items) => $items->pluck('horario')->toArray());
 
-        return view('pagos.checkout', compact('paquete', 'destino', 'horariosOcupados'));
+        // Rango permitido de personas
+        $rango = $this->calcularRangoPersonasPaquete($id_paquete);
+
+        return view('pagos.checkout', compact('paquete', 'destino', 'horariosOcupados', 'rango'));
     }
 
     // POST /paquetes/{id}/pagar
@@ -57,21 +83,25 @@ class PagoController extends Controller
 
         if (!$paquete) abort(404);
 
+        // Validaciones básicas
         $request->validate([
             'fecha_visita' => 'required|date|after:today',
             'personas'     => 'required|integer|min:1',
             'horario'      => 'required|string',
-        ], [
-            'fecha_visita.required' => 'La fecha de visita es obligatoria.',
-            'fecha_visita.after'    => 'La fecha de visita debe ser a partir de mañana.',
-            'personas.required'     => 'El número de personas es obligatorio.',
-            'personas.min'          => 'El mínimo de personas es 1.',
-            'horario.required'      => 'El horario es obligatorio.',
         ]);
 
-        // ============================================
-        // VALIDAR DISPONIBILIDAD DE FECHA Y HORARIO
-        // ============================================
+        // 1. Validar rango de personas según actividades del paquete
+        $rango = $this->calcularRangoPersonasPaquete($id_paquete);
+        $personas = $request->personas;
+
+        if ($personas < $rango['min']) {
+            return back()->with('error', "El número mínimo de personas para este paquete es {$rango['min']}.")->withInput();
+        }
+        if ($rango['max'] > 0 && $personas > $rango['max']) {
+            return back()->with('error', "El número máximo de personas para este paquete es {$rango['max']}.")->withInput();
+        }
+
+        // 2. Validar disponibilidad de fecha y horario
         $fecha_visita = $request->fecha_visita;
         $horario = $request->horario;
 
@@ -114,7 +144,7 @@ class PagoController extends Controller
                 'id_persona'            => $persona->id_persona,
                 'id_paquete'            => $paquete->id_paquete,
                 'id_destino'            => $paquete->id_destino,
-                'personas'              => $request->personas,
+                'personas'              => $personas,
                 'fecha_visita'          => $fecha_visita,
                 'horario'               => $horario,
                 'stripe_payment_intent' => $intent->id,
@@ -128,81 +158,38 @@ class PagoController extends Controller
                 $pago    = DB::table('pago')->where('id_pago', $id_pago)->first();
                 $destino = DB::table('destino')->where('id_destino', $paquete->id_destino)->first();
 
-                // ============================================
-                // LOGS PARA DEPURAR
-                // ============================================
-                \Log::info('=== INICIO NOTIFICACIONES PAGO ===');
-                \Log::info('Token del turista (usuario logueado): ' . ($user->fcm_token ?? 'NULL'));
-                \Log::info('ID Usuario turista: ' . $user->id_usuario);
-
                 // Correo al turista
                 $correoTurista = DB::table('usuario')
                     ->where('id_usuario', $user->id_usuario)
                     ->value('correo');
+                Mail::to($correoTurista)->send(new ConfirmacionPagoTurista($pago, $paquete, $destino, $persona));
 
-                Mail::to($correoTurista)
-                    ->send(new ConfirmacionPagoTurista($pago, $paquete, $destino, $persona));
-
-                // ============================================
-                // NOTIFICACIÓN PARA EL TURISTA (NUEVO)
-                // ============================================
+                // Notificación FCM al turista
                 if ($user->fcm_token) {
-                    \Log::info('Enviando notificación al turista...');
                     $this->enviarNotificacionFCM(
                         $user->fcm_token,
                         '🎉 Pago exitoso',
                         "Has adquirido el paquete {$paquete->nombre} para {$destino->nombre} el {$fecha_visita} a las {$horario}",
-                        [
-                            'id_pago'    => (string) $id_pago,
-                            'id_destino' => (string) $destino->id_destino,
-                            'tipo'       => 'pago_turista',
-                        ]
+                        ['id_pago' => (string) $id_pago, 'id_destino' => (string) $destino->id_destino, 'tipo' => 'pago_turista']
                     );
-                } else {
-                    \Log::info('El turista NO tiene token FCM guardado');
                 }
 
-                // ============================================
-                // NOTIFICACIÓN PARA EL ADMIN
-                // ============================================
-                // Obtener creador del destino
-                $creadorDestino = DB::table('persona')
-                    ->where('id_persona', $destino->creado_por)
-                    ->first();
-
+                // Notificar al admin dueño del destino
+                $creadorDestino = DB::table('persona')->where('id_persona', $destino->creado_por)->first();
                 if ($creadorDestino) {
-                    $usuarioAdmin = DB::table('usuario')
-                        ->where('id_usuario', $creadorDestino->id_usuario)
-                        ->first();
-
+                    $usuarioAdmin = DB::table('usuario')->where('id_usuario', $creadorDestino->id_usuario)->first();
                     if ($usuarioAdmin) {
-                        \Log::info('Token del admin: ' . ($usuarioAdmin->fcm_token ?? 'NULL'));
-                        \Log::info('ID Usuario admin: ' . $usuarioAdmin->id_usuario);
-
-                        // Correo al admin dueño del destino
-                        Mail::to($usuarioAdmin->correo)
-                            ->send(new NotificacionPagoAdmin($pago, $paquete, $destino, $persona));
-
-                        // Notificación FCM al admin
+                        Mail::to($usuarioAdmin->correo)->send(new NotificacionPagoAdmin($pago, $paquete, $destino, $persona));
                         if ($usuarioAdmin->fcm_token) {
-                            \Log::info('Enviando notificación al admin...');
                             $this->enviarNotificacionFCM(
                                 $usuarioAdmin->fcm_token,
                                 '💰 Nuevo pago recibido',
                                 "{$persona->nombre} {$persona->apellidos} adquirió el paquete {$paquete->nombre} de {$destino->nombre} para el {$fecha_visita} a las {$horario}",
-                                [
-                                    'id_pago'    => (string) $id_pago,
-                                    'id_destino' => (string) $destino->id_destino,
-                                    'tipo'       => 'pago_admin',
-                                ]
+                                ['id_pago' => (string) $id_pago, 'id_destino' => (string) $destino->id_destino, 'tipo' => 'pago_admin']
                             );
-                        } else {
-                            \Log::info('El admin NO tiene token FCM guardado');
                         }
                     }
                 }
-
-                \Log::info('=== FIN NOTIFICACIONES PAGO ===');
 
                 return redirect()->route('pagos.confirmacion', $id_paquete)
                     ->with('success', '¡Pago realizado con éxito!');
@@ -226,23 +213,20 @@ class PagoController extends Controller
         return view('pagos.confirmacion', compact('paquete', 'destino'));
     }
 
-    // Enviar notificación FCM
+    // Enviar notificación FCM (mismo código)
     private function enviarNotificacionFCM(string $token, string $titulo, string $cuerpo, array $data = [])
     {
         try {
             $factory   = (new Factory)->withServiceAccount(config('services.firebase.credentials'));
             $messaging = $factory->createMessaging();
-
             $message = CloudMessage::fromArray([
                 'token'        => $token,
                 'notification' => ['title' => $titulo, 'body' => $cuerpo],
                 'data'         => $data,
             ]);
-
             $messaging->send($message);
-            \Log::info('✅ Notificación FCM enviada correctamente a: ' . substr($token, 0, 20) . '...');
         } catch (\Exception $e) {
-            \Log::error('❌ Error FCM: ' . $e->getMessage());
+            \Log::error('Error FCM: ' . $e->getMessage());
         }
     }
 }
