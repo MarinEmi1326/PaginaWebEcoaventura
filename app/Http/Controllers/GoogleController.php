@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use Laravel\Socialite\Facades\Socialite;
 use App\Models\Usuario;
-use App\Models\Turista;
+use App\Models\Persona;
+use App\Models\Rol;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
@@ -21,36 +22,53 @@ class GoogleController extends Controller
         $usuario = Usuario::where('correo', $googleUser->getEmail())->first();
 
         if (!$usuario) {
-            // No existe → crear como turista
+            // ============================================
+            // CREAR NUEVO USUARIO (NUEVA ESTRUCTURA)
+            // ============================================
             $usuario = Usuario::create([
                 'correo'      => $googleUser->getEmail(),
                 'google_id'   => $googleUser->getId(),
                 'foto_perfil' => $googleUser->getAvatar(),
                 'password'    => bcrypt(Str::random(24)),
-                'rol'         => 'turista',
                 'activo'      => true,
                 'estado'      => 'aprobado',
-                'correo_verificado'  => 1,
+                'correo_verificado' => 1,
+                'fecha_solicitud' => now(),
+                'fecha_respuesta' => now(),
             ]);
 
-            Turista::create([
-                'nombre'     => $googleUser->user['given_name'] ?? 'Sin nombre',
-                'apaterno'   => $googleUser->user['family_name'] ?? 'Sin apellido',
+            // Crear persona
+            $nombre = $googleUser->user['given_name'] ?? 'Sin nombre';
+            $apellidos = $googleUser->user['family_name'] ?? 'Sin apellido';
+            
+            $persona = Persona::create([
                 'id_usuario' => $usuario->id_usuario,
+                'nombre'     => $nombre,
+                'apellidos'  => $apellidos,
+                'telefono'   => null,
             ]);
+
+            // Asignar rol TURISTA
+            $rolTurista = Rol::where('descripcion', 'turista')->first();
+            if ($rolTurista) {
+                $persona->roles()->attach($rolTurista->id_rol);
+            }
+
         } else {
-            // Ya existe → verificar estado
+            // ============================================
+            // USUARIO YA EXISTE (NUEVA ESTRUCTURA)
+            // ============================================
             if ($usuario->estado === 'pendiente') {
-                return redirect('/login')->with('error', 'Tu cuenta aún no ha sido aprobada por el administrador.');
+                return redirect('/login')->with('error', 'Tu cuenta aún no ha sido aprobada.');
             }
             if ($usuario->estado === 'rechazado') {
-                return redirect('/login')->with('error', 'Tu cuenta fue rechazada. Contacta al administrador.');
+                return redirect('/login')->with('error', 'Tu cuenta fue rechazada.');
             }
             if (!$usuario->activo) {
                 return redirect('/login')->with('error', 'Tu cuenta está desactivada.');
             }
 
-            // Actualizar google_id si aún no lo tenía
+            // Actualizar google_id y foto
             $usuario->update([
                 'google_id'   => $googleUser->getId(),
                 'foto_perfil' => $googleUser->getAvatar(),
@@ -59,12 +77,25 @@ class GoogleController extends Controller
 
         Auth::login($usuario);
 
-        // Redirigir según rol
-        return match ($usuario->rol) {
-            'admin_general'  => redirect('/admin/index'),
-            'admin_destinos' => redirect()->route('misdestinos.index'),
-            'gestor_rutas' => redirect()->route('rutas.index'),
-            'turista'        => redirect('/'),
-        };
+        // ============================================
+        // REDIRIGIR SEGÚN ROL (desde persona_rol)
+        // ============================================
+        $persona = $usuario->persona;
+        $roles = $persona?->roles->pluck('descripcion')->toArray() ?? [];
+
+        if (in_array('admin_general', $roles)) {
+            return redirect()->route('admin.index');
+        }
+        if (in_array('admin_destinos', $roles)) {
+            return redirect()->route('misdestinos.index');
+        }
+        if (in_array('gestor_rutas', $roles)) {
+            return redirect()->route('rutas.index');
+        }
+        if (in_array('turista', $roles)) {
+            return redirect('/');
+        }
+
+        return redirect('/login')->with('error', 'Rol no reconocido');
     }
 }
